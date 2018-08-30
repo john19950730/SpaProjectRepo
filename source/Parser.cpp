@@ -10,7 +10,7 @@ using namespace std;
 #include "PKB.h"
 #include "TNode.h"
 
-int Parse () {
+int Parse (string b) {
 
 	return 0;
 }
