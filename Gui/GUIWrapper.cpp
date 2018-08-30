@@ -1,6 +1,7 @@
 #include "GUIWrapper.h"
 
 #include <iostream>
+#include <vector>
 
 // a default constructor
 GUIWrapper::GUIWrapper() {
@@ -19,6 +20,20 @@ void GUIWrapper::parseFromCode(std::string code) {
 	// call your parser to do the parsing
 	std::cout << "parsed from code editor " << code;
 	// ...rest of your code...
+	//std::cout << "line num1 " << code[0];
+	int start = 0;
+	int lineCount = 0;
+	std::vector<std::string> line;
+	for (int i = 0; i < code.length(); i++) {
+		if (code[i] == '\n') {
+			int length = i + 1;
+			std::string subString = code.substr(start, length-start);
+			line.push_back(subString);
+			std::cout << lineCount+1 << " line is: " << line.at(lineCount);
+			lineCount++;
+			start = length;
+		}
+	}
 }
 
 // method to evaluating a query
