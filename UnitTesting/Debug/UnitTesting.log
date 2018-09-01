@@ -1,5 +1,0 @@
-﻿  stdafx.cpp
-  TestAST.cpp
-d:\schooldrive\official\unittesting\testast.cpp(15): warning C4101: 'T': unreferenced local variable
-     Creating library D:\SchoolDrive\Official\Debug\UnitTesting.lib and object D:\SchoolDrive\Official\Debug\UnitTesting.exp
-  UnitTesting.vcxproj -> D:\SchoolDrive\Official\Debug\UnitTesting.dll
