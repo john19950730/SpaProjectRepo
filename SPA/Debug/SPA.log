@@ -1,6 +1,3 @@
-﻿  DesignExtractor.cpp
-  Parser.cpp
-  PKB.cpp
-  TNode.cpp
-  Generating Code...
-  SPA.vcxproj -> D:\SchoolDrive\Test3203\StartupSPASolution\Debug\SPA.lib
+﻿  CodeParser.cpp
+\\mac\home\documents\spaprojectrepo\source\codeparser.cpp(20): warning C4018: '<': signed/unsigned mismatch
+  SPA.vcxproj -> \\Mac\Home\Documents\SpaProjectRepo\Debug\SPA.lib
