@@ -41,6 +41,8 @@ void MainWindow::btnLoad_clicked() {
 void MainWindow::btnRun_clicked() {
 	std::list<std::string> results;
 	wrapper->evaluate(ui->txtQuery->toPlainText().toStdString(),results);
+	wrapper->parseFromCode(ui->txtCodeEditor->toPlainText().toStdString());
+	//std::cout << ui->txtCodeEditor->toPlainText().toStdString();
 	QString result_str;
 
 	for (auto const& result : results) {
