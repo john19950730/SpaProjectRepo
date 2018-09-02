@@ -1,6 +1,6 @@
-﻿  DesignExtractor.cpp
-  Parser.cpp
+﻿  TNode.cpp
   PKB.cpp
-  TNode.cpp
-  Generating Code...
-  SPA.vcxproj -> D:\SchoolDrive\Test3203\StartupSPASolution\Debug\SPA.lib
+  Parser.cpp
+  DesignExtractor.cpp
+  正在產生程式碼...
+  SPA.vcxproj -> C:\Users\CY\Downloads\VS2017_StartupSPASolution\StartupSPASolution\Debug\SPA.lib
