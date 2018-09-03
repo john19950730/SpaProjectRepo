@@ -14,14 +14,13 @@ class VarTable;  // no need to #include "VarTable.h" as all I need is pointer
 
 class PKB {
 public:
-	static VarTable* varTable; 
 	static int setProcToAST(PROC p, TNode* r);
 	static TNode* getRootAST (PROC p);
 
-	static int addVariable(string varName, VarTable *varTable);
-	static int newProgram(string progName);
-	static int newProcedure(string procName);
-	static int addAssignment(string procName);
+	static int addVariable(string varName);
+	static void newProgram(string progName);
+	static void newProcedure(string procName);
+	static void addAssignment(string variableName, int immediate);
 
 	static bool setModifies(int stmtNo, string varName);
 
