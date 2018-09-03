@@ -17,6 +17,7 @@ public:
 	EntityAliasTable();
 
 	int insertEntityAlias(vector<string> entityAliasVector);
+	string getEntityTypeFromAlias(string aliasName);
 	vector<EntityAliasInfo> getTableData();
 
 private:

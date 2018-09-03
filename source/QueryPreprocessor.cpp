@@ -24,13 +24,23 @@ bool QueryPreprocessor::buildQueryTree(vector<string> querySubstatements) {
 			entityAliasTable.insertEntityAlias(wordsInQuerySubstatement);
 		if (wordsInQuerySubstatement[0] == "select") {
 			// build tree
+			// iterate through "select" substatement
+			vector<string>::iterator it = wordsInQuerySubstatement.begin();
+			std::advance(it, 1);
+			while (it != wordsInQuerySubstatement.end()) {
+				if (entityAliasTable.getEntityTypeFromAlias(*it) != "") // found
+					cout << endl;
+					cout << entityAliasTable.getEntityTypeFromAlias(*it) << endl;
+				++it;
+			}
 		}
 	}
 
-	vector<EntityAliasInfo> table = entityAliasTable.getTableData();
+	// Print table
+	/*vector<EntityAliasInfo> table = entityAliasTable.getTableData();
 	for (EntityAliasInfo info : table) {
 		cout << info.aliasName + ":" + info.entityType << endl;
-	}
+	}*/
 	return false;
 }
 
