@@ -26,6 +26,21 @@ int PKB::addVariable(string varName, VarTable *varTable)
 	return ++varTableIndex;
 }
 
+int PKB::newProgram(string progName)
+{
+	return 0;
+}
+
+int PKB::newProcedure(string procName)
+{
+	return 0;
+}
+
+int PKB::addAssignment(string procName)
+{
+	return 0;
+}
+
 bool PKB::setModifies(int stmtNo, string varName)
 {
 	return false;
