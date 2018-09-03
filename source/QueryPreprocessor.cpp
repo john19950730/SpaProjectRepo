@@ -4,16 +4,18 @@
 
 #include "QueryPreprocessor.h"
 #include "EntityAliasTable.h"
+#include "QueryTree.h"
+#include "QueryNode.h"
 
-bool QueryPreprocessor::parseQuery(string query)
+QueryTree* QueryPreprocessor::parseQuery(string query)
 {
 	vector<string> querySubstatements = splitByDelimiter(query, ";");
-	buildQueryTree(querySubstatements);
-	return false;
+	return buildQueryTree(querySubstatements);
 }
 
-bool QueryPreprocessor::buildQueryTree(vector<string> querySubstatements) {
+QueryTree* QueryPreprocessor::buildQueryTree(vector<string> querySubstatements) {
 	EntityAliasTable entityAliasTable;
+	QueryTree *queryTree = new QueryTree(new QueryNode("queryRoot"));
 
 	for (string substatement : querySubstatements) {
 		// further splits query substatements into words
@@ -28,9 +30,15 @@ bool QueryPreprocessor::buildQueryTree(vector<string> querySubstatements) {
 			vector<string>::iterator it = wordsInQuerySubstatement.begin();
 			std::advance(it, 1);
 			while (it != wordsInQuerySubstatement.end()) {
-				if (entityAliasTable.getEntityTypeFromAlias(*it) != "") // found
+				if (entityAliasTable.getEntityTypeFromAlias(*it) != "") { // found
 					cout << endl;
 					cout << entityAliasTable.getEntityTypeFromAlias(*it) << endl;
+					
+					// creating a new result query node
+					string elementInNode = entityAliasTable.getEntityTypeFromAlias(*it) + ":" + *it;
+					QueryNode *resultNode = new QueryNode(elementInNode);
+					queryTree->addResultNode(resultNode);
+				}
 				++it;
 			}
 		}
@@ -41,7 +49,7 @@ bool QueryPreprocessor::buildQueryTree(vector<string> querySubstatements) {
 	for (EntityAliasInfo info : table) {
 		cout << info.aliasName + ":" + info.entityType << endl;
 	}*/
-	return false;
+	return queryTree;
 }
 
 vector<string> QueryPreprocessor::splitByDelimiter(string s, string delimiter)
