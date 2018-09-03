@@ -14,12 +14,16 @@
     <ClCompile Include="..\source\DesignExtractor.cpp" />
     <ClCompile Include="..\source\CodeParser.cpp" />
     <ClCompile Include="..\source\PKB.cpp" />
+    <ClCompile Include="..\source\QueryNode.cpp" />
+    <ClCompile Include="..\source\QueryTree.cpp" />
     <ClCompile Include="..\source\TNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\CodeParser.h" />
     <ClInclude Include="..\source\Keywords.h" />
     <ClInclude Include="..\source\PKB.h" />
+    <ClInclude Include="..\source\QueryNode.h" />
+    <ClInclude Include="..\source\QueryTree.h" />
     <ClInclude Include="..\source\TNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
