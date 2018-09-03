@@ -6,13 +6,19 @@
 #include <vector>
 
 using namespace std;
-typedef short PROC;
 
-class RefTable;
+class EntityAliasTable;
 
 class QueryPreprocessor {
 public:
-	static RefTable* varTable;
-	static bool validateQuery(std::string query);
+	static EntityAliasTable entityAliasTable;
+	static bool parseQuery(string query);
 
+private:
+	static bool buildQueryTree(vector<string> queryParts);
+	
+	static std::vector<std::string> splitByDelimiter(string s, string delimiter);
+	static inline void ltrim(string &s);
+	static inline void rtrim(std::string &s);
+	static inline std::string trim_copy(string s);
 };
