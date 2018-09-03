@@ -1,4 +1,5 @@
 #include "GUIWrapper.h"
+#include "QueryPreprocessor.h"
 #include "CodeParser.h"
 
 #include <iostream>
@@ -29,6 +30,7 @@ void GUIWrapper::evaluate(std::string query, std::list<std::string>& results){
 // call your evaluator to evaluate the query here
   // ...code to evaluate query...
 
+	QueryPreprocessor::parseQuery(query);
 	std::cout << "query=  " << query << std::endl;
 	results.push_back(query + "\nQuery result: hello ...");
   // store the answers to the query in the results list (it is initially empty)
