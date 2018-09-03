@@ -1,7 +1,9 @@
 #include "GUIWrapper.h"
 #include "QueryPreprocessor.h"
+#include "CodeParser.h"
 
 #include <iostream>
+#include <vector>
 
 // a default constructor
 GUIWrapper::GUIWrapper() {
@@ -15,6 +17,13 @@ void GUIWrapper::parse(std::string filename) {
 	std::cout << "parsed " << filename << std::endl;
   // ...rest of your code...
 }
+//from code editor
+void GUIWrapper::parseFromCode(std::string code) {
+	// call your parser to do the parsing
+	std::cout << "parsed from code editor " << code;
+	// ...rest of your code...
+	CodeParser::parse(code);
+}
 
 // method to evaluating a query
 void GUIWrapper::evaluate(std::string query, std::list<std::string>& results){
@@ -23,7 +32,7 @@ void GUIWrapper::evaluate(std::string query, std::list<std::string>& results){
 
 	QueryPreprocessor::parseQuery(query);
 	std::cout << "query=  " << query << std::endl;
-	results.push_back(query + "\nQuery result: ...");
+	results.push_back(query + "\nQuery result: hello ...");
   // store the answers to the query in the results list (it is initially empty)
   // each result must be a string.
 }
