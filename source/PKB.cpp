@@ -16,18 +16,6 @@ static string varTable[100];
 
 static int lineNumber;
 
-static TNode* root;
-static TNode* nextProc;
-static TNode* nextStmt;
-
-int PKB::setProcToAST(PROC p, TNode* r) {
-	return NULL;
-}
-
-TNode* PKB::getRootAST (PROC p){
-	return NULL;
-}
-
 int PKB::addVariable(string varName)
 {
 	*(varTable + varTableIndex) = varName;

@@ -14,9 +14,6 @@ class VarTable;  // no need to #include "VarTable.h" as all I need is pointer
 
 class PKB {
 public:
-	static int setProcToAST(PROC p, TNode* r);
-	static TNode* getRootAST (PROC p);
-
 	static int addVariable(string varName);
 	static void newProgram(string progName);
 	static void newProcedure(string procName);
