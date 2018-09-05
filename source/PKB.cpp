@@ -14,47 +14,45 @@ static int varTableIndex = 0;
 static int varTableCapacity = 100;
 static string varTable[100];
 
-static int lineNumber;
-
 int PKB::addVariable(string varName)
 {
 	*(varTable + varTableIndex) = varName;
 	return ++varTableIndex;
 }
 
-void PKB::newProgram(string progName)
+int PKB::addAssign(string variableName)
 {
-	root = &TNode("program", progName);
-	nextProc = root->left = &TNode("procList", "");
-	root->left->parent = root;
+	return 0;
 }
 
-void PKB::newProcedure(string procName)
+void PKB::addFollows(int stmtBefore, int stmtAfter)
 {
-	TNode* proc = &TNode("procedure", procName);
-	nextProc->left = proc;
-	proc->parent = nextProc;
-	nextProc = nextProc->right = &TNode("", "");
-
-	nextStmt = proc->left = &TNode("stmtList", "");
 }
 
-void PKB::addAssignment(string variableName, int immediate)
+void PKB::addParent(int stmtParent, int stmtChild)
 {
-	TNode* stmt = &TNode("assignment", ++lineNumber + "");
-	stmt->left = &TNode("variable", variableName);
-	stmt->right = &TNode("expression", immediate + "");
-
-	nextStmt->left = stmt;
-	nextStmt = nextStmt->right = &TNode("", "");
 }
 
-bool PKB::setModifies(int stmtNo, string varName)
+void PKB::addUses(int stmtNo, string varName)
+{
+}
+
+void PKB::addModifies(int stmtNo, string varName)
+{
+
+}
+
+bool PKB::isFollows(int stmtNo1, int stmtNo2)
 {
 	return false;
 }
 
-bool PKB::isFollows(int stmtNo1, int stmtNo2)
+bool PKB::isParent(int stmtNo1, int stmtNo2)
+{
+	return false;
+}
+
+bool PKB::isUses(int stmtNo1, string varName)
 {
 	return false;
 }
@@ -64,7 +62,12 @@ bool PKB::isModifies(int stmtNo1, string varName)
 	return false;
 }
 
-int * PKB::getAssignmentStmts()
+string * PKB::getVariables()
+{
+	return nullptr;
+}
+
+int * PKB::getAssigns()
 {
 	static int dummy[] { 0 } ;
 	return dummy;
