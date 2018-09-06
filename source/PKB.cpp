@@ -10,23 +10,32 @@ using namespace std;
 #include "PKB.h"
 #include "TNode.h"
 
-static int varTableIndex = 0;
-static int varTableCapacity = 100;
-static string varTable[100];
+static vector<string> varList;
+static int varListIndex = 0;
+static vector<int> assignList;
+static int assignListIndex = 0;
+
+static TNode<int> **followsList;
+static vector< vector<bool> > followsStarTable;
+static TNode<int> **parentList;
+static vector< vector<bool> > parentTable;
+
 
 int PKB::addVariable(string varName)
 {
-	*(varTable + varTableIndex) = varName;
-	return ++varTableIndex;
+	varList.push_back(varName);
+	return varListIndex++;
 }
 
-int PKB::addAssign(string variableName)
+int PKB::addAssign(int stmtNo)
 {
-	return 0;
+	assignList.push_back(stmtNo);
+	return assignListIndex++;
 }
 
 void PKB::addFollows(int stmtBefore, int stmtAfter)
 {
+
 }
 
 void PKB::addParent(int stmtParent, int stmtChild)
@@ -42,12 +51,12 @@ void PKB::addModifies(int stmtNo, string varName)
 
 }
 
-bool PKB::isFollows(int stmtNo1, int stmtNo2)
+bool PKB::isFollows(int stmtNo1, int stmtNo2, bool star)
 {
 	return false;
 }
 
-bool PKB::isParent(int stmtNo1, int stmtNo2)
+bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
 	return false;
 }
@@ -62,13 +71,12 @@ bool PKB::isModifies(int stmtNo1, string varName)
 	return false;
 }
 
-string * PKB::getVariables()
+vector<string> PKB::getVariables()
 {
-	return nullptr;
+	return varList;
 }
 
-int * PKB::getAssigns()
+vector<int> PKB::getAssigns()
 {
-	static int dummy[] { 0 } ;
-	return dummy;
+	return assignList;
 }
