@@ -18,12 +18,19 @@ static int assignListIndex = 0;
 
 // element at index i means Follows(i, element) holds
 static vector<int> followsList;
+// element at index i, j means Follows*(i, j) holds
 static vector< vector<bool> > followsStarTable;
 
 // element at index i means Parent(element, i) holds
 static vector<int> parentList;
+// element at index i, j means Parent*(i, j) holds
 static vector< vector<bool> > parentStarTable;
 
+// array at index i of usesTable[i] contains list of variables v where Uses(i, v) holds
+static vector< vector<string> > usesTable;
+
+// array at index i of modifiesTable[i] contains list of variables v where Modifies(i, v) holds
+static vector< vector<string> > modifiesTable;
 
 int PKB::addVariable(string varName)
 {
@@ -51,11 +58,12 @@ void PKB::addParent(int stmtParent, int stmtChild)
 
 void PKB::addUses(int stmtNo, string varName)
 {
+	usesTable[stmtNo].push_back(varName);
 }
 
 void PKB::addModifies(int stmtNo, string varName)
 {
-
+	modifiesTable[stmtNo].push_back(varName);
 }
 
 bool PKB::isFollows(int stmtNo1, int stmtNo2, bool star)
@@ -80,12 +88,12 @@ bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 
 bool PKB::isUses(int stmtNo1, string varName)
 {
-	return false;
+	return find(usesTable[stmtNo1].begin(), usesTable[stmtNo1].end(), varName) != usesTable[stmtNo1].end();
 }
 
 bool PKB::isModifies(int stmtNo1, string varName)
 {
-	return false;
+	return find(modifiesTable[stmtNo1].begin(), modifiesTable[stmtNo1].end(), varName) != modifiesTable[stmtNo1].end();
 }
 
 vector<string> PKB::getVariables()
