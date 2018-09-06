@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 using namespace std;
 
@@ -15,10 +16,13 @@ static int varListIndex = 0;
 static vector<int> assignList;
 static int assignListIndex = 0;
 
-static TNode<int> **followsList;
+// element at index i means Follows(i, element) holds
+static vector<int> followsList;
 static vector< vector<bool> > followsStarTable;
-static TNode<int> **parentList;
-static vector< vector<bool> > parentTable;
+
+// element at index i means Parent(element, i) holds
+static vector<int> parentList;
+static vector< vector<bool> > parentStarTable;
 
 
 int PKB::addVariable(string varName)
@@ -35,11 +39,14 @@ int PKB::addAssign(int stmtNo)
 
 void PKB::addFollows(int stmtBefore, int stmtAfter)
 {
-
+	//TODO: implementation for storing follows* relation
+	followsList[stmtBefore] = stmtAfter;
 }
 
 void PKB::addParent(int stmtParent, int stmtChild)
 {
+	//TODO: implementation for storing parent* relation
+	parentList[stmtChild] = stmtParent;
 }
 
 void PKB::addUses(int stmtNo, string varName)
@@ -53,12 +60,22 @@ void PKB::addModifies(int stmtNo, string varName)
 
 bool PKB::isFollows(int stmtNo1, int stmtNo2, bool star)
 {
-	return false;
+	if (!star) {
+		return followsList[stmtNo1] == stmtNo2;
+	}
+	else {
+		return followsStarTable[stmtNo1][stmtNo2];
+	}
 }
 
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
-	return false;
+	if (!star) {
+		return parentList[stmtNo2] == stmtNo1;
+	}
+	else {
+		return parentStarTable[stmtNo1][stmtNo2];
+	}
 }
 
 bool PKB::isUses(int stmtNo1, string varName)
