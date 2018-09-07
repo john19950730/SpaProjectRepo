@@ -46,8 +46,18 @@ int PKB::addAssign(int stmtNo)
 
 void PKB::addFollows(int stmtBefore, int stmtAfter)
 {
-	//TODO: implementation for storing follows* relation
 	followsList[stmtBefore] = stmtAfter;
+
+	followsStarTable[stmtBefore][stmtAfter] = true;
+	followsStarTable[stmtBefore][stmtBefore] = false;
+	followsStarTable[stmtAfter][stmtAfter] = false;
+	int i;
+	for (i = 1; i <= stmtBefore; ++i) {
+		followsStarTable[i][stmtAfter] = followsStarTable[i][stmtBefore];
+	}
+	for (i = stmtAfter + 1; i <= followsStarTable[stmtBefore].size(); ++i) {
+		followsStarTable[stmtBefore][i] = followsStarTable[stmtBefore][i];
+	}
 }
 
 void PKB::addParent(int stmtParent, int stmtChild)
