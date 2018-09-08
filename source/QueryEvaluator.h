@@ -1,10 +1,10 @@
 #pragma once
-#include "QueryTree.h"
+#include "QueryObject.h"
 
 using namespace std;
 
 class QueryEvaluator {
 private:
 public:
-	static string evaluateQueryTree(QueryTree *queryTree);
+	static string evaluateQueryObject(QueryObject *queryObject);
 };

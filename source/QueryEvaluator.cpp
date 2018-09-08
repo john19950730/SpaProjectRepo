@@ -1,22 +1,23 @@
 #include "QueryEvaluator.h"
+#include "Keywords.h"
 
 #include <iostream>
 
 using namespace std;
+using namespace keywords::query;
 
-string QueryEvaluator::evaluateQueryTree(QueryTree *queryTree) {
-	// logic for evaluating query tree here
-	// calling of pkb's api here
+string QueryEvaluator::evaluateQueryObject(QueryObject *queryObject) {
+	SELECT_VAR_CLAUSE *selectClause = queryObject->getSelectClause();
+	string varName = selectClause->variableName;
+	string varType = selectClause->variableType;
 
-	// trasversing query tree - for debugging purpose only pls comment out after debugging
-	cout << "===========" << endl;
-	cout << "Query Tree" << endl;
-	QueryNode *ptr = queryTree->getRoot();
-	while (ptr != NULL) {
-		cout << ptr->getElement() << endl;
-		ptr = ptr->getNext();
+	// Return results immediately if there are no clauses
+	if (!queryObject->hasClauses()) {
+		if (varType == ASSIGNMENT_VAR) return "allAssignmentStmts";
+		else if (varType == VARIABLE_VAR) return "allVariableStmts";
+		else if (varType == STMT_VAR) return "allStmts";
+		else if (varType == PROC_VAR) return "allProcedures";
 	}
-	cout << "===========" << endl;
 
-	return "result is result";
+	return "";
 }
