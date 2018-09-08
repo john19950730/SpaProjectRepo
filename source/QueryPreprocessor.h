@@ -1,9 +1,9 @@
 #pragma once
-#include<stdio.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include <iterator>
+#include <map>
 
 using namespace std;
 
@@ -12,10 +12,9 @@ public:
 	static bool parseQuery(string query);
 
 private:
+	map<string, string> entityAliases;
+
+	static bool isValidStatement(string substatement);
 	static bool buildQueryObject(vector<string> queryParts);
-	
-	static std::vector<std::string> splitByDelimiter(string s, string delimiter);
-	static inline void ltrim(string &s);
-	static inline void rtrim(std::string &s);
-	static inline std::string trim_copy(string s);
+
 };

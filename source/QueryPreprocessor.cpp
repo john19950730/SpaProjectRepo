@@ -1,50 +1,49 @@
-#include <algorithm> 
-#include <cctype>
-#include <locale>
-
 #include "QueryPreprocessor.h"
+#include "Utility.h"
+#include "Keywords.h"
 
 bool QueryPreprocessor::parseQuery(string query)
 {
-	vector<string> querySubstatements = splitByDelimiter(query, ";");
-	return false;
-}
-
-bool QueryPreprocessor::buildQueryObject(vector<string> querySubstatements) {	
-	return false;
-}
-
-vector<string> QueryPreprocessor::splitByDelimiter(string s, string delimiter)
-{
-	size_t pos = 0;
-	string token;
-	vector<string> vector = {};
-	while ((pos = s.find(delimiter)) != string::npos) {
-		token = s.substr(0, pos);
-		vector.push_back(trim_copy(token));
-		s.erase(0, pos + delimiter.length());
+	vector<string> queryStatements = Utility::splitByDelimiter(query, ";");
+	for (size_t i = 0; i < queryStatements.size(); i++) {
+		cout << queryStatements[i] << endl;
+		cout << isValidStatement(queryStatements[i]) << endl;
 	}
-	vector.push_back(trim_copy(s));
-	return vector;
+	return false;
 }
 
-// trim from start (in place)
-void QueryPreprocessor::ltrim(string &s) {
-	s.erase(s.begin(), find_if(s.begin(), s.end(), [](int ch) {
-		return !isspace(ch);
-	}));
+bool QueryPreprocessor::buildQueryObject(vector<string> queryStatements) {	
+	return false;
 }
 
-// trim from end (in place)
-void QueryPreprocessor::rtrim(string &s) {
-	s.erase(find_if(s.rbegin(), s.rend(), [](int ch) {
-		return !isspace(ch);
-	}).base(), s.end());
-}
+bool QueryPreprocessor::isValidStatement(string statement) {
+	map<string, string> entityAliases;
+	
+	regex delimiters("[^\\s,]+"); // wip - need to remove multiple whitespace
+	vector<string> tokens = Utility::splitByRegex(statement, delimiters);
 
-// trim from both ends (copying)
-std::string QueryPreprocessor::trim_copy(string s) {
-	ltrim(s);
-	rtrim(s);
-	return s;
+	// cannot have 1 or less tokens in a single statement
+	if (tokens.size() <= 1)
+		return false;
+
+	string keyword = tokens[0];
+
+	// validate declaration statements
+	if (Utility::matchesDesignEntityKeyword(keyword))  {
+		for (size_t i = 1; i < tokens.size(); i++) {
+			string alias = tokens[i];
+			if (!Utility::isValidVariableName(alias)) // not a valid alias/var name
+				return false;
+			entityAliases[alias] = keyword; // add alias to table for future reference
+		}
+		cout << entityAliases["a1"] << endl;
+		return true;
+	}
+
+	// wip - validate select clauses
+	if (keyword == keywords::query::SELECT_VAR) {
+		return true;
+	}
+
+	return false;
 }
