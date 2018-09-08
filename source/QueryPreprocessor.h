@@ -1,6 +1,4 @@
 #pragma once
-#include "QueryTree.h"
-
 #include<stdio.h>
 #include <iostream>
 #include <string>
@@ -14,10 +12,10 @@ class EntityAliasTable;
 class QueryPreprocessor {
 public:
 	static EntityAliasTable entityAliasTable;
-	static QueryTree* parseQuery(string query);
+	static bool parseQuery(string query);
 
 private:
-	static QueryTree* buildQueryTree(vector<string> queryParts);
+	static bool buildQueryTree(vector<string> queryParts);
 	
 	static std::vector<std::string> splitByDelimiter(string s, string delimiter);
 	static inline void ltrim(string &s);
