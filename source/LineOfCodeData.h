@@ -13,6 +13,9 @@ class LineOfCodeData {
 public:
 	int store(string type, string actualData
 		, std::stack <std::string> nestlevel);
+	string getTypeOfData();
+	string getActualData(); // get the whole line of code with no processing
+	std::stack <std::string> getNestingLevel();
 
 private:
 	string typeOfData; //whether procedure, read, print, while, if, assign...

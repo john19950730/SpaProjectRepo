@@ -18,11 +18,12 @@ using namespace std;
 
 stack <string> CodeParser::nesting_level;
 vector<LineOfCodeData> CodeParser::lineData;
+int CodeParser::lineNumber = 0;
 
 int CodeParser::parse(string code) {
 	int start = 0;
 	int lineCount = 1;
-	static vector<string> line; //saves line of code 
+	static vector<string> line; //saves line of code
 
 
 	for (int i = 0; i < code.length(); i++) { //logic for read code line by line
@@ -67,73 +68,60 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 
 	int foundEquals = std::regex_search(lineOfCode, equals_regex);
 
-	//need to check for follows
-	//need to check for parents
-	//currprocedure,prevprocedure, ignore main procedure
-	//currstatement,prevstatment
-
 	if (foundProcedure == 1) {
-		//procedure found
-		std::cout << "Procedure Found!!!!";
 		CodeParser::nesting_level.push("procedure");
 	}
 	if (foundWhile == 1) {
-		//while found
-		std::cout << "While Found!!!!";
 		CodeParser::nesting_level.push("while");
 		LineOfCodeData lcd;
 		lcd.store("while", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
-
+		lineNumber++;
 	}
 	if (foundIf == 1 && foundThen == 1) {
-		//if found
-		std::cout << "If Found!!!!";
 		CodeParser::nesting_level.push("if");
 		LineOfCodeData lcd;
 		lcd.store("if", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
+		lineNumber++;
 	}
 	if (foundClose == 1) {
-		//close bracket found
-		std::cout << "Close Found!!!!";
-		std::cout << "end of nesting for: " << CodeParser::nesting_level.top();
 		CodeParser::nesting_level.pop();
 	}
 	if (foundElse == 1) {
-		//else found
-		std::cout << "Else Found!!!!";
 		CodeParser::nesting_level.push("else");
 	}
 	if (foundRead == 1) {
-		//read found
-		std::cout << "Read Found!!!!";
 		LineOfCodeData lcd;
 		lcd.store("read", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
+		lineNumber++;
+		//chiying api
+		PKB::addModifies(lineNumber,checkModifies("read",lineOfCode));
 	}
 	if (foundPrint == 1) {
-		//print found
-		std::cout << "Print Found!!!!";
 		LineOfCodeData lcd;
 		lcd.store("print", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
+		lineNumber++;
+		// add uses
 	}
 	if (foundProcedure != 1 && foundWhile != 1 && foundIf != 1 && foundThen != 1 && foundElse != 1
 		&& foundRead != 1 && foundPrint != 1 && foundEquals == 1) {
-		//assignment
-		std::cout << "Assignment Found!!!!";
 		LineOfCodeData lcd;
 		lcd.store("assignment", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
+		lineNumber++;
+		//find var being modified
+		PKB::addModifies(lineNumber,checkModifies("assignment", lineOfCode));
 	}
 
 	return 0;
 }
 
 string CodeParser::tokenize(string keyword, string line) {
-	std::regex patternP(keyword);
-	string token = std::regex_replace(line, patternP, "");
+	std::regex pattern(keyword);
+	string token = std::regex_replace(line, pattern, "");
 	token.erase(std::remove(token.begin(), token.end(), '{'), token.end());
 	token.erase(std::remove(token.begin(), token.end(), ' '), token.end());
 	return token;
@@ -142,5 +130,32 @@ string CodeParser::tokenize(string keyword, string line) {
 int CodeParser::checkFollows() {
 
 	return 0;
+}
+
+string CodeParser::checkModifies(string stmtType, string stmt) { //returns var being modified
+
+	string token = "";
+	if (stmtType == "read") {
+		std::regex pattern(stmtType);
+		token = std::regex_replace(stmt, pattern, "");
+		token.erase(std::remove(token.begin(), token.end(), ' '), token.end());
+		token.erase(std::remove(token.begin(), token.end(), '\t'), token.end());//remove tab
+		token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());//remove nextline
+		token.erase(std::remove(token.begin(), token.end(), ';'), token.end());
+	}
+	if (stmtType == "assignment") {
+		for (char& c : stmt) {
+			if (c != '=') {
+				token += c;
+				
+			}
+			else {
+				break;
+			}
+		}
+		token.erase(std::remove(token.begin(), token.end(), ' '), token.end());
+	}
+
+	return token;
 }
 
