@@ -15,7 +15,7 @@ typedef struct STMT_PROC_VAR_RS_CLAUSE {
 
 // For Follows/Parent relationship clauses
 typedef struct STMT_RS_CLAUSE {
-	int firstStmt;
-	int secondStmt;
+	string firstStmt;
+	string secondStmt;
 	bool hasTransitiveClosure;
 } STMT_RS_CLAUSE;
