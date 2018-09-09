@@ -57,3 +57,7 @@ string Utility::trim_copy(string s) {
 	rtrim(s);
 	return s;
 }
+
+bool Utility::isInteger(string str) {
+	return str.find_first_not_of("0123456789") == string::npos;
+}

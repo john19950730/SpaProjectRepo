@@ -10,11 +10,10 @@ public:
 	QueryEvaluator(QueryObject *queryObject);
 
 	string evaluateQueryObject();
+	string evaluateSingleClause();
 	string selectImmediateResults();
 	string evaluateUsesClause();
 	string evaluateModifiesClause();
 	string evaluateFollowsClause();
 	string evaluateParentClause();
-
-	bool isInteger(string str);	// to be moved to utility class	
 };

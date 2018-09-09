@@ -1,5 +1,6 @@
 #include "QueryEvaluator.h"
 #include "Keywords.h"
+#include "Utility.h"
 
 #include <iostream>
 
@@ -12,12 +13,9 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 
 string QueryEvaluator::evaluateQueryObject() {
 	if (!queryObject->hasClauses()) return selectImmediateResults();
-
+	
 	// First milestone - evaluate only one clause
-	if (queryObject->getUsesClause() != NULL) return evaluateUsesClause();
-	else if (queryObject->getModifiesClause() != NULL) return evaluateModifiesClause();
-	else if (queryObject->getParentClause() != NULL) return evaluateParentClause();
-	else if (queryObject->getFollowsClause() != NULL) return evaluateFollowsClause();
+	if (queryObject->getNumberOfClauses == 1) return evaluateSingleClause();
 	
 	return "Error";
 }
@@ -36,11 +34,18 @@ string QueryEvaluator::selectImmediateResults() {
 	return "";
 }
 
+string QueryEvaluator::evaluateSingleClause() {
+	if (queryObject->getUsesClause() != NULL) return evaluateUsesClause();
+	else if (queryObject->getModifiesClause() != NULL) return evaluateModifiesClause();
+	else if (queryObject->getParentClause() != NULL) return evaluateParentClause();
+	else if (queryObject->getFollowsClause() != NULL) return evaluateFollowsClause();
+}
+
 string QueryEvaluator::evaluateUsesClause() {
 	STMT_PROC_VAR_RS_CLAUSE *usesClause = queryObject->getUsesClause();
 	string firstEntity = usesClause->firstEntity; // check if the first parameter is a stmtNo or synonym
 
-	if (isInteger(firstEntity)) {
+	if (Utility::isInteger(firstEntity)) {
 		int parsedFirstEntity = stoi(firstEntity);
 		string api = "isUses(parsedFirstEntity, varname)"; // check if the clause is true
 		return selectImmediateResults(); // return the "select" immediately if its true
@@ -59,8 +64,4 @@ string QueryEvaluator::evaluateParentClause() {
 
 string QueryEvaluator::evaluateFollowsClause() {
 	return "";
-}
-
-bool QueryEvaluator::isInteger(string str) {
-	return str.find_first_not_of("0123456789") == string::npos;
 }
