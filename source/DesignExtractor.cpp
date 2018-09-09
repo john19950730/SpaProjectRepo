@@ -9,7 +9,13 @@ using namespace std;
 
 
 #include "PKB.h"
+#include "DesignExtractor.h"
 
 int DesignExtractor () {
 	return 0;
+}
+
+void DesignExtractor::inputLineData(vector<LineOfCodeData>)
+{
+
 }

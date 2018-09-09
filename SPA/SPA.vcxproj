@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\CodeParser.h" />
+    <ClInclude Include="..\source\DesignExtractor.h" />
     <ClInclude Include="..\source\Keywords.h" />
     <ClInclude Include="..\source\LineOfCodeData.h" />
     <ClInclude Include="..\source\PKB.h" />

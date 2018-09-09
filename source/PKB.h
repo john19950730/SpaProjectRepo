@@ -33,6 +33,14 @@ public:
 	static bool isUses(int stmtNo1, string varName);
 	static bool isModifies(int stmtNo1, string varName);
 	
+	// SPA advanced Uses query
+	static vector<int> getAllStmtThatUses(string v);
+	static vector<int> getAllAssignmentThatUses(string v);
+
+	// SPA advanced Modifies query
+	static vector<int> getAllStmtThatModifies(string v);
+	static vector<int> getAllAssignmentThatModifies(string v);
+
 	// SPA synonyms query
 	static vector<string> getVariables();
 	static vector<int> getAssigns();
