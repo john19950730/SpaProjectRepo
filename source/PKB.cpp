@@ -47,7 +47,16 @@ int PKB::addAssign(int stmtNo)
 
 void PKB::addFollows(int stmtBefore, int stmtAfter)
 {
+	while (followsList.size() <= stmtBefore)
+		followsList.push_back(0);
 	followsList[stmtBefore] = stmtAfter;
+
+	while (followsStarTable.size() <= stmtAfter)
+		followsStarTable.push_back(vector<bool>(stmtAfter));
+	for (unsigned int i = 0; i < followsStarTable.size(); ++i) {
+		while (followsStarTable[i].size() <= stmtAfter)
+			followsStarTable[i].push_back(false);
+	}
 
 	followsStarTable[stmtBefore][stmtAfter] = true;
 	followsStarTable[stmtBefore][stmtBefore] = false;
@@ -64,7 +73,16 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 
 void PKB::addParent(int stmtParent, int stmtChild)
 {
+	while (parentList.size() <= stmtChild)
+		parentList.push_back(0);
 	parentList[stmtChild] = stmtParent;
+
+	while (parentStarTable.size() <= stmtChild)
+		parentStarTable.push_back(vector<bool>(stmtChild));
+	for (unsigned int i = 0; i < parentStarTable.size(); ++i) {
+		while (parentStarTable[i].size() <= stmtChild)
+			parentStarTable[i].push_back(false);
+	}
 
 	parentStarTable[stmtParent][stmtChild] = true;
 	parentStarTable[stmtParent][stmtParent] = false;
