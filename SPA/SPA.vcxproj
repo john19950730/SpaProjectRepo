@@ -33,6 +33,7 @@
     <ClInclude Include="..\source\QueryPreprocessor.h" />
     <ClInclude Include="..\source\EntityAliasTable.h" />
     <ClInclude Include="..\source\TNode.h" />
+    <ClInclude Include="DesignExtractor.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC21A1EA-D2C6-4D14-A2B4-E025B64BDE81}</ProjectGuid>
