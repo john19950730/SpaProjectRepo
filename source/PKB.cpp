@@ -52,6 +52,7 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 	followsStarTable[stmtBefore][stmtAfter] = true;
 	followsStarTable[stmtBefore][stmtBefore] = false;
 	followsStarTable[stmtAfter][stmtAfter] = false;
+	
 	int i;
 	for (i = 1; i <= stmtBefore; ++i) {
 		followsStarTable[i][stmtAfter] = followsStarTable[i][stmtBefore];
@@ -64,9 +65,11 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 void PKB::addParent(int stmtParent, int stmtChild)
 {
 	parentList[stmtChild] = stmtParent;
+
 	parentStarTable[stmtParent][stmtChild] = true;
 	parentStarTable[stmtParent][stmtParent] = false;
 	parentStarTable[stmtChild][stmtChild] = false;
+
 	int parent = stmtParent;
 	while (parentList[parent]) {
 		parentStarTable[parent][stmtChild] = true;
