@@ -53,7 +53,7 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 	followsStarTable[stmtBefore][stmtBefore] = false;
 	followsStarTable[stmtAfter][stmtAfter] = false;
 	
-	int i;
+	unsigned int i;
 	for (i = 1; i <= stmtBefore; ++i) {
 		followsStarTable[i][stmtAfter] = followsStarTable[i][stmtBefore];
 	}
@@ -118,22 +118,40 @@ bool PKB::isModifies(int stmtNo1, string varName)
 
 vector<int> PKB::getAllStmtThatUses(string v)
 {
-	return vector<int>();
+	vector<int> stmts(usesTable.size());
+	vector<int> result;
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n;});
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
+		[=](int stmtNo) { return PKB::isUses(stmtNo, v); });
+	return result;
 }
 
 vector<int> PKB::getAllAssignmentThatUses(string v)
 {
-	return vector<int>();
+	vector<int> result;
+	copy_if(assignList.begin(), assignList.end(), back_inserter(result),
+		[=](int assignStmtNo) { return PKB::isUses(assignStmtNo, v); });
+	return result;
 }
 
 vector<int> PKB::getAllStmtThatModifies(string v)
 {
-	return vector<int>();
+	vector<int> stmts(modifiesTable.size());
+	vector<int> result;
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
+		[=](int stmtNo) { return PKB::isModifies(stmtNo, v); });
+	return result;
 }
 
 vector<int> PKB::getAllAssignmentThatModifies(string v)
 {
-	return vector<int>();
+	vector<int> result;
+	copy_if(assignList.begin(), assignList.end(), back_inserter(result),
+		[=](int assignStmtNo) { return PKB::isModifies(assignStmtNo, v); });
+	return result;
 }
 
 vector<string> PKB::getVariables()
