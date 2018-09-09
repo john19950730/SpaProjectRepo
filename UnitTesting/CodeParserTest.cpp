@@ -19,5 +19,12 @@ namespace UnitTesting
 			// TODO: Your test code here
 		}
 
+		TEST_METHOD(ProcessLineTest) 
+		{
+			int processLineVal;
+			processLineVal = CodeParser::processLine("Test1", 1);
+			Assert::AreEqual(0, processLineVal);
+		}
+
 	};
 }
