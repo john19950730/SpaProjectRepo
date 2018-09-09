@@ -79,3 +79,14 @@ bool QueryObject::hasUsesClause() {
 	if (USES_CLAUSE == NULL) return false;
 	return true;
 }
+
+int QueryObject::getNumberOfClauses() {
+	int count = 0;
+
+	if (hasUsesClause()) count++;
+	if (hasModifiesClause()) count++;
+	if (hasParentClause()) count++;
+	if (hasFollowsClause()) count++;
+
+	return count;
+}

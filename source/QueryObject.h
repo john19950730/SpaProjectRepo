@@ -37,4 +37,7 @@ public:
 	bool hasUsesClause();
 	bool hasFollowsClause();
 	bool hasParentClause();
+
+	// Counting methods
+	int getNumberOfClauses();
 };
