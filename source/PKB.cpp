@@ -78,11 +78,17 @@ void PKB::addParent(int stmtParent, int stmtChild)
 
 void PKB::addUses(int stmtNo, string varName)
 {
+	while (usesTable.size() <= (unsigned int)stmtNo) {
+		usesTable.push_back(vector<string>());
+	}
 	usesTable[stmtNo].push_back(varName);
 }
 
 void PKB::addModifies(int stmtNo, string varName)
 {
+	while (modifiesTable.size() <= (unsigned int)stmtNo) {
+		modifiesTable.push_back(vector<string>());
+	}
 	modifiesTable[stmtNo].push_back(varName);
 }
 
