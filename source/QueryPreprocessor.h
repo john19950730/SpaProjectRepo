@@ -1,24 +1,34 @@
 #pragma once
-#include<stdio.h>
+
 #include <iostream>
 #include <string>
 #include <vector>
-#include <iterator>
+#include <map>
+#include <regex>
 
 using namespace std;
 
-class EntityAliasTable;
+class QueryObject;
+struct SELECT_VAR_CLAUSE;
+
+const string SELECT_SYNTAX_REGEX = "^[Ss]elect[\\s]+[a-zA-Z_][a-zA-Z0-9]*(?:[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*(?:[\\s]+such that[\\s]+(?:Uses|Modifies|Follows|Parent)[*]?[(][a-zA-Z_][a-zA-Z0-9]*[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*[)])*$";
+const string RESULT_REGEX = "[Ss]elect[\\s]+((?:[a-zA-Z_][a-zA-Z0-9]*)(?:(?:[\\s]*[,][\\s]*)(?:[a-zA-Z_][a-zA-Z0-9]*))*)";
+const string REL_REGEX = "(?:((?:Uses|Modifies|Follows|Parent)[*]?)[(]([a-zA-Z_][a-zA-Z0-9]*)(?:[\\s]*[,][\\s]*)([a-zA-Z_][a-zA-Z0-9]*)[)])";
+
+static map<string, string> entityAliases;
 
 class QueryPreprocessor {
 public:
-	static EntityAliasTable entityAliasTable;
 	static bool parseQuery(string query);
 
 private:
-	static bool buildQueryTree(vector<string> queryParts);
-	
-	static std::vector<std::string> splitByDelimiter(string s, string delimiter);
-	static inline void ltrim(string &s);
-	static inline void rtrim(std::string &s);
-	static inline std::string trim_copy(string s);
+	QueryObject *queryObject;
+
+	static QueryObject* buildQueryObject(string query);
+	static bool isValidQuery(string query);
+	static bool isValidStatement(string substatement);
+	static bool isValidDeclaration(string keyword, vector<string> tokens);
+	static bool isValidSelectClauseSyntax(string selectClause);
+	static SELECT_VAR_CLAUSE* extractResultClause(string selectClause);
+
 };

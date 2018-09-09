@@ -1,81 +1,115 @@
-#include <algorithm> 
-#include <cctype>
-#include <locale>
-
 #include "QueryPreprocessor.h"
-#include "EntityAliasTable.h"
+#include "QueryObject.h"
+#include "Utility.h"
+#include "Keywords.h"
 
 bool QueryPreprocessor::parseQuery(string query)
 {
-	vector<string> querySubstatements = splitByDelimiter(query, ";");
-	buildQueryTree(querySubstatements);
+	// initialise QueryObject here
+	if (!isValidQuery(query)) {
+		cout << endl;
+		cout << "##### Query not valid!" << endl;
+		return false;
+	}
+	buildQueryObject(query);
 	return false;
 }
 
-bool QueryPreprocessor::buildQueryTree(vector<string> querySubstatements) {
-	EntityAliasTable entityAliasTable;
-	
-	for (string substatement : querySubstatements) {
-		// further splits query substatements into words
-		vector<string> wordsInQuerySubstatement = splitByDelimiter(substatement, " ");
-		// insert into entityAliasTable if not a "select" substatement
-		// wip - plans to implement a design entity table to refer
-		if (wordsInQuerySubstatement.size() >= 2 && wordsInQuerySubstatement[0] != "select")
-			entityAliasTable.insertEntityAlias(wordsInQuerySubstatement);
-		if (wordsInQuerySubstatement[0] == "select") {
-			// build tree
-			// iterate through "select" substatement
-			vector<string>::iterator it = wordsInQuerySubstatement.begin();
-			std::advance(it, 1);
-			while (it != wordsInQuerySubstatement.end()) {
-				if (entityAliasTable.getEntityTypeFromAlias(*it) != "") { // found
-					cout << endl;
-					cout << entityAliasTable.getEntityTypeFromAlias(*it) << endl;
-				}
-				++it;
-			}
+QueryObject* QueryPreprocessor::buildQueryObject(string query) {
+	QueryObject *queryObject = new QueryObject();
+	SELECT_VAR_CLAUSE *selectStmt = extractResultClause(query);
+	regex relSyntax(REL_REGEX);
+	smatch matches;
+
+	while (regex_search(query, matches, relSyntax)){
+		string relationship = matches[1];
+		string param1 = matches[2];
+		string param2 = matches[3];
+		/*
+		if (relationship == "Uses") {
+			// get STMT_PROC_VAR_RS_CLAUSE
 		}
+		else if (relationship == "Modifies") {
+			// get STMT_PROC_VAR_RS_CLAUSE
+		}
+		else if (relationship == "Follows") {
+			// get STMT_RS_CLAUSE
+		}
+		else if (relationship == "Parent") {
+			// get STMT_RS_CLAUSE
+		}*/
+		query = matches.suffix();
 	}
 
-	// Print table
-	/*vector<EntityAliasInfo> table = entityAliasTable.getTableData();
-	for (EntityAliasInfo info : table) {
-		cout << info.aliasName + ":" + info.entityType << endl;
-	}*/
+	return new QueryObject();
+}
+
+// Checks all statements in query are valid
+bool QueryPreprocessor::isValidQuery(string query) {	
+	vector<string> queryStatements = Utility::splitByDelimiter(query, ";");
+	for (size_t i = 0; i < queryStatements.size(); i++) {
+		bool result = isValidStatement(queryStatements[i]);
+		if (!result) return false;
+	}
+	return true;
+}
+
+
+bool QueryPreprocessor::isValidStatement(string statement) {
+	regex delimiters("[^\\s,]+"); // wip - need to remove multiple whitespace
+	vector<string> tokens = Utility::splitByRegex(statement, delimiters);
+
+	// cannot have 1 or less tokens in a single statement
+	if (tokens.size() <= 1)
+		return false;
+
+	string keyword = tokens[0];
+
+	if (Utility::matchesDesignEntityKeyword(keyword)) {
+		// is a declaration statement -> check if valid
+		return isValidDeclaration(keyword, tokens);
+	}
+
+	// wip - validate select clauses
+	if (keyword == keywords::query::SELECT_VAR) {
+		return isValidSelectClauseSyntax(statement);
+	}
+
 	return false;
 }
 
-vector<string> QueryPreprocessor::splitByDelimiter(string s, string delimiter)
+bool QueryPreprocessor::isValidDeclaration(string keyword, vector<string> tokens)
 {
-	size_t pos = 0;
-	string token;
-	vector<string> vector = {};
-	while ((pos = s.find(delimiter)) != string::npos) {
-		token = s.substr(0, pos);
-		vector.push_back(trim_copy(token));
-		s.erase(0, pos + delimiter.length());
+	// validate declaration statements
+	for (size_t i = 1; i < tokens.size(); i++) {
+		string alias = tokens[i];
+		if (!Utility::isValidVariableName(alias)) // not a valid alias/var name
+			return false;
+		entityAliases[alias] = keyword; // add alias to table for future reference
 	}
-	vector.push_back(trim_copy(s));
-	return vector;
+	return true;
 }
 
-// trim from start (in place)
-void QueryPreprocessor::ltrim(string &s) {
-	s.erase(s.begin(), find_if(s.begin(), s.end(), [](int ch) {
-		return !isspace(ch);
-	}));
+bool QueryPreprocessor::isValidSelectClauseSyntax(string selectClause) {
+	regex selectSyntax(SELECT_SYNTAX_REGEX);
+	bool isValidOverallSyntaxBool = regex_match(selectClause, selectSyntax);
+	return isValidOverallSyntaxBool;
 }
 
-// trim from end (in place)
-void QueryPreprocessor::rtrim(string &s) {
-	s.erase(find_if(s.rbegin(), s.rend(), [](int ch) {
-		return !isspace(ch);
-	}).base(), s.end());
-}
-
-// trim from both ends (copying)
-std::string QueryPreprocessor::trim_copy(string s) {
-	ltrim(s);
-	rtrim(s);
-	return s;
+SELECT_VAR_CLAUSE* QueryPreprocessor::extractResultClause(string query) {
+	SELECT_VAR_CLAUSE select;
+	SELECT_VAR_CLAUSE *selectPtr;
+	regex selectSyntax(RESULT_REGEX);
+	smatch matches;
+	if (regex_search(query, matches, selectSyntax)) {
+		// Search hashmap to check if alias exists
+		if (entityAliases.find(matches[1].str()) == entityAliases.end()) {
+			return NULL; // not found
+		}
+		select = { entityAliases[matches[1].str()], matches[1].str() };
+	}
+	selectPtr = &select;
+	//cout << "VarName : " << selectPtr->variableName << endl;
+	//cout << "VarType : " << selectPtr->variableType << endl;
+	return selectPtr;
 }

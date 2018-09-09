@@ -18,17 +18,17 @@
     <ClCompile Include="..\source\QueryObject.cpp" />
     <ClCompile Include="..\source\QueryObjStructures.h" />
     <ClCompile Include="..\source\QueryPreprocessor.cpp" />
-    <ClCompile Include="..\source\EntityAliasTable.cpp" />
+    <ClCompile Include="..\source\Utility.cpp" />
     <ClCompile Include="..\source\TNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\CodeParser.h" />
+    <ClInclude Include="..\source\Utility.h" />
     <ClInclude Include="..\source\Keywords.h" />
     <ClInclude Include="..\source\PKB.h" />
     <ClInclude Include="..\source\QueryEvaluator.h" />
     <ClInclude Include="..\source\QueryObject.h" />
     <ClInclude Include="..\source\QueryPreprocessor.h" />
-    <ClInclude Include="..\source\EntityAliasTable.h" />
     <ClInclude Include="..\source\TNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
