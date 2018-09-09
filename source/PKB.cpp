@@ -116,6 +116,26 @@ bool PKB::isModifies(int stmtNo1, string varName)
 	return find(modifiesTable[stmtNo1].begin(), modifiesTable[stmtNo1].end(), varName) != modifiesTable[stmtNo1].end();
 }
 
+vector<int> PKB::getAllStmtThatUses(string v)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllAssignmentThatUses(string v)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllStmtThatModifies(string v)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllAssignmentThatModifies(string v)
+{
+	return vector<int>();
+}
+
 vector<string> PKB::getVariables()
 {
 	return varList;
