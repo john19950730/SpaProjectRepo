@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
 #include <unordered_map>
 
 using namespace std;
@@ -62,8 +63,14 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 
 void PKB::addParent(int stmtParent, int stmtChild)
 {
-	//TODO: implementation for storing parent* relation
 	parentList[stmtChild] = stmtParent;
+	parentStarTable[stmtParent][stmtChild] = true;
+	parentStarTable[stmtParent][stmtParent] = false;
+	parentStarTable[stmtChild][stmtChild] = false;
+	int parent = stmtParent;
+	while (parentList[parent]) {
+		parentStarTable[parent][stmtChild] = true;
+	}
 }
 
 void PKB::addUses(int stmtNo, string varName)
