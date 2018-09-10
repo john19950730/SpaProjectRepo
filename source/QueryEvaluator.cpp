@@ -22,9 +22,9 @@ string QueryEvaluator::evaluateQueryObject() {
 
 // Return results immediately if there are no clauses
 string QueryEvaluator::selectImmediateResults() {
-	SELECT_VAR_CLAUSE *selectClause = queryObject->getSelectClause();
-	string varName = selectClause->variableName;
-	string varType = selectClause->variableType;
+	SELECT_VAR_CLAUSE selectClause = queryObject->getSelectClause();
+	string varName = selectClause.variableName;
+	string varType = selectClause.variableType;
 
 	if (varType == ASSIGNMENT_VAR) return "allAssignmentStmts";
 	else if (varType == VARIABLE_VAR) return "allVariableStmts";

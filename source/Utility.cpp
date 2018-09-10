@@ -5,6 +5,13 @@ bool Utility::isValidVariableName(string s) {
 	return regex_match(s, regex("^[a-zA-Z][a-zA-Z0-9]*?$"));
 }
 
+bool Utility::isInteger(const std::string& s)
+{
+	std::string::const_iterator it = s.begin();
+	while (it != s.end() && std::isdigit(*it)) ++it;
+	return !s.empty() && it == s.end();
+}
+
 bool Utility::matchesDesignEntityKeyword(string s) {
 	for (size_t i = 0; i < keywords::query::DESIGN_ENTITY.size(); i++) {
 		if (s == keywords::query::DESIGN_ENTITY[i]) {
