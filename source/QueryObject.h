@@ -6,30 +6,36 @@ using namespace std;
 
 class QueryObject {
 private:
-	SELECT_VAR_CLAUSE *SELECT_CLAUSE = NULL;
-	STMT_PROC_VAR_RS_CLAUSE *MODIFIES_CLAUSE = NULL;
-	STMT_PROC_VAR_RS_CLAUSE *USES_CLAUSE = NULL;
-	STMT_RS_CLAUSE *FOLLOWS_CLAUSE = NULL;
-	STMT_RS_CLAUSE *PARENT_CLAUSE = NULL;
+	SELECT_VAR_CLAUSE SELECT_CLAUSE;
+	STMT_PROC_VAR_RS_CLAUSE MODIFIES_CLAUSE;
+	STMT_PROC_VAR_RS_CLAUSE USES_CLAUSE;
+	STMT_RS_CLAUSE FOLLOWS_CLAUSE;
+	STMT_RS_CLAUSE PARENT_CLAUSE;
+
+	bool selectClauseIsset;
+	bool modifiesClauseIsset;
+	bool usesClauseIsset;
+	bool followsClauseIsset;
+	bool parentClauseIsset;
 public:
 	// Constructors
 	QueryObject();
-	QueryObject(STMT_RS_CLAUSE *followsClause, STMT_PROC_VAR_RS_CLAUSE *modifiesClause, STMT_RS_CLAUSE *parentClause,
-		SELECT_VAR_CLAUSE *selectClause, STMT_PROC_VAR_RS_CLAUSE *usesClause);
+	QueryObject(STMT_RS_CLAUSE followsClause, STMT_PROC_VAR_RS_CLAUSE modifiesClause, STMT_RS_CLAUSE parentClause,
+		SELECT_VAR_CLAUSE selectClause, STMT_PROC_VAR_RS_CLAUSE usesClause);
 
 	// Setter methods
-	void setSelectClause(SELECT_VAR_CLAUSE *selectClause);
-	void setModifiesClause(STMT_PROC_VAR_RS_CLAUSE *modifiesClause);
-	void setUsesClause(STMT_PROC_VAR_RS_CLAUSE *usesClause);
-	void setFollowsClause(STMT_RS_CLAUSE *followsClause);
-	void setParentClause(STMT_RS_CLAUSE *parentClause);
+	void setSelectClause(SELECT_VAR_CLAUSE selectClause);
+	void setModifiesClause(STMT_PROC_VAR_RS_CLAUSE modifiesClause);
+	void setUsesClause(STMT_PROC_VAR_RS_CLAUSE usesClause);
+	void setFollowsClause(STMT_RS_CLAUSE followsClause);
+	void setParentClause(STMT_RS_CLAUSE parentClause);
 
 	// Getter methods
-	SELECT_VAR_CLAUSE* getSelectClause();
-	STMT_PROC_VAR_RS_CLAUSE* getModifiesClause();
-	STMT_PROC_VAR_RS_CLAUSE* getUsesClause();
-	STMT_RS_CLAUSE* getFollowsClause();
-	STMT_RS_CLAUSE* getParentClause();
+	SELECT_VAR_CLAUSE getSelectClause();
+	STMT_PROC_VAR_RS_CLAUSE getModifiesClause();
+	STMT_PROC_VAR_RS_CLAUSE getUsesClause();
+	STMT_RS_CLAUSE getFollowsClause();
+	STMT_RS_CLAUSE getParentClause();
 
 	// Checking methods
 	bool hasClauses();

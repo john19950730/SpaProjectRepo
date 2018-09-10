@@ -7,9 +7,9 @@ using namespace std;
 using namespace keywords::query;
 
 string QueryEvaluator::evaluateQueryObject(QueryObject *queryObject) {
-	SELECT_VAR_CLAUSE *selectClause = queryObject->getSelectClause();
-	string varName = selectClause->variableName;
-	string varType = selectClause->variableType;
+	SELECT_VAR_CLAUSE selectClause = queryObject->getSelectClause();
+	string varName = selectClause.variableName;
+	string varType = selectClause.variableType;
 
 	// Return results immediately if there are no clauses
 	if (!queryObject->hasClauses()) {

@@ -33,8 +33,12 @@ bool QueryPreprocessor::parseQuery(string query)
 		return false;
 	}
 
-	// doesn't print/access properly (only for select clause) 
+	// [SOLVED] doesn't print/access properly (only for select clause)
+	cout << "Testing parsing: " << endl;
+	SELECT_VAR_CLAUSE selectClause = queryObject->getSelectClause();
+	cout << "Variable name: " << selectClause.variableName << endl;
 	// cout << queryObject->getSelectClause()->variableName << endl;
+
 	return true;
 }
 
@@ -42,7 +46,7 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 	if (!isValidResultClause(query))
 		return false;
 	SELECT_VAR_CLAUSE resultsClause = createResultsClause(query);
-	queryObject->setSelectClause(&resultsClause);
+	queryObject->setSelectClause(resultsClause);
 
 	regex relSyntax(REL_REGEX);
 	smatch matches;
@@ -53,19 +57,19 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 		if (isRelationshipParamsValid(relationship, param1, param2)) {
 			if (relationship == "Uses" || relationship == "Uses*") {
 				STMT_PROC_VAR_RS_CLAUSE usesClause = createStmtProcVarRsClause(relationship, param1, param2);
-				queryObject->setUsesClause(&usesClause);
+				queryObject->setUsesClause(usesClause);
 			}
 			else if (relationship == "Modifies" || relationship == "Modifies*") {
 				STMT_PROC_VAR_RS_CLAUSE modifiesClause = createStmtProcVarRsClause(relationship, param1, param2);
-				queryObject->setModifiesClause(&modifiesClause);
+				queryObject->setModifiesClause(modifiesClause);
 			}
 			else if (relationship == "Follows" || relationship == "Follows*") {
 				STMT_RS_CLAUSE followsClause = createStmtRsClause(relationship, param1, param2);
-				queryObject->setFollowsClause(&followsClause);
+				queryObject->setFollowsClause(followsClause);
 			}
 			else if (relationship == "Parent" || relationship == "Parent*") {
 				STMT_RS_CLAUSE parentClause = createStmtRsClause(relationship, param1, param2);
-				queryObject->setParentClause(&parentClause);
+				queryObject->setParentClause(parentClause);
 			}
 		}
 		query = matches.suffix();
