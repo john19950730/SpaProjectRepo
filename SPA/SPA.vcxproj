@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\source\DesignExtractor.cpp" />
     <ClCompile Include="..\source\CodeParser.cpp" />
+    <ClCompile Include="..\source\LineOfCodeData.cpp" />
     <ClCompile Include="..\source\PKB.cpp" />
     <ClCompile Include="..\source\QueryEvaluator.cpp" />
     <ClCompile Include="..\source\QueryObject.cpp" />
@@ -24,7 +25,9 @@
   <ItemGroup>
     <ClInclude Include="..\source\CodeParser.h" />
     <ClInclude Include="..\source\Utility.h" />
+    <ClInclude Include="..\source\DesignExtractor.h" />
     <ClInclude Include="..\source\Keywords.h" />
+    <ClInclude Include="..\source\LineOfCodeData.h" />
     <ClInclude Include="..\source\PKB.h" />
     <ClInclude Include="..\source\QueryEvaluator.h" />
     <ClInclude Include="..\source\QueryObject.h" />
