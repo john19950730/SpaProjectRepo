@@ -8,7 +8,8 @@
 
 using namespace std;
 
-const string SELECT_SYNTAX_REGEX = "^[Ss]elect[\\s]+[a-zA-Z_][a-zA-Z0-9]*(?:[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*(?:[\\s]+such that[\\s]+(?:Uses|Modifies|Follows|Parent)[*]?[(](?:[a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[\\s]*[,][\\s]*([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])*$";
+const string QUERY_SYNTAX_REGEX = "^(?:[\\s]*(?:assign|variable|stmt|procedure|while)[\\s+](?:[a-zA-Z_][a-zA-Z0-9]*(?:[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*)[\\s]*[;][\\s]*)*(?:[Ss]elect[\\s]+[a-zA-Z_][a-zA-Z0-9]*(?:[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*(?:[\\s]+such that[\\s]+(?:Uses|Modifies|Follows|Parent)[*]?[(](?:[a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[\\s]*[,][\\s]*(?:[a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])*)*[;]?$";
+const string DECL_REGEX = "(assign|variable|stmt|procedure|while)[\\s+]([a-zA-Z_][a-zA-Z0-9]*(?:[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*)[;]";
 const string RESULT_REGEX = "[Ss]elect[\\s]+((?:[a-zA-Z_][a-zA-Z0-9]*)(?:(?:[\\s]*[,][\\s]*)(?:[a-zA-Z_][a-zA-Z0-9]*))*)";
 const string REL_REGEX = "(?:((?:Uses|Modifies|Follows|Parent)[*]?)[(]([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])(?:[\\s]*[,][\\s]*)([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])";
 const string TRANS_REGEX = "[*]$";
@@ -32,10 +33,8 @@ private:
 
 	bool buildQueryObject(string query);
 	bool isValidQuery(string query);
-	bool isValidStatement(string substatement);
-	bool isValidDeclaration(string keyword, vector<string> tokens);
-	bool isValidSelectClauseSyntax(string selectClause);
-	bool isValidResultClause(string query);
+	bool extractAliasesFromDeclaration(string query);
+	bool isValidResultsClause(string query);
 	bool isRelationshipParamsValid(string relationship, string param1, string param2);
 	string getParameterType(string param);
 
