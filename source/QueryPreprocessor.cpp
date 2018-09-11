@@ -23,13 +23,14 @@ QueryPreprocessor::QueryPreprocessor()
 bool QueryPreprocessor::parseQuery(string query)
 {
 	if (!isValidQuery(query)) {
-		cout << endl;
-		cout << "##### Query syntax not valid!" << endl;
+		cout << endl << "##### Query syntax not valid!" << endl;
 		return false;
 	}
+	
+	extractAliasesFromDeclaration(query);
+
 	if (!buildQueryObject(query)) {
-		cout << endl;
-		cout << "##### Query not valid!" << endl;
+		cout << endl << "##### Query not valid!" << endl;
 		return false;
 	}
 
@@ -43,7 +44,7 @@ bool QueryPreprocessor::parseQuery(string query)
 }
 
 bool QueryPreprocessor::buildQueryObject(string query) {
-	if (!isValidResultClause(query))
+	if (!isValidResultsClause(query))
 		return false;
 	SELECT_VAR_CLAUSE resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
@@ -72,67 +73,57 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 				queryObject->setParentClause(parentClause);
 			}
 		}
+		else {
+			return false;
+		}
 		query = matches.suffix();
 	}
 	return true;
 }
 
-// Checks all statements in query are valid
+// Checks if query syntax is valid
 bool QueryPreprocessor::isValidQuery(string query) {	
-	vector<string> queryStatements = Utility::splitByDelimiter(query, ";");
-	for (size_t i = 0; i < queryStatements.size(); i++) {
-		bool result = isValidStatement(queryStatements[i]);
-		if (!result) return false;
+	regex querySyntax(QUERY_SYNTAX_REGEX);
+	return regex_match(query, querySyntax);
+}
+
+bool QueryPreprocessor::extractAliasesFromDeclaration(string query) {
+	regex declarationSyntax(DECL_REGEX);
+	smatch matches;
+
+	while (regex_search(query, matches, declarationSyntax)) {
+		string designEntity = matches[1];
+		string aliasStr = matches[2];
+
+		vector<string> aliasVctr = Utility::splitByDelimiter(aliasStr, ",");
+		for (size_t i = 0; i < aliasVctr.size(); i++)
+		{
+			entityAliases[aliasVctr[i]] = designEntity;
+		}
+
+		query = matches.suffix();
 	}
+
 	return true;
 }
 
-
-bool QueryPreprocessor::isValidStatement(string statement) {
-	regex delimiters("[^\\s,]+"); // wip - need to remove multiple whitespace
-	vector<string> tokens = Utility::splitByRegex(statement, delimiters);
-
-	// cannot have 1 or less tokens in a single statement
-	if (tokens.size() <= 1)
-		return false;
-
-	string keyword = tokens[0];
-
-	if (Utility::matchesDesignEntityKeyword(keyword)) {
-		// is a declaration statement -> check if valid
-		return isValidDeclaration(keyword, tokens);
-	}
-
-	// check if select clause is valid
-	if (keyword == keywords::query::SELECT_VAR) {
-		return isValidSelectClauseSyntax(statement);
-	}
-
-	return false;
-}
-
-bool QueryPreprocessor::isValidDeclaration(string keyword, vector<string> tokens)
-{
-	// validate declaration statements
-	for (size_t i = 1; i < tokens.size(); i++) {
-		string alias = tokens[i];
-		if (!Utility::isValidVariableName(alias)) // not a valid alias/var name
-			return false;
-		entityAliases[alias] = keyword; // add alias to table for future reference
+bool QueryPreprocessor::isValidResultsClause(string query) {
+	regex resultSyntax(RESULT_REGEX);
+	smatch matches;
+	if (regex_search(query, matches, resultSyntax)) {
+		// Search hashmap to check if alias exists
+		if (entityAliases.count(matches[1].str()) != 1) {
+			return false; // not found
+		}
 	}
 	return true;
-}
-
-bool QueryPreprocessor::isValidSelectClauseSyntax(string selectClause) {
-	regex selectSyntax(SELECT_SYNTAX_REGEX);
-	return regex_match(selectClause, selectSyntax);
 }
 
 SELECT_VAR_CLAUSE QueryPreprocessor::createResultsClause(string query) {
 	SELECT_VAR_CLAUSE clause;
-	regex selectSyntax(RESULT_REGEX);
+	regex resultSyntax(RESULT_REGEX);
 	smatch matches;
-	regex_search(query, matches, selectSyntax);
+	regex_search(query, matches, resultSyntax);
 	string aliasType = entityAliases[matches[1].str()];
 	string aliasName = matches[1].str();
 	clause = { aliasType, aliasName };
@@ -163,25 +154,13 @@ STMT_RS_CLAUSE QueryPreprocessor::createStmtRsClause(string relationship, string
 	return clause;
 }
 
-bool QueryPreprocessor::isValidResultClause(string query) {
-	regex selectSyntax(RESULT_REGEX);
-	smatch matches;
-	if (regex_search(query, matches, selectSyntax)) {
-		// Search hashmap to check if alias exists
-		if (entityAliases.count(matches[1].str()) != 1) {
-			return false; // not found
-		}
-	}
-	return true;
-}
-
 bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string param1, string param2) {
 	string paramType1 = getParameterType(param1);
 	string paramType2 = getParameterType(param2);
-	/*cout << "param1: " << param1 << endl;
+	cout << "param1: " << param1 << endl;
 	cout << "param2: " << param2 << endl;
 	cout << "paramType1: " << paramType1 << endl;
-	cout << "paramType2: " << paramType2 << endl;*/
+	cout << "paramType2: " << paramType2 << endl;
 	if (paramType1 == "" || paramType2 == "") return false;
 
 	regex rel("([a-zA-Z]+)[*]?");
@@ -209,8 +188,8 @@ bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string pa
 		}
 	}
 
-	/*cout << "paramValid1: " << paramValid1 << endl;
-	cout << "paramValid2: " << paramValid2 << endl;*/
+	cout << "paramValid1: " << paramValid1 << endl;
+	cout << "paramValid2: " << paramValid2 << endl;
 
 	return paramValid1 && paramValid2;
 }
