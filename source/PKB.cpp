@@ -16,6 +16,16 @@ static vector<string> varList;
 static int varListIndex = 0;
 static vector<int> assignList;
 static int assignListIndex = 0;
+static vector<int> readList;
+static int readListIndex = 0;
+static vector<int> printList;
+static int printListIndex = 0;
+static vector<int> ifList;
+static int ifListIndex = 0;
+static vector<int> whileList;
+static int whileListIndex = 0;
+static vector<string> procedureList;
+static int procedureListIndex = 0;
 
 // element at index i means Follows(i, element) holds
 static vector<int> followsList;
@@ -43,6 +53,36 @@ int PKB::addAssign(int stmtNo)
 {
 	assignList.push_back(stmtNo);
 	return assignListIndex++;
+}
+
+int PKB::addRead(int stmtNo)
+{
+	readList.push_back(stmtNo);
+	return readListIndex++;
+}
+
+int PKB::addPrint(int stmtNo)
+{
+	printList.push_back(stmtNo);
+	return printListIndex++;
+}
+
+int PKB::addIf(int stmtNo)
+{
+	ifList.push_back(stmtNo);
+	return ifListIndex++;
+}
+
+int PKB::addWhile(int stmtNo)
+{
+	whileList.push_back(stmtNo);
+	return whileListIndex++;
+}
+
+int PKB::addProcedure(string procName)
+{
+	procedureList.push_back(procName);
+	return procedureListIndex++;
 }
 
 void PKB::addFollows(int stmtBefore, int stmtAfter)
@@ -184,4 +224,29 @@ vector<string> PKB::getVariables()
 vector<int> PKB::getAssigns()
 {
 	return assignList;
+}
+
+vector<int> PKB::getReads()
+{
+	return readList;
+}
+
+vector<int> PKB::getPrints()
+{
+	return printList;
+}
+
+vector<int> PKB::getIfs()
+{
+	return ifList;
+}
+
+vector<int> PKB::getWhiles()
+{
+	return whileList;
+}
+
+vector<string> PKB::getProcedures()
+{
+	return procedureList;
 }
