@@ -39,13 +39,20 @@ public:
 	static bool isModifies(int stmtNo1, string varName);
 	
 	// SPA advanced Uses query
-	static vector<int> getAllStmtThatUses(string v);
-	static vector<int> getAllAssignmentThatUses(string v);
-
+	static vector<int> getAllStmtThatUses(string varName);
+	static vector<int> getAllAssignmentThatUses(string varName);
+	static vector<int> getAllPrintThatUses(string varName);
+	static vector<int> getAllIfThatUses(string varName);
+	static vector<int> getAllWhileThatUses(string varName);
+	static vector<string> getAllProcedureThatUses(string varName);
 
 	// SPA advanced Modifies query
-	static vector<int> getAllStmtThatModifies(string v);
-	static vector<int> getAllAssignmentThatModifies(string v);
+	static vector<int> getAllStmtThatModifies(string varName);
+	static vector<int> getAllAssignmentThatModifies(string varName);
+	static vector<int> getAllReadThatModifies(string varName);
+	static vector<int> getAllIfThatModifies(string varName);
+	static vector<int> getAllWhileThatModifies(string varName);
+	static vector<string> getAllProcedureThatModifies(string varName);
 
 	// SPA synonyms query
 	static vector<string> getVariables();

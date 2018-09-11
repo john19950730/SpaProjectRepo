@@ -197,6 +197,26 @@ vector<int> PKB::getAllAssignmentThatUses(string v)
 	return result;
 }
 
+vector<int> PKB::getAllPrintThatUses(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllIfThatUses(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllWhileThatUses(string varName)
+{
+	return vector<int>();
+}
+
+vector<string> PKB::getAllProcedureThatUses(string varName)
+{
+	return vector<string>();
+}
+
 vector<int> PKB::getAllStmtThatModifies(string v)
 {
 	vector<int> stmts(modifiesTable.size());
@@ -214,6 +234,26 @@ vector<int> PKB::getAllAssignmentThatModifies(string v)
 	copy_if(assignList.begin(), assignList.end(), back_inserter(result),
 		[=](int assignStmtNo) { return PKB::isModifies(assignStmtNo, v); });
 	return result;
+}
+
+vector<int> PKB::getAllReadThatModifies(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllIfThatModifies(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllWhileThatModifies(string varName)
+{
+	return vector<int>();
+}
+
+vector<string> PKB::getAllProcedureThatModifies(string varName)
+{
+	return vector<string>();
 }
 
 vector<string> PKB::getVariables()
