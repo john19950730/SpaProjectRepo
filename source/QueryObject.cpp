@@ -10,8 +10,9 @@ QueryObject::QueryObject() {
 	usesClauseIsset = false;
 }
 
-QueryObject::QueryObject(STMT_RS_CLAUSE followsClause, STMT_PROC_VAR_RS_CLAUSE modifiesClause,
-	STMT_RS_CLAUSE parentClause, SELECT_VAR_CLAUSE selectClause, STMT_PROC_VAR_RS_CLAUSE usesClause) {
+QueryObject::QueryObject(vector<string> selectClause, vector<SUCH_THAT_CLAUSE> followsClause,
+	vector<SUCH_THAT_CLAUSE> modifiesClause, vector<SUCH_THAT_CLAUSE> parentClause, 
+	vector<SUCH_THAT_CLAUSE> usesClause) {
 	this->setFollowsClause(followsClause);
 	this->setModifiesClause(modifiesClause);
 	this->setParentClause(parentClause);
@@ -19,53 +20,57 @@ QueryObject::QueryObject(STMT_RS_CLAUSE followsClause, STMT_PROC_VAR_RS_CLAUSE m
 	this->setUsesClause(usesClause);
 }
 
-void QueryObject::setFollowsClause(STMT_RS_CLAUSE followsClause) {
-	this->FOLLOWS_CLAUSE = followsClause;
+void QueryObject::setFollowsClause(vector<SUCH_THAT_CLAUSE> followsClause) {
+	this->followsClause = followsClause;
 	followsClauseIsset = true;
 }
 
-void QueryObject::setModifiesClause(STMT_PROC_VAR_RS_CLAUSE modifiesClause) {
-	this->MODIFIES_CLAUSE = modifiesClause;
+void QueryObject::setModifiesClause(vector<SUCH_THAT_CLAUSE> modifiesClause) {
+	this->modifiesClause = modifiesClause;
 	modifiesClauseIsset = true;
 }
 
-void QueryObject::setParentClause(STMT_RS_CLAUSE parentClause) {
-	this->PARENT_CLAUSE = parentClause;
+void QueryObject::setParentClause(vector<SUCH_THAT_CLAUSE> parentClause) {
+	this->parentClause = parentClause;
 	parentClauseIsset = true;
 }
 
-void QueryObject::setSelectClause(SELECT_VAR_CLAUSE selectClause) {
-	this->SELECT_CLAUSE = selectClause;
+void QueryObject::setSelectClause(vector<string> selectClause) {
+	this->selectSynoymsClause = selectClause;
 	selectClauseIsset = true;
 }
 
-void QueryObject::setUsesClause(STMT_PROC_VAR_RS_CLAUSE usesClause) {
-	this->USES_CLAUSE = usesClause;
+void QueryObject::setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause) {
+	this->usesClause = usesClause;
 	usesClauseIsset = true;
 }
 
-STMT_RS_CLAUSE QueryObject::getFollowsClause() {
-	return FOLLOWS_CLAUSE;
+vector<SUCH_THAT_CLAUSE> QueryObject::getFollowsClause() {
+	return followsClause;
 }
 
-STMT_PROC_VAR_RS_CLAUSE QueryObject::getModifiesClause() {
-	return MODIFIES_CLAUSE;
+vector<SUCH_THAT_CLAUSE> QueryObject::getModifiesClause() {
+	return modifiesClause;
 }
 
-STMT_RS_CLAUSE QueryObject::getParentClause() {
-	return PARENT_CLAUSE;
+vector<SUCH_THAT_CLAUSE> QueryObject::getParentClause() {
+	return parentClause;
 }
 
-SELECT_VAR_CLAUSE QueryObject::getSelectClause() {
-	return SELECT_CLAUSE;
+vector<string> QueryObject::getSelectClause() {
+	return selectSynoymsClause;
 }
 
-STMT_PROC_VAR_RS_CLAUSE QueryObject::getUsesClause() {
-	return USES_CLAUSE;
+vector<SUCH_THAT_CLAUSE> QueryObject::getUsesClause() {
+	return usesClause;
+}
+
+map<string, string> QueryObject::getEntityAliases() {
+	return entityAliases;
 }
 
 bool QueryObject::hasClauses() {
-	if (modifiesClauseIsset && usesClauseIsset && followsClauseIsset && parentClauseIsset)
+	if (!modifiesClauseIsset && !usesClauseIsset && !followsClauseIsset && !parentClauseIsset)
 		return false;
 	return true;
 }

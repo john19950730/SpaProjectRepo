@@ -1,5 +1,6 @@
 #pragma once
 #include "QueryObject.h"
+#include <vector>
 
 using namespace std;
 
@@ -16,4 +17,6 @@ public:
 	string evaluateModifiesClause();
 	string evaluateFollowsClause();
 	string evaluateParentClause();
+
+	vector<int> getStmtsThatUsesVariable(vector<int> v, string variable);
 };

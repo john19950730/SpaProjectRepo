@@ -35,8 +35,11 @@ void GUIWrapper::evaluate(std::string query, std::list<std::string>& results){
 	queryPreprocessor.parseQuery(query);	// create a query object
 	// code to pass query object to query evaluator
 
+	QueryEvaluator *queryEvaluator = new QueryEvaluator(queryPreprocessor.getQueryObject());
+	string result = queryEvaluator->evaluateQueryObject();
+
 	std::cout << "query=  " << query << std::endl;
-	results.push_back(query + "\nQuery result: " + "hello");
+	results.push_back(query + "\nQuery result: " + result);
   // store the answers to the query in the results list (it is initially empty)
   // each result must be a string.
 }

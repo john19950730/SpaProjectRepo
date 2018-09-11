@@ -20,6 +20,10 @@ QueryPreprocessor::QueryPreprocessor()
 	relParamTypes["Parent"] = make_pair(followsParentParam1, followsParentParam2);
 }
 
+QueryObject* QueryPreprocessor::getQueryObject() {
+	return this->queryObject;
+}
+
 bool QueryPreprocessor::parseQuery(string query)
 {
 	if (!isValidQuery(query)) {
@@ -159,7 +163,7 @@ STMT_RS_CLAUSE QueryPreprocessor::createStmtRsClause(string relationship, string
 	if (regex_search(relationship, matches, transSyntax)) {
 		hasTransitiveClosure = true;
 	}
-	clause = { stoi(param1), stoi(param2), hasTransitiveClosure };
+	clause = { param1, param2, hasTransitiveClosure };
 	return clause;
 }
 

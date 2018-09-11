@@ -1,6 +1,7 @@
 #include "QueryEvaluator.h"
 #include "Keywords.h"
 #include "Utility.h"
+#include "PKB.h"
 
 #include <iostream>
 
@@ -12,20 +13,21 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 }
 
 string QueryEvaluator::evaluateQueryObject() {
-	if (!queryObject->hasClauses()) return selectImmediateResults();
+	if (!queryObject->hasClauses()) {
+		cout << "No clauses" << endl;
+		return selectImmediateResults();
+	}
 	
 	// First milestone - evaluate only one clause
-	if (queryObject->getNumberOfClauses == 1) return evaluateSingleClause();
+	if (queryObject->getNumberOfClauses() == 1) return evaluateSingleClause();
 	
 	return "Error";
 }
 
 // Return results immediately if there are no clauses
 string QueryEvaluator::selectImmediateResults() {
-	SELECT_VAR_CLAUSE selectClause = queryObject->getSelectClause();
-	string varName = selectClause.variableName;
-	string varType = selectClause.variableType;
-
+	vector<string> selectSynonyms = queryObject->getSelectClause();
+	
 	if (varType == ASSIGNMENT_VAR) return "allAssignmentStmts";
 	else if (varType == VARIABLE_VAR) return "allVariableStmts";
 	else if (varType == STMT_VAR) return "allStmts";
@@ -35,20 +37,28 @@ string QueryEvaluator::selectImmediateResults() {
 }
 
 string QueryEvaluator::evaluateSingleClause() {
-	if (queryObject->getUsesClause() != NULL) return evaluateUsesClause();
-	else if (queryObject->getModifiesClause() != NULL) return evaluateModifiesClause();
-	else if (queryObject->getParentClause() != NULL) return evaluateParentClause();
-	else if (queryObject->getFollowsClause() != NULL) return evaluateFollowsClause();
+	if (queryObject->hasUsesClause()) return evaluateUsesClause();
+	else if (queryObject->hasModifiesClause()) return evaluateModifiesClause();
+	else if (queryObject->hasParentClause()) return evaluateParentClause();
+	else if (queryObject->hasFollowsClause()) return evaluateFollowsClause();
 }
 
 string QueryEvaluator::evaluateUsesClause() {
-	STMT_PROC_VAR_RS_CLAUSE *usesClause = queryObject->getUsesClause();
-	string firstEntity = usesClause->firstEntity; // check if the first parameter is a stmtNo or synonym
+	STMT_PROC_VAR_RS_CLAUSE usesClause = queryObject->getUsesClause();
+	string firstEntity = usesClause.firstEntity; // check if the first parameter is a stmtNo or synonym
+	string variable = usesClause.variable;
 
 	if (Utility::isInteger(firstEntity)) {
 		int parsedFirstEntity = stoi(firstEntity);
-		string api = "isUses(parsedFirstEntity, varname)"; // check if the clause is true
-		return selectImmediateResults(); // return the "select" immediately if its true
+		// return the "select" immediately if its true
+		if(PKB::isUses(parsedFirstEntity, variable)) return selectImmediateResults();
+		else return ""; // clause is false hence return immediately
+	}
+	else {
+		vector<int> stmtsThatUsesVariable = getStmtsThatUsesVariable(PKB::getAllStmtThatUses(variable)
+			, variable);
+		if(stmtsThatUsesVariable.size !=0 ) cout << getStmtsThatUsesVariable << endl;
+		else return "";
 	}
 
 	return "";
@@ -64,4 +74,15 @@ string QueryEvaluator::evaluateParentClause() {
 
 string QueryEvaluator::evaluateFollowsClause() {
 	return "";
+}
+
+vector<int> QueryEvaluator::getStmtsThatUsesVariable(vector<int> v, string variable) {
+	vector<int>::iterator it;
+	vector<int> stmtThatUsesVariable;
+	for (it = v.begin(); it != v.end(); it++) {
+		if (PKB::isUses(*it, variable)) {
+			stmtThatUsesVariable.push_back(*it);
+		}
+	}
+	return stmtThatUsesVariable;
 }

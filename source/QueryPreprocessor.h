@@ -23,6 +23,7 @@ class QueryPreprocessor {
 public:
 	QueryPreprocessor();
 	bool parseQuery(string query);
+	QueryObject* getQueryObject();
 
 private:
 	QueryObject *queryObject;
