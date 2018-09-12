@@ -52,10 +52,10 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
 
-	vector<SUCH_THAT_CLAUSE> usesClauses; // Added
-	vector<SUCH_THAT_CLAUSE> modifiesClauses; // Added
-	vector<SUCH_THAT_CLAUSE> followsClauses; // Added
-	vector<SUCH_THAT_CLAUSE> parentClauses; // Added
+	vector<SUCH_THAT_CLAUSE> usesClauses;
+	vector<SUCH_THAT_CLAUSE> modifiesClauses;
+	vector<SUCH_THAT_CLAUSE> followsClauses;
+	vector<SUCH_THAT_CLAUSE> parentClauses;
 
 	regex relSyntax(REL_REGEX);
 	smatch matches;
@@ -66,24 +66,24 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 		SUCH_THAT_CLAUSE clause;
 		if (isRelationshipParamsValid(relationship, param1, param2)) {
 			if (relationship == "Uses" || relationship == "Uses*") {
-				clause = createSuchThatClause(relationship, param1, param2); // Modified
-				usesClauses.push_back(clause); // Added
-				queryObject->setUsesClause(usesClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				usesClauses.push_back(clause);
+				queryObject->setUsesClause(usesClauses);
 			}
 			else if (relationship == "Modifies" || relationship == "Modifies*") {
-				clause = createSuchThatClause(relationship, param1, param2); // Modified
-				modifiesClauses.push_back(clause); // Added
-				queryObject->setModifiesClause(modifiesClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				modifiesClauses.push_back(clause);
+				queryObject->setModifiesClause(modifiesClauses);
 			}
 			else if (relationship == "Follows" || relationship == "Follows*") {
-				clause = createSuchThatClause(relationship, param1, param2); // Modified
-				followsClauses.push_back(clause); // Added
-				queryObject->setFollowsClause(followsClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				followsClauses.push_back(clause);
+				queryObject->setFollowsClause(followsClauses);
 			}
 			else if (relationship == "Parent" || relationship == "Parent*") {
-				clause = createSuchThatClause(relationship, param1, param2); // Modified
-				parentClauses.push_back(clause); // Added
-				queryObject->setParentClause(parentClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				parentClauses.push_back(clause);
+				queryObject->setParentClause(parentClauses);
 			}
 		}
 		else {
@@ -130,7 +130,6 @@ bool QueryPreprocessor::isValidResultsClause(string query) {
 	return true;
 }
 
-// Modified
 vector<string> QueryPreprocessor::createResultsClause(string query) {
 	vector<string> clause;
 	regex resultSyntax(RESULT_REGEX);
@@ -138,12 +137,10 @@ vector<string> QueryPreprocessor::createResultsClause(string query) {
 	regex_search(query, matches, resultSyntax);
 	string aliasType = entityAliases[matches[1].str()];
 	string aliasName = matches[1].str();
-	clause.push_back(aliasName); // Added
-	//clause = { aliasType, aliasName }; 
+	clause.push_back(aliasName);
 	return clause;
 }
 
-// Added
 SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, string param1, string param2) {
 	SUCH_THAT_CLAUSE clause;
 	regex transSyntax(TRANS_REGEX);
