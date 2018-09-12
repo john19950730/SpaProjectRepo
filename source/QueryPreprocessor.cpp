@@ -10,7 +10,7 @@ QueryPreprocessor::QueryPreprocessor()
 	queryObject = new QueryObject();
 
 	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_NAME" };
-	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_", "_NAME" };
+	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_NAME" };
 	vector<string> followsParentParam1 = { keywords::query::STMT_VAR };
 	vector<string> followsParentParam2 = { keywords::query::STMT_VAR };
 
@@ -201,7 +201,7 @@ string QueryPreprocessor::getParameterType(string param) {
 		return keywords::query::STMT_VAR;
 	}
 	if (param == "_") {
-		return "_";
+		return "_UNDERSCORE";
 	}
 	regex doubleQuotes("[\"].*[\"]");
 	if (regex_match(param, doubleQuotes)) {
