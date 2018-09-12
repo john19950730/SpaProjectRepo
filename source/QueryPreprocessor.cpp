@@ -20,6 +20,10 @@ QueryPreprocessor::QueryPreprocessor()
 	relParamTypes["Parent"] = make_pair(followsParentParam1, followsParentParam2);
 }
 
+QueryObject* QueryPreprocessor::getQueryObject() {
+	return this->queryObject;
+}
+
 bool QueryPreprocessor::parseQuery(string query)
 {
 	if (!isValidQuery(query)) {
@@ -35,9 +39,9 @@ bool QueryPreprocessor::parseQuery(string query)
 	}
 
 	// [SOLVED] doesn't print/access properly (only for select clause)
-	cout << "Testing parsing: " << endl;
+	/*cout << "Testing parsing: " << endl;
 	SELECT_VAR_CLAUSE selectClause = queryObject->getSelectClause();
-	cout << "Variable name: " << selectClause.variableName << endl;
+	cout << "Variable name: " << selectClause.variableName << endl;*/
 	// cout << queryObject->getSelectClause()->variableName << endl;
 
 	return true;
@@ -46,7 +50,7 @@ bool QueryPreprocessor::parseQuery(string query)
 bool QueryPreprocessor::buildQueryObject(string query) {
 	if (!isValidResultsClause(query))
 		return false;
-	SELECT_VAR_CLAUSE resultsClause = createResultsClause(query);
+	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
 
 	regex relSyntax(REL_REGEX);
@@ -57,20 +61,28 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 		string param2 = matches[3];
 		if (isRelationshipParamsValid(relationship, param1, param2)) {
 			if (relationship == "Uses" || relationship == "Uses*") {
-				STMT_PROC_VAR_RS_CLAUSE usesClause = createStmtProcVarRsClause(relationship, param1, param2);
-				queryObject->setUsesClause(usesClause);
+				vector<SUCH_THAT_CLAUSE> usesClauses; // Added
+				SUCH_THAT_CLAUSE usesClause = createSuchThatClause(relationship, param1, param2); // Modified
+				usesClauses.push_back(usesClause); // Added
+				queryObject->setUsesClause(usesClauses); // Modified
 			}
 			else if (relationship == "Modifies" || relationship == "Modifies*") {
-				STMT_PROC_VAR_RS_CLAUSE modifiesClause = createStmtProcVarRsClause(relationship, param1, param2);
-				queryObject->setModifiesClause(modifiesClause);
+				vector<SUCH_THAT_CLAUSE> modifiesClauses; // Added
+				SUCH_THAT_CLAUSE modifiesClause = createSuchThatClause(relationship, param1, param2); // Modified
+				modifiesClauses.push_back(modifiesClause); // Added
+				queryObject->setModifiesClause(modifiesClauses); // Modified
 			}
 			else if (relationship == "Follows" || relationship == "Follows*") {
-				STMT_RS_CLAUSE followsClause = createStmtRsClause(relationship, param1, param2);
-				queryObject->setFollowsClause(followsClause);
+				vector<SUCH_THAT_CLAUSE> followsClauses; // Added
+				SUCH_THAT_CLAUSE followsClause = createSuchThatClause(relationship, param1, param2); // Modified
+				followsClauses.push_back(followsClause); // Added
+				queryObject->setFollowsClause(followsClauses); // Modified
 			}
 			else if (relationship == "Parent" || relationship == "Parent*") {
-				STMT_RS_CLAUSE parentClause = createStmtRsClause(relationship, param1, param2);
-				queryObject->setParentClause(parentClause);
+				vector<SUCH_THAT_CLAUSE> parentClauses; // Added
+				SUCH_THAT_CLAUSE parentClause = createSuchThatClause(relationship, param1, param2); // Modified
+				parentClauses.push_back(parentClause); // Added
+				queryObject->setParentClause(parentClauses); // Modified
 			}
 		}
 		else {
@@ -119,18 +131,33 @@ bool QueryPreprocessor::isValidResultsClause(string query) {
 	return true;
 }
 
-SELECT_VAR_CLAUSE QueryPreprocessor::createResultsClause(string query) {
-	SELECT_VAR_CLAUSE clause;
+// Modified
+vector<string> QueryPreprocessor::createResultsClause(string query) {
+	vector<string> clause;
 	regex resultSyntax(RESULT_REGEX);
 	smatch matches;
 	regex_search(query, matches, resultSyntax);
 	string aliasType = entityAliases[matches[1].str()];
 	string aliasName = matches[1].str();
-	clause = { aliasType, aliasName };
+	clause.push_back(aliasName); // Added
+	//clause = { aliasType, aliasName }; 
 	return clause;
 }
 
-STMT_PROC_VAR_RS_CLAUSE QueryPreprocessor::createStmtProcVarRsClause(string relationship, string param1, string param2) {
+// Added
+SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, string param1, string param2) {
+	SUCH_THAT_CLAUSE clause;
+	regex transSyntax(TRANS_REGEX);
+	smatch matches;
+	bool hasTransitiveClosure = false;
+	if (regex_search(relationship, matches, transSyntax)) {
+		hasTransitiveClosure = true;
+	}
+	clause = { param1, param2, hasTransitiveClosure, false, false }; // Please determine if params are synonyms
+	return clause;
+}
+
+/*STMT_PROC_VAR_RS_CLAUSE QueryPreprocessor::createStmtProcVarRsClause(string relationship, string param1, string param2) {
 	STMT_PROC_VAR_RS_CLAUSE clause;
 	regex transSyntax(TRANS_REGEX);
 	smatch matches;
@@ -150,9 +177,9 @@ STMT_RS_CLAUSE QueryPreprocessor::createStmtRsClause(string relationship, string
 	if (regex_search(relationship, matches, transSyntax)) {
 		hasTransitiveClosure = true;
 	}
-	clause = { stoi(param1), stoi(param2), hasTransitiveClosure };
+	clause = { param1, param2, hasTransitiveClosure };
 	return clause;
-}
+}*/
 
 bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string param1, string param2) {
 	string paramType1 = getParameterType(param1);

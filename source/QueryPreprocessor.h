@@ -14,9 +14,10 @@ const string RESULT_REGEX = "[Ss]elect[\\s]+((?:[a-zA-Z_][a-zA-Z0-9]*)(?:(?:[\\s
 const string REL_REGEX = "(?:((?:Uses|Modifies|Follows|Parent)[*]?)[(]([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])(?:[\\s]*[,][\\s]*)([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])";
 const string TRANS_REGEX = "[*]$";
 
-struct SELECT_VAR_CLAUSE;
+/*struct SELECT_VAR_CLAUSE;
 struct STMT_PROC_VAR_RS_CLAUSE;
-struct STMT_RS_CLAUSE;
+struct STMT_RS_CLAUSE;*/
+struct SUCH_THAT_CLAUSE;
 
 class QueryObject;
 
@@ -24,6 +25,7 @@ class QueryPreprocessor {
 public:
 	QueryPreprocessor();
 	bool parseQuery(string query);
+	QueryObject* getQueryObject();
 
 private:
 	QueryObject *queryObject;
@@ -37,8 +39,9 @@ private:
 	bool isRelationshipParamsValid(string relationship, string param1, string param2);
 	string getParameterType(string param);
 
-	SELECT_VAR_CLAUSE createResultsClause(string query);
-	STMT_PROC_VAR_RS_CLAUSE createStmtProcVarRsClause(string relationship, string param1, string param2);
-	STMT_RS_CLAUSE createStmtRsClause(string relationship, string param1, string param2);
+	vector<string> createResultsClause(string query);
+	SUCH_THAT_CLAUSE createSuchThatClause(string relationship, string param1, string param2);
+	//STMT_PROC_VAR_RS_CLAUSE createStmtProcVarRsClause(string relationship, string param1, string param2);
+	//STMT_RS_CLAUSE createStmtRsClause(string relationship, string param1, string param2);
 
 };
