@@ -6,5 +6,5 @@ typedef struct SUCH_THAT_CLAUSE {
 	string secondParameter;
 	bool hasTransitiveClosure;
 	bool firstParamIsSynonym;
-	bool secondParamIsSyonym;
+	bool secondParamIsSynonym;
 } SUCH_THAT_CLAUSE;
