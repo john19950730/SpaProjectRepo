@@ -153,7 +153,7 @@ SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, st
 	if (regex_search(relationship, matches, transSyntax)) {
 		hasTransitiveClosure = true;
 	}
-	clause = { param1, param2, hasTransitiveClosure };
+	clause = { param1, param2, hasTransitiveClosure, false, false }; // Please determine if params are synonyms
 	return clause;
 }
 

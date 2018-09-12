@@ -15,11 +15,6 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 string QueryEvaluator::evaluateQueryObject() {
 	if (!queryObject->hasClauses()) {
 		cout << "No clauses" << endl;
-		SUCH_THAT_CLAUSE usesClause = { "uses", "ya", false };
-		vector<SUCH_THAT_CLAUSE> usesClauses;
-		usesClauses.push_back(usesClause);
-		queryObject->setUsesClause(usesClauses);
-		cout << queryObject->getUsesClause().at(0).firstParameter << endl;
 		return selectImmediateResults();
 	}
 
@@ -51,6 +46,17 @@ string QueryEvaluator::evaluateSingleClause() {
 
 string QueryEvaluator::evaluateUsesClause() {
 	vector<SUCH_THAT_CLAUSE> usesClause = queryObject->getUsesClause();
+	vector<SUCH_THAT_CLAUSE>::iterator it;
+	/*for (it = usesClause.begin(); it != usesClause.end(); it++) {
+		string firstParam = it->firstParameter;
+		string secondParam = it->secondParameter;
+
+		if (Utility::isInteger(firstParam)) {
+			int stmtNo = stoi(firstParam);
+			if(PKB::isUses(stmtNo, secondParam))
+		}
+	}*/
+
 	//string firstEntity = usesClause.firstParameter; // check if the first parameter is a stmtNo or synonym
 	//string variable = usesClause.secondParameter;
 
