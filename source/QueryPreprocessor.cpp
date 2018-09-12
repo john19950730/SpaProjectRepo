@@ -52,35 +52,37 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
 
+	vector<SUCH_THAT_CLAUSE> usesClauses; // Added
+	vector<SUCH_THAT_CLAUSE> modifiesClauses; // Added
+	vector<SUCH_THAT_CLAUSE> followsClauses; // Added
+	vector<SUCH_THAT_CLAUSE> parentClauses; // Added
+
 	regex relSyntax(REL_REGEX);
 	smatch matches;
 	while (regex_search(query, matches, relSyntax)){
 		string relationship = matches[1];
 		string param1 = matches[2];
 		string param2 = matches[3];
+		SUCH_THAT_CLAUSE clause;
 		if (isRelationshipParamsValid(relationship, param1, param2)) {
 			if (relationship == "Uses" || relationship == "Uses*") {
-				vector<SUCH_THAT_CLAUSE> usesClauses; // Added
-				SUCH_THAT_CLAUSE usesClause = createSuchThatClause(relationship, param1, param2); // Modified
-				usesClauses.push_back(usesClause); // Added
+				clause = createSuchThatClause(relationship, param1, param2); // Modified
+				usesClauses.push_back(clause); // Added
 				queryObject->setUsesClause(usesClauses); // Modified
 			}
 			else if (relationship == "Modifies" || relationship == "Modifies*") {
-				vector<SUCH_THAT_CLAUSE> modifiesClauses; // Added
-				SUCH_THAT_CLAUSE modifiesClause = createSuchThatClause(relationship, param1, param2); // Modified
-				modifiesClauses.push_back(modifiesClause); // Added
+				clause = createSuchThatClause(relationship, param1, param2); // Modified
+				modifiesClauses.push_back(clause); // Added
 				queryObject->setModifiesClause(modifiesClauses); // Modified
 			}
 			else if (relationship == "Follows" || relationship == "Follows*") {
-				vector<SUCH_THAT_CLAUSE> followsClauses; // Added
-				SUCH_THAT_CLAUSE followsClause = createSuchThatClause(relationship, param1, param2); // Modified
-				followsClauses.push_back(followsClause); // Added
+				clause = createSuchThatClause(relationship, param1, param2); // Modified
+				followsClauses.push_back(clause); // Added
 				queryObject->setFollowsClause(followsClauses); // Modified
 			}
 			else if (relationship == "Parent" || relationship == "Parent*") {
-				vector<SUCH_THAT_CLAUSE> parentClauses; // Added
-				SUCH_THAT_CLAUSE parentClause = createSuchThatClause(relationship, param1, param2); // Modified
-				parentClauses.push_back(parentClause); // Added
+				clause = createSuchThatClause(relationship, param1, param2); // Modified
+				parentClauses.push_back(clause); // Added
 				queryObject->setParentClause(parentClauses); // Modified
 			}
 		}
@@ -150,7 +152,10 @@ SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, st
 	if (regex_search(relationship, matches, transSyntax)) {
 		hasTransitiveClosure = true;
 	}
-	clause = { param1, param2, hasTransitiveClosure, false, false }; // Please determine if params are synonyms
+	bool paramIsSynonym1 = isSynonym(param1);
+	bool paramIsSynonym2 = isSynonym(param2);
+	clause = { stripDoubleQuotes(param1), stripDoubleQuotes(param2),
+		hasTransitiveClosure, paramIsSynonym1, paramIsSynonym2 };
 	return clause;
 }
 
@@ -202,9 +207,23 @@ string QueryPreprocessor::getParameterType(string param) {
 	if (regex_match(param, doubleQuotes)) {
 		return "_NAME";
 	}
-	if (entityAliases.count(param) == 1) {
+	if (isSynonym(param)) {
 		return entityAliases[param];
 	}
 	return "";
 }
 
+bool QueryPreprocessor::isSynonym(string param) {
+	if (entityAliases.count(param) == 1) {
+		return true;
+	}
+	return false;
+}
+
+string QueryPreprocessor::stripDoubleQuotes(string param) {
+	if (param.front() == '"') {
+		param.erase(0, 1); // erase the first character
+		param.erase(param.size() - 1); // erase the last character
+	}
+	return param;
+}

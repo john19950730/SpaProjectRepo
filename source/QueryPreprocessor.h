@@ -37,7 +37,10 @@ private:
 	bool extractAliasesFromDeclaration(string query);
 	bool isValidResultsClause(string query);
 	bool isRelationshipParamsValid(string relationship, string param1, string param2);
+	
+	bool isSynonym(string param);
 	string getParameterType(string param);
+	string stripDoubleQuotes(string param);
 
 	vector<string> createResultsClause(string query);
 	SUCH_THAT_CLAUSE createSuchThatClause(string relationship, string param1, string param2);
