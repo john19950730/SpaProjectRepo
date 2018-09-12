@@ -9,8 +9,8 @@ QueryPreprocessor::QueryPreprocessor()
 	relParamTypes = {};
 	queryObject = new QueryObject();
 
-	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR };
-	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR };
+	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_NAME" };
+	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_NAME" };
 	vector<string> followsParentParam1 = { keywords::query::STMT_VAR };
 	vector<string> followsParentParam2 = { keywords::query::STMT_VAR };
 
@@ -27,29 +27,28 @@ QueryObject* QueryPreprocessor::getQueryObject() {
 bool QueryPreprocessor::parseQuery(string query)
 {
 	if (!isValidQuery(query)) {
-		cout << endl << "##### Query syntax not valid!" << endl;
+		cout << endl << endl << "##### Query syntax is invalid!" << endl;
+		cout << endl << "### Example usage:  variable v; procedure v; select v such that Uses(1, v)" << endl;
+		cout << "#### keywords are case-sensitive i.e. relationships must begin with an upper-case letter, but 'select' and 'Select' are both accepted" << endl;
+		cout << "#### semicolon at the end of `select` clause is optional" << endl << endl;
 		return false;
 	}
 	
 	extractAliasesFromDeclaration(query);
 
 	if (!buildQueryObject(query)) {
-		cout << endl << "##### Query not valid!" << endl;
+		cout << endl << "##### Query is invalid!" << endl << endl;
 		return false;
 	}
-
-	// [SOLVED] doesn't print/access properly (only for select clause)
-	/*cout << "Testing parsing: " << endl;
-	SELECT_VAR_CLAUSE selectClause = queryObject->getSelectClause();
-	cout << "Variable name: " << selectClause.variableName << endl;*/
-	// cout << queryObject->getSelectClause()->variableName << endl;
 
 	return true;
 }
 
 bool QueryPreprocessor::buildQueryObject(string query) {
-	if (!isValidResultsClause(query))
+	if (!isValidResultsClause(query)) {
+		cout << endl << endl << "### Check that you have declared all used synonyms";
 		return false;
+	}
 	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
 
@@ -106,13 +105,11 @@ bool QueryPreprocessor::extractAliasesFromDeclaration(string query) {
 	while (regex_search(query, matches, declarationSyntax)) {
 		string designEntity = matches[1];
 		string aliasStr = matches[2];
-
 		vector<string> aliasVctr = Utility::splitByDelimiter(aliasStr, ",");
 		for (size_t i = 0; i < aliasVctr.size(); i++)
 		{
 			entityAliases[aliasVctr[i]] = designEntity;
 		}
-
 		query = matches.suffix();
 	}
 
@@ -157,37 +154,13 @@ SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, st
 	return clause;
 }
 
-/*STMT_PROC_VAR_RS_CLAUSE QueryPreprocessor::createStmtProcVarRsClause(string relationship, string param1, string param2) {
-	STMT_PROC_VAR_RS_CLAUSE clause;
-	regex transSyntax(TRANS_REGEX);
-	smatch matches;
-	bool hasTransitiveClosure = false;
-	if (regex_search(relationship, matches, transSyntax)) {
-		hasTransitiveClosure = true;
-	}
-	clause = { param1, param2, hasTransitiveClosure };
-	return clause;
-}
-
-STMT_RS_CLAUSE QueryPreprocessor::createStmtRsClause(string relationship, string param1, string param2) {
-	STMT_RS_CLAUSE clause;
-	regex transSyntax(TRANS_REGEX);
-	smatch matches;
-	bool hasTransitiveClosure = false;
-	if (regex_search(relationship, matches, transSyntax)) {
-		hasTransitiveClosure = true;
-	}
-	clause = { param1, param2, hasTransitiveClosure };
-	return clause;
-}*/
-
 bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string param1, string param2) {
 	string paramType1 = getParameterType(param1);
 	string paramType2 = getParameterType(param2);
-	cout << "param1: " << param1 << endl;
+	/*cout << "param1: " << param1 << endl;
 	cout << "param2: " << param2 << endl;
 	cout << "paramType1: " << paramType1 << endl;
-	cout << "paramType2: " << paramType2 << endl;
+	cout << "paramType2: " << paramType2 << endl;*/
 	if (paramType1 == "" || paramType2 == "") return false;
 
 	regex rel("([a-zA-Z]+)[*]?");
@@ -215,8 +188,8 @@ bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string pa
 		}
 	}
 
-	cout << "paramValid1: " << paramValid1 << endl;
-	cout << "paramValid2: " << paramValid2 << endl;
+	if (!paramValid1) cout << endl << endl << "### 1st parameter in " << relationship << " relationship is invalid";
+	if (!paramValid2) cout << endl << endl << "### 2nd parameter in " << relationship << " relationship is invalid";
 
 	return paramValid1 && paramValid2;
 }
@@ -227,12 +200,11 @@ string QueryPreprocessor::getParameterType(string param) {
 	}
 	regex doubleQuotes("[\"].*[\"]");
 	if (regex_match(param, doubleQuotes)) {
-		return keywords::query::VARIABLE_VAR;
+		return "_NAME";
 	}
 	if (entityAliases.count(param) == 1) {
 		return entityAliases[param];
 	}
-
 	return "";
 }
 

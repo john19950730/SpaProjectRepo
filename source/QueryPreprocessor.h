@@ -9,7 +9,7 @@
 using namespace std;
 
 const string QUERY_SYNTAX_REGEX = "^(?:[\\s]*(?:assign|variable|stmt|procedure|while)[\\s+](?:[a-zA-Z_][a-zA-Z0-9]*(?:[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*)[\\s]*[;][\\s]*)*(?:[Ss]elect[\\s]+[a-zA-Z_][a-zA-Z0-9]*(?:[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*(?:[\\s]+such that[\\s]+(?:Uses|Modifies|Follows|Parent)[*]?[(](?:[a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[\\s]*[,][\\s]*(?:[a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])*)*[;]?$";
-const string DECL_REGEX = "(assign|variable|stmt|procedure|while)[\\s+]([a-zA-Z_][a-zA-Z0-9]*(?:[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*)[;]";
+const string DECL_REGEX = "(assign|variable|stmt|procedure|while)[\\s+]([a-zA-Z_][a-zA-Z0-9]*(?:[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*)[;]?";
 const string RESULT_REGEX = "[Ss]elect[\\s]+((?:[a-zA-Z_][a-zA-Z0-9]*)(?:(?:[\\s]*[,][\\s]*)(?:[a-zA-Z_][a-zA-Z0-9]*))*)";
 const string REL_REGEX = "(?:((?:Uses|Modifies|Follows|Parent)[*]?)[(]([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])(?:[\\s]*[,][\\s]*)([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])";
 const string TRANS_REGEX = "[*]$";
