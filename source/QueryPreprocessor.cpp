@@ -5,7 +5,7 @@
 
 QueryPreprocessor::QueryPreprocessor()
 {
-	entityAliases = {};
+	synonymTable = {};
 	relParamTypes = {};
 	queryObject = new QueryObject();
 
@@ -26,7 +26,7 @@ QueryObject* QueryPreprocessor::getQueryObject() {
 
 bool QueryPreprocessor::parseQuery(string query)
 {
-	if (!isValidQuery(query)) {
+	if (!isValidQuerySyntax(query)) {
 		cout << endl << endl << "##### Query syntax is invalid!" << endl;
 		cout << endl << "### Example usage:  variable v; procedure v; select v such that Uses(1, v)" << endl;
 		cout << "#### keywords are case-sensitive i.e. relationships must begin with an upper-case letter, but 'select' and 'Select' are both accepted" << endl;
@@ -34,7 +34,7 @@ bool QueryPreprocessor::parseQuery(string query)
 		return false;
 	}
 	
-	extractAliasesFromDeclaration(query);
+	extractSynonymsFromDeclaration(query);
 
 	if (!buildQueryObject(query)) {
 		cout << endl << "##### Query is invalid!" << endl << endl;
@@ -95,22 +95,22 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 }
 
 // Checks if query syntax is valid
-bool QueryPreprocessor::isValidQuery(string query) {	
+bool QueryPreprocessor::isValidQuerySyntax(string query) {	
 	regex querySyntax(QUERY_SYNTAX_REGEX);
 	return regex_match(query, querySyntax);
 }
 
-bool QueryPreprocessor::extractAliasesFromDeclaration(string query) {
+bool QueryPreprocessor::extractSynonymsFromDeclaration(string query) {
 	regex declarationSyntax(DECL_REGEX);
 	smatch matches;
 
 	while (regex_search(query, matches, declarationSyntax)) {
 		string designEntity = matches[1];
-		string aliasStr = matches[2];
-		vector<string> aliasVctr = Utility::splitByDelimiter(aliasStr, ",");
-		for (size_t i = 0; i < aliasVctr.size(); i++)
+		string synonymStr = matches[2];
+		vector<string> synVctr = Utility::splitByDelimiter(synonymStr, ",");
+		for (size_t i = 0; i < synVctr.size(); i++)
 		{
-			entityAliases[aliasVctr[i]] = designEntity;
+			synonymTable[synVctr[i]] = designEntity;
 		}
 		query = matches.suffix();
 	}
@@ -123,7 +123,7 @@ bool QueryPreprocessor::isValidResultsClause(string query) {
 	smatch matches;
 	if (regex_search(query, matches, resultSyntax)) {
 		// Search hashmap to check if alias exists
-		if (entityAliases.count(matches[1].str()) != 1) {
+		if (synonymTable.count(matches[1].str()) != 1) {
 			return false; // not found
 		}
 	}
@@ -135,9 +135,9 @@ vector<string> QueryPreprocessor::createResultsClause(string query) {
 	regex resultSyntax(RESULT_REGEX);
 	smatch matches;
 	regex_search(query, matches, resultSyntax);
-	string aliasType = entityAliases[matches[1].str()];
-	string aliasName = matches[1].str();
-	clause.push_back(aliasName);
+	string synonymType = synonymTable[matches[1].str()];
+	string synonymName = matches[1].str();
+	clause.push_back(synonymName);
 	return clause;
 }
 
@@ -205,13 +205,13 @@ string QueryPreprocessor::getParameterType(string param) {
 		return "_NAME";
 	}
 	if (isSynonym(param)) {
-		return entityAliases[param];
+		return synonymTable[param];
 	}
 	return "";
 }
 
 bool QueryPreprocessor::isSynonym(string param) {
-	if (entityAliases.count(param) == 1) {
+	if (synonymTable.count(param) == 1) {
 		return true;
 	}
 	return false;

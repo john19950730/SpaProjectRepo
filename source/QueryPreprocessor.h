@@ -26,12 +26,12 @@ public:
 
 private:
 	QueryObject *queryObject;
-	map<string, string> entityAliases;
+	map<string, string> synonymTable;
 	map<string, pair<vector<string>, vector<string>>> relParamTypes;
 
 	bool buildQueryObject(string query);
-	bool isValidQuery(string query);
-	bool extractAliasesFromDeclaration(string query);
+	bool isValidQuerySyntax(string query);
+	bool extractSynonymsFromDeclaration(string query);
 	bool isValidResultsClause(string query);
 	bool isRelationshipParamsValid(string relationship, string param1, string param2);
 	
