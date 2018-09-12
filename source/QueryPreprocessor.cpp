@@ -10,7 +10,7 @@ QueryPreprocessor::QueryPreprocessor()
 	queryObject = new QueryObject();
 
 	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_NAME" };
-	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_NAME" };
+	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_", "_NAME" };
 	vector<string> followsParentParam1 = { keywords::query::STMT_VAR };
 	vector<string> followsParentParam2 = { keywords::query::STMT_VAR };
 
@@ -122,7 +122,7 @@ bool QueryPreprocessor::isValidResultsClause(string query) {
 	regex resultSyntax(RESULT_REGEX);
 	smatch matches;
 	if (regex_search(query, matches, resultSyntax)) {
-		// Search hashmap to check if alias exists
+		// Search hashmap to check if synonym exists
 		if (synonymTable.count(matches[1].str()) != 1) {
 			return false; // not found
 		}
@@ -199,6 +199,9 @@ bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string pa
 string QueryPreprocessor::getParameterType(string param) {
 	if (Utility::isInteger(param)) {
 		return keywords::query::STMT_VAR;
+	}
+	if (param == "_") {
+		return "_";
 	}
 	regex doubleQuotes("[\"].*[\"]");
 	if (regex_match(param, doubleQuotes)) {
