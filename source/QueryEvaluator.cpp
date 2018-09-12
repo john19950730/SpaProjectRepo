@@ -15,9 +15,15 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 string QueryEvaluator::evaluateQueryObject() {
 	if (!queryObject->hasClauses()) {
 		cout << "No clauses" << endl;
+		SUCH_THAT_CLAUSE usesClause = { "uses", "ya", false };
+		vector<SUCH_THAT_CLAUSE> usesClauses;
+		usesClauses.push_back(usesClause);
+		queryObject->setUsesClause(usesClauses);
+		cout << queryObject->getUsesClause().at(0).firstParameter << endl;
 		return selectImmediateResults();
 	}
-	
+
+
 	// First milestone - evaluate only one clause
 	if (queryObject->getNumberOfClauses() == 1) return evaluateSingleClause();
 	
@@ -28,10 +34,10 @@ string QueryEvaluator::evaluateQueryObject() {
 string QueryEvaluator::selectImmediateResults() {
 	vector<string> selectSynonyms = queryObject->getSelectClause();
 	
-	if (varType == ASSIGNMENT_VAR) return "allAssignmentStmts";
+	/*if (varType == ASSIGNMENT_VAR) return "allAssignmentStmts";
 	else if (varType == VARIABLE_VAR) return "allVariableStmts";
 	else if (varType == STMT_VAR) return "allStmts";
-	else if (varType == PROC_VAR) return "allProcedures";
+	else if (varType == PROC_VAR) return "allProcedures";*/
 
 	return "";
 }
@@ -44,11 +50,11 @@ string QueryEvaluator::evaluateSingleClause() {
 }
 
 string QueryEvaluator::evaluateUsesClause() {
-	STMT_PROC_VAR_RS_CLAUSE usesClause = queryObject->getUsesClause();
-	string firstEntity = usesClause.firstEntity; // check if the first parameter is a stmtNo or synonym
-	string variable = usesClause.variable;
+	vector<SUCH_THAT_CLAUSE> usesClause = queryObject->getUsesClause();
+	//string firstEntity = usesClause.firstParameter; // check if the first parameter is a stmtNo or synonym
+	//string variable = usesClause.secondParameter;
 
-	if (Utility::isInteger(firstEntity)) {
+	/*if (Utility::isInteger(firstEntity)) {
 		int parsedFirstEntity = stoi(firstEntity);
 		// return the "select" immediately if its true
 		if(PKB::isUses(parsedFirstEntity, variable)) return selectImmediateResults();
@@ -59,7 +65,7 @@ string QueryEvaluator::evaluateUsesClause() {
 			, variable);
 		if(stmtsThatUsesVariable.size !=0 ) cout << getStmtsThatUsesVariable << endl;
 		else return "";
-	}
+	}*/
 
 	return "";
 }

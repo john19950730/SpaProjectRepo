@@ -45,6 +45,10 @@ void QueryObject::setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause) {
 	usesClauseIsset = true;
 }
 
+void QueryObject::setEntityAliasMap(map<string, string> entityAliases) {
+	this->entityAliases = entityAliases;
+}
+
 vector<SUCH_THAT_CLAUSE> QueryObject::getFollowsClause() {
 	return followsClause;
 }

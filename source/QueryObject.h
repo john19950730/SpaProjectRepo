@@ -33,6 +33,7 @@ public:
 	void setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause);
 	void setFollowsClause(vector<SUCH_THAT_CLAUSE> followsClause);
 	void setParentClause(vector<SUCH_THAT_CLAUSE> parentClause);
+	void setEntityAliasMap(map<string, string> entityAliases);
 
 	// Getter methods
 	vector<string> getSelectClause();
