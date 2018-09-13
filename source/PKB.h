@@ -46,6 +46,11 @@ public:
 	static vector<int> getAllWhileThatUses(string varName);
 	static vector<string> getAllProcedureThatUses(string varName);
 
+	// SPA Uses Pair query
+	static vector< pair<int, string> > getAllAssignmentUsesVariablePairs();
+	static vector< pair<int, string> > getAllStmtUsesVariablePairs();
+	static vector< pair<string, string> > getAllProcedureUsesVariablePairs();
+
 	// SPA advanced Modifies query
 	static vector<int> getAllStmtThatModifies(string varName);
 	static vector<int> getAllAssignmentThatModifies(string varName);
@@ -53,6 +58,11 @@ public:
 	static vector<int> getAllIfThatModifies(string varName);
 	static vector<int> getAllWhileThatModifies(string varName);
 	static vector<string> getAllProcedureThatModifies(string varName);
+
+	// SPA Modifies Pair query
+	static vector< pair<int, string> > getAllAssignmentModifiesVariablePairs();
+	static vector< pair<int, string> > getAllStmtModifiesVariablePairs();
+	static vector< pair<string, string> > getAllProcedureModifiesVariablePairs();
 
 	// SPA synonyms query
 	static vector<string> getVariables();

@@ -158,6 +158,37 @@ bool PKB::isFollows(int stmtNo1, int stmtNo2, bool star)
 	}
 }
 
+vector< pair<int, string> > PKB::getAllAssignmentUsesVariablePairs()
+{
+	vector< pair<int, string> > result;
+	for_each(assignList.begin(), assignList.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+vector< pair<int, string> > PKB::getAllStmtUsesVariablePairs()
+{
+	vector<int> stmts(usesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<int, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
+{
+	// TODO: Be able to check line numbers enclosed by procedures (for multi-procedure support)
+	vector<int> stmts(usesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<string, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<string, string>(procedureList[0], varName)); }); });
+	return result;
+}
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
 	if (!star) {
@@ -254,6 +285,40 @@ vector<int> PKB::getAllWhileThatModifies(string varName)
 vector<string> PKB::getAllProcedureThatModifies(string varName)
 {
 	return vector<string>();
+}
+
+vector< pair<int, string> > PKB::getAllAssignmentModifiesVariablePairs()
+{
+	vector< pair<int, string> > result;
+	for_each(assignList.begin(), assignList.end(),
+		[&](int stmtNo) { for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+
+vector< pair<int, string> > PKB::getAllStmtModifiesVariablePairs()
+{
+	vector<int> stmts(modifiesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<int, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+
+vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
+{
+	// TODO: Be able to check line numbers enclosed by procedures (for multi-procedure support)
+	vector<int> stmts(usesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<string, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<string, string>(procedureList[0], varName)); }); });
+	return result;
 }
 
 vector<string> PKB::getVariables()
