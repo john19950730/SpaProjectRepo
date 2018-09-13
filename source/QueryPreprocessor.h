@@ -18,11 +18,11 @@ const string SYNONYM = "[a-zA-Z_][a-zA-Z0-9]*";		// Synonym
 const string NUMBER = "[0-9]+";						// Number
 const string STRING = "[\"].+[\"]";					// One or more characters enclosed in double quotes
 
-const string DECL_DE = "assign|variable|stmt|procedure|while";		// Design entities
-const string REL = "Uses|Modifies";									// Relationships (that don't support transitive closure)
-const string REL_T = "Follows|Parent";								// Relationships (that support transitive closure)
-const string REL_PARAM = SYNONYM + '|' + NUMBER + '|' + STRING;		// Possible relationshp parameter
-const string ASTERISK = "[*]?";										// Asterisk to indicate transitive closure
+const string DECL_DE = "assign|variable|stmt|procedure|while|read|print|call|constant";		// Design entities
+const string REL = "Uses|Modifies";															// Relationships (that don't support transitive closure)
+const string REL_T = "Follows|Parent";														// Relationships (that support transitive closure)
+const string REL_PARAM = SYNONYM + '|' + NUMBER + '|' + STRING;								// Possible relationshp parameter
+const string ASTERISK = "[*]?";																// Asterisk to indicate transitive closure
 
 const string DECL_REGEX = '(' + DECL_DE + ')' + SPACE + '(' + SYNONYM + "(?:" + COMMA + SYNONYM + ")*)" + SEMICOLON;
 const string RESULT_REGEX = "[Ss]elect" + SPACE + "((?:" + SYNONYM + ")(?:" + COMMA + SYNONYM + ")*)";
@@ -54,6 +54,7 @@ private:
 	bool isRelationshipParamsValid(string relationship, string param1, string param2);
 	
 	bool isSynonym(string param);
+	bool isTypeOfStatement(string param);
 	string getParameterType(string param);
 	string stripDoubleQuotes(string param);
 

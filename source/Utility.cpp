@@ -13,15 +13,6 @@ bool Utility::isInteger(string s)
 	return !s.empty() && it == s.end();*/
 }
 
-bool Utility::matchesDesignEntityKeyword(string s) {
-	for (size_t i = 0; i < keywords::query::DESIGN_ENTITY.size(); i++) {
-		if (s == keywords::query::DESIGN_ENTITY[i]) {
-			return true;
-		}
-	}
-	return false;
-}
-
 vector<string> Utility::splitByDelimiter(string s, string delimiter)
 {
 	size_t pos = 0;

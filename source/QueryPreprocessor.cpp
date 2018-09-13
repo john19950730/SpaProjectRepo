@@ -11,8 +11,8 @@ QueryPreprocessor::QueryPreprocessor()
 
 	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_NAME" };
 	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_NAME" };
-	vector<string> followsParentParam1 = { keywords::query::STMT_VAR };
-	vector<string> followsParentParam2 = { keywords::query::STMT_VAR };
+	vector<string> followsParentParam1 = { keywords::query::STMT_VAR, "_UNDERSCORE" };
+	vector<string> followsParentParam2 = { keywords::query::STMT_VAR, "_UNDERSCORE" };
 
 	relParamTypes["Uses"] = make_pair(usesModParam1, usesModParam2);
 	relParamTypes["Modifies"] = make_pair(usesModParam1, usesModParam2);
@@ -208,7 +208,14 @@ string QueryPreprocessor::getParameterType(string param) {
 		return "_NAME";
 	}
 	if (isSynonym(param)) {
-		return synonymTable[param];
+		if (isTypeOfStatement(synonymTable[param])) {
+			// is a type of statement e.g. assign, while, if, etc.
+			return keywords::query::STMT_VAR;
+		}
+		else {
+			// could be procedure, constant, variable, etc.
+			return synonymTable[param];
+		}
 	}
 	return "";
 }
@@ -216,6 +223,16 @@ string QueryPreprocessor::getParameterType(string param) {
 bool QueryPreprocessor::isSynonym(string param) {
 	if (synonymTable.count(param) == 1) {
 		return true;
+	}
+	return false;
+}
+
+bool QueryPreprocessor::isTypeOfStatement(string param) {
+	vector<string> statementTypes = keywords::query::STATEMENTS;
+	for (size_t i = 0; i < statementTypes.size(); i++)
+	{
+		if (param == statementTypes[i])
+			return true;
 	}
 	return false;
 }
