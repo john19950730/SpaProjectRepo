@@ -32,6 +32,7 @@ vector<string> Utility::splitByDelimiter(string s, string delimiter)
 		vector.push_back(trim_copy(token));
 		s.erase(0, pos + delimiter.length());
 	}
+	vector.push_back(trim_copy(s));
 	return vector;
 }
 

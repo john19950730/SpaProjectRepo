@@ -5,12 +5,12 @@
 
 QueryPreprocessor::QueryPreprocessor()
 {
-	entityAliases = {};
+	synonymTable = {};
 	relParamTypes = {};
 	queryObject = new QueryObject();
 
-	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR };
-	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR };
+	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_NAME" };
+	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_NAME" };
 	vector<string> followsParentParam1 = { keywords::query::STMT_VAR };
 	vector<string> followsParentParam2 = { keywords::query::STMT_VAR };
 
@@ -26,32 +26,36 @@ QueryObject* QueryPreprocessor::getQueryObject() {
 
 bool QueryPreprocessor::parseQuery(string query)
 {
-	if (!isValidQuery(query)) {
-		cout << endl << "##### Query syntax not valid!" << endl;
+	if (!isValidQuerySyntax(query)) {
+		cout << endl << endl << "##### Query syntax is invalid!" << endl;
+		cout << endl << "### Example usage:  variable v; procedure v; select v such that Uses(1, v)" << endl;
+		cout << "#### keywords are case-sensitive i.e. relationships must begin with an upper-case letter, but 'select' and 'Select' are both accepted" << endl;
+		cout << "#### semicolon at the end of `select` clause is optional" << endl << endl;
 		return false;
 	}
 	
-	extractAliasesFromDeclaration(query);
+	extractSynonymsFromDeclaration(query);
 
 	if (!buildQueryObject(query)) {
-		cout << endl << "##### Query not valid!" << endl;
+		cout << endl << "##### Query is invalid!" << endl << endl;
 		return false;
 	}
-
-	// [SOLVED] doesn't print/access properly (only for select clause)
-	/*cout << "Testing parsing: " << endl;
-	SELECT_VAR_CLAUSE selectClause = queryObject->getSelectClause();
-	cout << "Variable name: " << selectClause.variableName << endl;*/
-	// cout << queryObject->getSelectClause()->variableName << endl;
 
 	return true;
 }
 
 bool QueryPreprocessor::buildQueryObject(string query) {
-	if (!isValidResultsClause(query))
+	if (!isValidResultsClause(query)) {
+		cout << endl << endl << "### Check that you have declared all used synonyms";
 		return false;
+	}
 	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
+
+	vector<SUCH_THAT_CLAUSE> usesClauses;
+	vector<SUCH_THAT_CLAUSE> modifiesClauses;
+	vector<SUCH_THAT_CLAUSE> followsClauses;
+	vector<SUCH_THAT_CLAUSE> parentClauses;
 
 	regex relSyntax(REL_REGEX);
 	smatch matches;
@@ -59,30 +63,27 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 		string relationship = matches[1];
 		string param1 = matches[2];
 		string param2 = matches[3];
+		SUCH_THAT_CLAUSE clause;
 		if (isRelationshipParamsValid(relationship, param1, param2)) {
 			if (relationship == "Uses" || relationship == "Uses*") {
-				vector<SUCH_THAT_CLAUSE> usesClauses; // Added
-				SUCH_THAT_CLAUSE usesClause = createSuchThatClause(relationship, param1, param2); // Modified
-				usesClauses.push_back(usesClause); // Added
-				queryObject->setUsesClause(usesClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				usesClauses.push_back(clause);
+				queryObject->setUsesClause(usesClauses);
 			}
 			else if (relationship == "Modifies" || relationship == "Modifies*") {
-				vector<SUCH_THAT_CLAUSE> modifiesClauses; // Added
-				SUCH_THAT_CLAUSE modifiesClause = createSuchThatClause(relationship, param1, param2); // Modified
-				modifiesClauses.push_back(modifiesClause); // Added
-				queryObject->setModifiesClause(modifiesClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				modifiesClauses.push_back(clause);
+				queryObject->setModifiesClause(modifiesClauses);
 			}
 			else if (relationship == "Follows" || relationship == "Follows*") {
-				vector<SUCH_THAT_CLAUSE> followsClauses; // Added
-				SUCH_THAT_CLAUSE followsClause = createSuchThatClause(relationship, param1, param2); // Modified
-				followsClauses.push_back(followsClause); // Added
-				queryObject->setFollowsClause(followsClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				followsClauses.push_back(clause);
+				queryObject->setFollowsClause(followsClauses);
 			}
 			else if (relationship == "Parent" || relationship == "Parent*") {
-				vector<SUCH_THAT_CLAUSE> parentClauses; // Added
-				SUCH_THAT_CLAUSE parentClause = createSuchThatClause(relationship, param1, param2); // Modified
-				parentClauses.push_back(parentClause); // Added
-				queryObject->setParentClause(parentClauses); // Modified
+				clause = createSuchThatClause(relationship, param1, param2);
+				parentClauses.push_back(clause);
+				queryObject->setParentClause(parentClauses);
 			}
 		}
 		else {
@@ -94,25 +95,23 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 }
 
 // Checks if query syntax is valid
-bool QueryPreprocessor::isValidQuery(string query) {	
+bool QueryPreprocessor::isValidQuerySyntax(string query) {	
 	regex querySyntax(QUERY_SYNTAX_REGEX);
 	return regex_match(query, querySyntax);
 }
 
-bool QueryPreprocessor::extractAliasesFromDeclaration(string query) {
+bool QueryPreprocessor::extractSynonymsFromDeclaration(string query) {
 	regex declarationSyntax(DECL_REGEX);
 	smatch matches;
 
 	while (regex_search(query, matches, declarationSyntax)) {
 		string designEntity = matches[1];
-		string aliasStr = matches[2];
-
-		vector<string> aliasVctr = Utility::splitByDelimiter(aliasStr, ",");
-		for (size_t i = 0; i < aliasVctr.size(); i++)
+		string synonymStr = matches[2];
+		vector<string> synVctr = Utility::splitByDelimiter(synonymStr, ",");
+		for (size_t i = 0; i < synVctr.size(); i++)
 		{
-			entityAliases[aliasVctr[i]] = designEntity;
+			synonymTable[synVctr[i]] = designEntity;
 		}
-
 		query = matches.suffix();
 	}
 
@@ -123,28 +122,25 @@ bool QueryPreprocessor::isValidResultsClause(string query) {
 	regex resultSyntax(RESULT_REGEX);
 	smatch matches;
 	if (regex_search(query, matches, resultSyntax)) {
-		// Search hashmap to check if alias exists
-		if (entityAliases.count(matches[1].str()) != 1) {
+		// Search hashmap to check if synonym exists
+		if (synonymTable.count(matches[1].str()) != 1) {
 			return false; // not found
 		}
 	}
 	return true;
 }
 
-// Modified
 vector<string> QueryPreprocessor::createResultsClause(string query) {
 	vector<string> clause;
 	regex resultSyntax(RESULT_REGEX);
 	smatch matches;
 	regex_search(query, matches, resultSyntax);
-	string aliasType = entityAliases[matches[1].str()];
-	string aliasName = matches[1].str();
-	clause.push_back(aliasName); // Added
-	//clause = { aliasType, aliasName }; 
+	string synonymType = synonymTable[matches[1].str()];
+	string synonymName = matches[1].str();
+	clause.push_back(synonymName);
 	return clause;
 }
 
-// Added
 SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, string param1, string param2) {
 	SUCH_THAT_CLAUSE clause;
 	regex transSyntax(TRANS_REGEX);
@@ -153,41 +149,20 @@ SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, st
 	if (regex_search(relationship, matches, transSyntax)) {
 		hasTransitiveClosure = true;
 	}
-	clause = { param1, param2, hasTransitiveClosure, false, false }; // Please determine if params are synonyms
+	bool paramIsSynonym1 = isSynonym(param1);
+	bool paramIsSynonym2 = isSynonym(param2);
+	clause = { stripDoubleQuotes(param1), stripDoubleQuotes(param2),
+		hasTransitiveClosure, paramIsSynonym1, paramIsSynonym2 };
 	return clause;
 }
-
-/*STMT_PROC_VAR_RS_CLAUSE QueryPreprocessor::createStmtProcVarRsClause(string relationship, string param1, string param2) {
-	STMT_PROC_VAR_RS_CLAUSE clause;
-	regex transSyntax(TRANS_REGEX);
-	smatch matches;
-	bool hasTransitiveClosure = false;
-	if (regex_search(relationship, matches, transSyntax)) {
-		hasTransitiveClosure = true;
-	}
-	clause = { param1, param2, hasTransitiveClosure };
-	return clause;
-}
-
-STMT_RS_CLAUSE QueryPreprocessor::createStmtRsClause(string relationship, string param1, string param2) {
-	STMT_RS_CLAUSE clause;
-	regex transSyntax(TRANS_REGEX);
-	smatch matches;
-	bool hasTransitiveClosure = false;
-	if (regex_search(relationship, matches, transSyntax)) {
-		hasTransitiveClosure = true;
-	}
-	clause = { param1, param2, hasTransitiveClosure };
-	return clause;
-}*/
 
 bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string param1, string param2) {
 	string paramType1 = getParameterType(param1);
 	string paramType2 = getParameterType(param2);
-	cout << "param1: " << param1 << endl;
+	/*cout << "param1: " << param1 << endl;
 	cout << "param2: " << param2 << endl;
 	cout << "paramType1: " << paramType1 << endl;
-	cout << "paramType2: " << paramType2 << endl;
+	cout << "paramType2: " << paramType2 << endl;*/
 	if (paramType1 == "" || paramType2 == "") return false;
 
 	regex rel("([a-zA-Z]+)[*]?");
@@ -215,8 +190,8 @@ bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string pa
 		}
 	}
 
-	cout << "paramValid1: " << paramValid1 << endl;
-	cout << "paramValid2: " << paramValid2 << endl;
+	if (!paramValid1) cout << endl << endl << "### 1st parameter in " << relationship << " relationship is invalid";
+	if (!paramValid2) cout << endl << endl << "### 2nd parameter in " << relationship << " relationship is invalid";
 
 	return paramValid1 && paramValid2;
 }
@@ -225,14 +200,30 @@ string QueryPreprocessor::getParameterType(string param) {
 	if (Utility::isInteger(param)) {
 		return keywords::query::STMT_VAR;
 	}
+	if (param == "_") {
+		return "_UNDERSCORE";
+	}
 	regex doubleQuotes("[\"].*[\"]");
 	if (regex_match(param, doubleQuotes)) {
-		return keywords::query::VARIABLE_VAR;
+		return "_NAME";
 	}
-	if (entityAliases.count(param) == 1) {
-		return entityAliases[param];
+	if (isSynonym(param)) {
+		return synonymTable[param];
 	}
-
 	return "";
 }
 
+bool QueryPreprocessor::isSynonym(string param) {
+	if (synonymTable.count(param) == 1) {
+		return true;
+	}
+	return false;
+}
+
+string QueryPreprocessor::stripDoubleQuotes(string param) {
+	if (param.front() == '"') {
+		param.erase(0, 1); // erase the first character
+		param.erase(param.size() - 1); // erase the last character
+	}
+	return param;
+}
