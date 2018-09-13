@@ -24,7 +24,7 @@ static vector<int> ifList;
 static int ifListIndex = 0;
 static vector<int> whileList;
 static int whileListIndex = 0;
-static vector<string> procedureList;
+static vector< pair<string, pair<int, int> > > procedureList;
 static int procedureListIndex = 0;
 
 // element at index i means Follows(i, element) holds
@@ -79,9 +79,9 @@ int PKB::addWhile(int stmtNo)
 	return whileListIndex++;
 }
 
-int PKB::addProcedure(string procName)
+int PKB::addProcedure(string procName, pair<int, int> startEndLine)
 {
-	procedureList.push_back(procName);
+	procedureList.push_back(make_pair(procName, startEndLine));
 	return procedureListIndex++;
 }
 
@@ -186,7 +186,7 @@ vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 	vector< pair<string, string> > result;
 	for_each(stmts.begin(), stmts.end(),
 		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<string, string>(procedureList[0], varName)); }); });
+			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
 	return result;
 }
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
@@ -317,7 +317,7 @@ vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 	vector< pair<string, string> > result;
 	for_each(stmts.begin(), stmts.end(),
 		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<string, string>(procedureList[0], varName)); }); });
+			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
 	return result;
 }
 
@@ -351,7 +351,7 @@ vector<int> PKB::getWhiles()
 	return whileList;
 }
 
-vector<string> PKB::getProcedures()
+vector< pair<string, pair<int, int> > > PKB::getProcedures()
 {
 	return procedureList;
 }

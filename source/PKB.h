@@ -30,7 +30,7 @@ public:
 	static int addPrint(int stmtNo);
 	static int addIf(int stmtNo);
 	static int addWhile(int stmtNo);
-	static int addProcedure(string procName);
+	static int addProcedure(string procName, pair<int, int> startEndLine);
 
 	// SPA relationships query
 	static bool isFollows(int stmtNo1, int stmtNo2, bool star);
@@ -71,5 +71,5 @@ public:
 	static vector<int> getPrints();
 	static vector<int> getIfs();
 	static vector<int> getWhiles();
-	static vector<string> getProcedures();
+	static vector< pair<string, pair<int, int> > > getProcedures();
 };
