@@ -8,11 +8,29 @@
 
 using namespace std;
 
-const string QUERY_SYNTAX_REGEX = "^(?:[\\s]*(?:assign|variable|stmt|procedure|while)[\\s+](?:[a-zA-Z_][a-zA-Z0-9]*(?:[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*)[\\s]*[;][\\s]*)*(?:[Ss]elect[\\s]+[a-zA-Z_][a-zA-Z0-9]*(?:[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*(?:[\\s]+such that[\\s]+(?:Uses|Modifies|Follows|Parent)[*]?[(](?:[a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[\\s]*[,][\\s]*(?:[a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])*)*[;]?$";
-const string DECL_REGEX = "(assign|variable|stmt|procedure|while)[\\s+]([a-zA-Z_][a-zA-Z0-9]*(?:[\\s]*[,][\\s]*[a-zA-Z_][a-zA-Z0-9]*)*)[;]?";
-const string RESULT_REGEX = "[Ss]elect[\\s]+((?:[a-zA-Z_][a-zA-Z0-9]*)(?:(?:[\\s]*[,][\\s]*)(?:[a-zA-Z_][a-zA-Z0-9]*))*)";
-const string REL_REGEX = "(?:((?:Uses|Modifies|Follows|Parent)[*]?)[(]([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])(?:[\\s]*[,][\\s]*)([a-zA-Z_][a-zA-Z0-9]*|[0-9]+|[\"].*[\"])[)])";
-const string TRANS_REGEX = "[*]$";
+const string SPACE = "[\\s]+";						// One or more spaces
+const string COMMA = "[\\s]*[,][\\s]*";				// Comma (padded by zero or more spaces)
+const string SEMICOLON = "[\\s]*[;][\\s]*";			// Semicolon (padded by zero or more spaces)
+const string SEMICOLON_OPT = "[\\s]*[;]?[\\s]*";	// Semicolon (optional; padded by zero or more spaces)
+const string BRACKET_O = "[\\s]*[(][\\s]*";			// Open bracket (padded by zero or more spaces)
+const string BRACKET_C = "[\\s]*[)][\\s]*";			// Close bracket (padded by zero or more spaces)
+const string SYNONYM = "[a-zA-Z_][a-zA-Z0-9]*";		// Synonym
+const string NUMBER = "[0-9]+";						// Number
+const string STRING = "[\"].+[\"]";					// One or more characters enclosed in double quotes
+
+const string DECL_DE = "assign|variable|stmt|procedure|while";		// Design entities
+const string REL = "Uses|Modifies";									// Relationships (that don't support transitive closure)
+const string REL_T = "Follows|Parent";								// Relationships (that support transitive closure)
+const string REL_PARAM = SYNONYM + '|' + NUMBER + '|' + STRING;		// Possible relationshp parameter
+const string ASTERISK = "[*]?";										// Asterisk to indicate transitive closure
+
+const string DECL_REGEX = '(' + DECL_DE + ')' + SPACE + '(' + SYNONYM + "(?:" + COMMA + SYNONYM + ")*)" + SEMICOLON;
+const string RESULT_REGEX = "[Ss]elect" + SPACE + "((?:" + SYNONYM + ")(?:" + COMMA + SYNONYM + ")*)";
+const string REL_REGEX = '(' + REL + "|(?:" + REL_T + ")" + ASTERISK + ')' + BRACKET_O + "(?:(" + REL_PARAM + ')' + COMMA + '(' + REL_PARAM + "))" + BRACKET_C;
+const string SUCH_THAT = SPACE + "such" + SPACE + "that" + SPACE + "(?:" + REL_REGEX + ")*";
+const string QUERY_SYNTAX_REGEX = "^((" + DECL_REGEX + ")*" + '(' + RESULT_REGEX + "(?:" + SUCH_THAT + ")*)*)" + SEMICOLON_OPT + '$';
+
+const string TRANS_REGEX = "[*]$";	// To check for transitive closure
 
 struct SUCH_THAT_CLAUSE;
 

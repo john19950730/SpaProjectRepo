@@ -65,12 +65,12 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 		string param2 = matches[3];
 		SUCH_THAT_CLAUSE clause;
 		if (isRelationshipParamsValid(relationship, param1, param2)) {
-			if (relationship == "Uses" || relationship == "Uses*") {
+			if (relationship == "Uses") {
 				clause = createSuchThatClause(relationship, param1, param2);
 				usesClauses.push_back(clause);
 				queryObject->setUsesClause(usesClauses);
 			}
-			else if (relationship == "Modifies" || relationship == "Modifies*") {
+			else if (relationship == "Modifies") {
 				clause = createSuchThatClause(relationship, param1, param2);
 				modifiesClauses.push_back(clause);
 				queryObject->setModifiesClause(modifiesClauses);
