@@ -202,7 +202,19 @@ vector<string> PKB::getAllVariablesUsedByStmtNo(int stmtNo)
 }
 vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
 {
-	return vector<string>();
+	unordered_map<string, pair<int, int> >::const_iterator procedure = procedureMap.find(procName);
+	if (procedure == procedureMap.end())
+		return vector<string>();
+	vector<string> result;
+	pair<int, int> stmtNoRange = procedure->second;
+	vector<int> stmts(stmtNoRange.second - stmtNoRange.first + 1);
+	int n = stmtNoRange.first;
+	generate(stmts.begin(), stmts.end(), [&] {return n++; });
+	for_each(stmts.begin(), stmts.end(), [&](int stmtNo) {
+		for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), [&](string varName) {
+			if (find(result.begin(), result.end(), varName) == result.end())
+				result.push_back(varName);
+		}); });
 }
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
@@ -381,7 +393,19 @@ vector<string> PKB::getAllVariablesModifiedByStmtNo(int stmtNo)
 
 vector<string> PKB::getAllVariablesModifiedByProcedures(string procName)
 {
-	return vector<string>();
+	unordered_map<string, pair<int, int> >::const_iterator procedure = procedureMap.find(procName);
+	if (procedure == procedureMap.end())
+		return vector<string>();
+	vector<string> result;
+	pair<int, int> stmtNoRange = procedure->second;
+	vector<int> stmts(stmtNoRange.second - stmtNoRange.first + 1);
+	int n = stmtNoRange.first;
+	generate(stmts.begin(), stmts.end(), [&] {return n++; });
+	for_each(stmts.begin(), stmts.end(), [&](int stmtNo) {
+		for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), [&](string varName) {
+			if (find(result.begin(), result.end(), varName) == result.end())
+				result.push_back(varName);
+	}); });
 }
 
 vector<string> PKB::getVariables()
