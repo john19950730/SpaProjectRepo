@@ -80,23 +80,19 @@ bool QueryObject::hasClauses() {
 }
 
 bool QueryObject::hasFollowsClause() {
-	if (followsClauseIsset) return false;
-	return true;
+	return followsClauseIsset;
 }
 
 bool QueryObject::hasModifiesClause() {
-	if (modifiesClauseIsset) return false;
-	return true;
+	return modifiesClauseIsset;
 }
 
 bool QueryObject::hasParentClause() {
-	if (parentClauseIsset) return false;
-	return true;
+	return parentClauseIsset;
 }
 
 bool QueryObject::hasUsesClause() {
-	if (usesClauseIsset) return false;
-	return true;
+	return usesClauseIsset;
 }
 
 // Changes to be made in iteration 2
