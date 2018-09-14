@@ -87,14 +87,14 @@ int PKB::addProcedure(string procName, pair<int, int> startEndLine)
 
 void PKB::addFollows(int stmtBefore, int stmtAfter)
 {
-	while (followsList.size() <= stmtBefore)
+	while (followsList.size() <= (unsigned int) stmtBefore)
 		followsList.push_back(0);
 	followsList[stmtBefore] = stmtAfter;
 
-	while (followsStarTable.size() <= stmtAfter)
+	while (followsStarTable.size() <= (unsigned int) stmtAfter)
 		followsStarTable.push_back(vector<bool>(stmtAfter));
 	for (unsigned int i = 0; i < followsStarTable.size(); ++i) {
-		while (followsStarTable[i].size() <= stmtAfter)
+		while (followsStarTable[i].size() <= (unsigned int) stmtAfter)
 			followsStarTable[i].push_back(false);
 	}
 
@@ -103,7 +103,7 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 	followsStarTable[stmtAfter][stmtAfter] = false;
 	
 	unsigned int i;
-	for (i = 1; i <= stmtBefore; ++i) {
+	for (i = 1; i <= (unsigned int) stmtBefore; ++i) {
 		followsStarTable[i][stmtAfter] = followsStarTable[i][stmtBefore];
 	}
 	for (i = stmtAfter + 1; i <= followsStarTable[stmtBefore].size(); ++i) {
@@ -113,14 +113,14 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 
 void PKB::addParent(int stmtParent, int stmtChild)
 {
-	while (parentList.size() <= stmtChild)
+	while (parentList.size() <= (unsigned int) stmtChild)
 		parentList.push_back(0);
 	parentList[stmtChild] = stmtParent;
 
-	while (parentStarTable.size() <= stmtChild)
+	while (parentStarTable.size() <= (unsigned int) stmtChild)
 		parentStarTable.push_back(vector<bool>(stmtChild));
 	for (unsigned int i = 0; i < parentStarTable.size(); ++i) {
-		while (parentStarTable[i].size() <= stmtChild)
+		while (parentStarTable[i].size() <= (unsigned int) stmtChild)
 			parentStarTable[i].push_back(false);
 	}
 
@@ -179,19 +179,26 @@ vector< pair<int, string> > PKB::getAllStmtUsesVariablePairs()
 }
 vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 {
-	// TODO: Be able to check line numbers enclosed by procedures (for multi-procedure support)
-	vector<int> stmts(usesTable.size());
-	int n = 0;
-	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
 	vector< pair<string, string> > result;
-	for_each(stmts.begin(), stmts.end(),
-		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
+	for_each(procedureList.begin(), procedureList.end(),
+		[&](pair<string, pair<int, int> > procedure) {
+		string procName = procedure.first;
+		pair<int, int> stmtNoRange = procedure.second;
+		vector<int> stmts(stmtNoRange.second - stmtNoRange.first + 1);
+		int n = stmtNoRange.first;
+		generate(stmts.begin(), stmts.end(), [&] {return n++; });
+		for_each(stmts.begin(), stmts.end(), [&](int stmtNo) {
+			for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), [&](string varName) {
+				pair<string, string> procVarPair = make_pair(procedureList[0].first, varName);
+				if (find(result.begin(), result.end(), procVarPair) == result.end())
+					result.push_back(procVarPair); }); }); });
 	return result;
 }
 vector<string> PKB::getAllVariablesUsedByStmtNo(int stmtNo)
 {
-	return vector<string>();
+	if ((unsigned int) stmtNo >= usesTable.size())
+		return vector<string>();
+	return usesTable[stmtNo];
 }
 vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
 {
@@ -348,20 +355,28 @@ vector< pair<int, string> > PKB::getAllStmtModifiesVariablePairs()
 
 vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 {
-	// TODO: Be able to check line numbers enclosed by procedures (for multi-procedure support)
-	vector<int> stmts(usesTable.size());
-	int n = 0;
-	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
 	vector< pair<string, string> > result;
-	for_each(stmts.begin(), stmts.end(),
-		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
+	for_each(procedureList.begin(), procedureList.end(),
+		[&](pair<string, pair<int, int> > procedure) {
+		string procName = procedure.first;
+		pair<int, int> stmtNoRange = procedure.second;
+		vector<int> stmts(stmtNoRange.second - stmtNoRange.first + 1);
+		int n = stmtNoRange.first;
+		generate(stmts.begin(), stmts.end(), [&] {return n++; });
+		for_each(stmts.begin(), stmts.end(), [&](int stmtNo) {
+			for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), [&](string varName) { 
+				pair<string, string> procVarPair = make_pair(procName, varName);
+				if (find(result.begin(), result.end(), procVarPair) == result.end())
+					result.push_back(procVarPair);
+	}); }); });
 	return result;
 }
 
 vector<string> PKB::getAllVariablesModifiedByStmtNo(int stmtNo)
 {
-	return vector<string>();
+	if ((unsigned int)stmtNo >= modifiesTable.size())
+		return vector<string>();
+	return modifiesTable[stmtNo];
 }
 
 vector<string> PKB::getAllVariablesModifiedByProcedures(string procName)
