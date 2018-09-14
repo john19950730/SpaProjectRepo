@@ -19,6 +19,11 @@ namespace keywords {
 		const std::string PRINT_VAR = "print";
 		const std::string CALL_VAR = "call";
 		const std::vector<string> STATEMENTS = { STMT_VAR, ASSIGNMENT_VAR, IF_VAR, WHILE_VAR, READ_VAR, PRINT_VAR, CALL_VAR };
+
+		const std::string USES_RS = "uses";
+		const std::string MODIFIES_RS = "modifies";
+		const std::string FOLLOWS_RS = "follows";
+		const std::string PARENT_RS = "parent";
 	}
 	
 	namespace clauseParamType {
