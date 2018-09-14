@@ -24,7 +24,7 @@ static vector<int> ifList;
 static int ifListIndex = 0;
 static vector<int> whileList;
 static int whileListIndex = 0;
-static vector< pair<string, pair<int, int> > > procedureList;
+static unordered_map<string, pair<int, int> > procedureMap;
 static int procedureListIndex = 0;
 
 // element at index i means Follows(i, element) holds
@@ -81,7 +81,7 @@ int PKB::addWhile(int stmtNo)
 
 int PKB::addProcedure(string procName, pair<int, int> startEndLine)
 {
-	procedureList.push_back(make_pair(procName, startEndLine));
+	procedureMap.insert(make_pair(procName, startEndLine));
 	return procedureListIndex++;
 }
 
@@ -180,7 +180,7 @@ vector< pair<int, string> > PKB::getAllStmtUsesVariablePairs()
 vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 {
 	vector< pair<string, string> > result;
-	for_each(procedureList.begin(), procedureList.end(),
+	for_each(procedureMap.begin(), procedureMap.end(),
 		[&](pair<string, pair<int, int> > procedure) {
 		string procName = procedure.first;
 		pair<int, int> stmtNoRange = procedure.second;
@@ -189,7 +189,7 @@ vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 		generate(stmts.begin(), stmts.end(), [&] {return n++; });
 		for_each(stmts.begin(), stmts.end(), [&](int stmtNo) {
 			for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), [&](string varName) {
-				pair<string, string> procVarPair = make_pair(procedureList[0].first, varName);
+				pair<string, string> procVarPair = make_pair(procName, varName);
 				if (find(result.begin(), result.end(), procVarPair) == result.end())
 					result.push_back(procVarPair); }); }); });
 	return result;
@@ -356,7 +356,7 @@ vector< pair<int, string> > PKB::getAllStmtModifiesVariablePairs()
 vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 {
 	vector< pair<string, string> > result;
-	for_each(procedureList.begin(), procedureList.end(),
+	for_each(procedureMap.begin(), procedureMap.end(),
 		[&](pair<string, pair<int, int> > procedure) {
 		string procName = procedure.first;
 		pair<int, int> stmtNoRange = procedure.second;
@@ -414,7 +414,7 @@ vector<int> PKB::getWhiles()
 	return whileList;
 }
 
-vector< pair<string, pair<int, int> > > PKB::getProcedures()
+unordered_map<string, pair<int, int> > PKB::getProcedures()
 {
-	return procedureList;
+	return procedureMap;
 }
