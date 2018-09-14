@@ -51,6 +51,7 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 	}
 	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
+	queryObject->setSynonymTable(synonymTable);
 
 	vector<SUCH_THAT_CLAUSE> usesClauses;
 	vector<SUCH_THAT_CLAUSE> modifiesClauses;
