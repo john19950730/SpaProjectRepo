@@ -189,6 +189,14 @@ vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
 	return result;
 }
+vector<string> PKB::getAllVariablesUsedByStmtNo(int stmtNo)
+{
+	return vector<string>();
+}
+vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
+{
+	return vector<string>();
+}
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
 	if (!star) {
@@ -207,6 +215,36 @@ bool PKB::isUses(int stmtNo1, string varName)
 bool PKB::isModifies(int stmtNo1, string varName)
 {
 	return find(modifiesTable[stmtNo1].begin(), modifiesTable[stmtNo1].end(), varName) != modifiesTable[stmtNo1].end();
+}
+
+vector<pair<int, int>> PKB::getAllFollowsPair(bool star)
+{
+	return vector<pair<int, int>>();
+}
+
+vector<int> PKB::getStmtNoThatFollows(int stmtNo, bool star)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getStmtNoThatIsFollowedBy(int stmtNo, bool star)
+{
+	return vector<int>();
+}
+
+vector<pair<int, int>> PKB::getAllParentPair(bool star)
+{
+	return vector<pair<int, int>>();
+}
+
+vector<int> PKB::getStmtNoThatIsChildOf(int stmtNo, bool star)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getStmtNoThatIsParentOf(int stmtNo, bool star)
+{
+	return vector<int>();
 }
 
 vector<int> PKB::getAllStmtThatUses(string v)
@@ -319,6 +357,16 @@ vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
 			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
 	return result;
+}
+
+vector<string> PKB::getAllVariablesModifiedByStmtNo(int stmtNo)
+{
+	return vector<string>();
+}
+
+vector<string> PKB::getAllVariablesModifiedByProcedures(string procName)
+{
+	return vector<string>();
 }
 
 vector<string> PKB::getVariables()
