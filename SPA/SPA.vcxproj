@@ -19,12 +19,10 @@
     <ClCompile Include="..\source\QueryObject.cpp" />
     <ClCompile Include="..\source\QueryObjStructures.h" />
     <ClCompile Include="..\source\QueryPreprocessor.cpp" />
-    <ClCompile Include="..\source\Utility.cpp" />
     <ClCompile Include="..\source\TNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\CodeParser.h" />
-    <ClInclude Include="..\source\Utility.h" />
     <ClInclude Include="..\source\DesignExtractor.h" />
     <ClInclude Include="..\source\Keywords.h" />
     <ClInclude Include="..\source\LineOfCodeData.h" />

@@ -39,9 +39,6 @@
     <ClCompile Include="..\source\QueryObjStructures.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\Utility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\LineOfCodeData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -66,9 +63,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\QueryObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\LineOfCodeData.h">
