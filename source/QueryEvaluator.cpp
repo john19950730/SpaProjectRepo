@@ -13,10 +13,8 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 	this->queryObject = queryObject;
 }
 
-string QueryEvaluator::evaluateQueryObject() {
-	if (!queryObject->hasClauses()) {
-		return selectImmediateResults();
-	}
+string QueryEvaluator::evaluateQueryObject() {	
+	if (!queryObject->hasClauses()) return selectImmediateResults();
 
 	// First milestone - evaluate only one clause
 	if (queryObject->getNumberOfClauses() == 1) return evaluateSingleClause();
@@ -33,67 +31,222 @@ string QueryEvaluator::selectImmediateResults() {
 	else if (synonymType == VARIABLE_VAR) return "allVariableStmts";
 	else if (synonymType == STMT_VAR) return "allStmts";
 	else if (synonymType == PROC_VAR) return "allProcedures";
+	else if (synonymType == IF_VAR) return "allIfStmts";
+	else if (synonymType == WHILE_VAR) return "allWhileStmts";
+	else if (synonymType == READ_VAR) return "allReadStmts";
+	else if (synonymType == PRINT_VAR) return "allPrintStmts";
 
 	return "";
 }
 
 string QueryEvaluator::evaluateSingleClause() {
-	if (queryObject->hasUsesClause()) return evaluateUsesClause();
-	else if (queryObject->hasModifiesClause()) return evaluateModifiesClause();
-	else if (queryObject->hasParentClause()) return evaluateParentClause();
-	else if (queryObject->hasFollowsClause()) return evaluateFollowsClause();
+	if (queryObject->hasUsesClause()) return evaluateClause(queryObject->getUsesClause().at(0), USES_RS);
+	else if (queryObject->hasModifiesClause()) return evaluateClause(queryObject->getModifiesClause().at(0), MODIFIES_RS);
+	else if (queryObject->hasParentClause()) return evaluateClause(queryObject->getParentClause().at(0), PARENT_RS);
+	else if (queryObject->hasFollowsClause()) return evaluateClause(queryObject->getFollowsClause().at(0), FOLLOWS_RS);
 }
 
-string QueryEvaluator::evaluateUsesClause() {
-	SUCH_THAT_CLAUSE useClause = queryObject->getUsesClause().at(0);
-
+string QueryEvaluator::evaluateClause(SUCH_THAT_CLAUSE clause, string typeOfRs) {
 	// Extract the clause information
 	map<string, string> synonymTable = queryObject->getSynonymTable();
-	string firstParam = useClause.firstParameter;
-	string secondParam = useClause.secondParameter;
-	pair<string, string> paramType = getParamType(useClause);
-	
-	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
-		return "getAllVariablesUsedBy(int stmtNo)";
-	}
-	else if (paramType == make_pair(STMT_NO, VARIABLE)) {
-		if (PKB::isUses(stoi(firstParam), secondParam)) return noResult();
-		else return selectImmediateResults();
-	} 
-	else if (paramType == make_pair(PROC_NAME, SYNONYM) || paramType == make_pair(PROC_NAME, UNDERSCORE)) {
-		return "getAllProceduresUsedBy(string proc_name)";
-	}
-	else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
-		return "isProcUses(string proc_name, string variable)";
-	} 
-	else if (paramType == make_pair(SYNONYM, SYNONYM) || paramType == make_pair(SYNONYM, UNDERSCORE)) {
-		if (synonymTable[firstParam] == ASSIGNMENT_VAR) return "getAllAssignmentUsesVariablePairs()";
-		else if (synonymTable[firstParam] == STMT_VAR) return "getAllStmtUsesVariablePairs()";
-		else if (synonymTable[firstParam] == PROC_VAR) return "getAllProcedureUsesVariablePairs()";
+	string firstParam = clause.firstParameter;
+	string secondParam = clause.secondParameter;
+	pair<string, string> paramType = getParamType(clause);
 
-		return "";
+	if (paramType == make_pair(STMT_NO, VARIABLE) || paramType == make_pair(PROC_NAME, VARIABLE)
+		|| paramType == make_pair(STMT_NO, STMT_NO)) {
+		return evaluateNonSynonym(typeOfRs, paramType, clause);
+	}
+	else if (paramType == make_pair(PROC_NAME, SYNONYM) || paramType == make_pair(PROC_NAME, UNDERSCORE)
+		|| paramType == make_pair(SYNONYM, VARIABLE) || paramType == make_pair(STMT_NO, SYNONYM)
+		|| paramType == make_pair(STMT_NO, UNDERSCORE)) {
+		return evaluateOneSynonym(typeOfRs, paramType, clause);
+	}
+	else if (paramType == make_pair(SYNONYM, SYNONYM) || paramType == make_pair(SYNONYM, UNDERSCORE) || 
+		paramType == make_pair(UNDERSCORE, SYNONYM)) {
+		return evaluateTwoSynonym(typeOfRs, paramType, clause);
+	}
+}
+
+string QueryEvaluator::evaluateNonSynonym(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE clause) {
+	bool isRsValid = false;
+	
+	if (typeOfRs == USES_RS) { 
+		if (paramType == make_pair(STMT_NO, VARIABLE)) {
+			isRsValid = PKB::isUses(stoi(clause.firstParameter), clause.secondParameter);
+		}
+		else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
+			cout << "Proc uses name" << endl;
+			return "";
+		}
+	}
+	else if (typeOfRs == MODIFIES_RS) {
+		if (paramType == make_pair(STMT_NO, VARIABLE)) {
+			isRsValid = PKB::isModifies(stoi(clause.firstParameter), clause.secondParameter);
+		}
+		else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
+			cout << "Proc modifies name" << endl;
+			return "";
+		}
+	}
+	else if (typeOfRs == FOLLOWS_RS) {
+		if (paramType == make_pair(STMT_NO, STMT_NO)) {
+			isRsValid = PKB::isFollows(stoi(clause.firstParameter), stoi(clause.secondParameter), clause.hasTransitiveClosure);
+		}
+	}
+	else if (typeOfRs == PARENT_RS) {
+		if (paramType == make_pair(STMT_NO, STMT_NO)) {
+			isRsValid = PKB::isParent(stoi(clause.firstParameter), stoi(clause.secondParameter), clause.hasTransitiveClosure);
+		}
+	}
+	
+	string result = isRsValid ? selectImmediateResults() : noResult() ;
+	return result;
+}
+
+string QueryEvaluator::evaluateOneSynonym(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE clause) {
+	map<string, string> synonymTable = queryObject->getSynonymTable();
+	
+	vector<string> stringResult;
+	bool stringResultIsset = false;
+	vector<int> intResult;
+	bool intResultIsset = false;
+
+	string firstParam = clause.firstParameter;
+	string secondParam = clause.secondParameter;
+
+	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
+		if (typeOfRs == USES_RS) {
+			stringResult = PKB::getAllVariablesUsedByStmtNo(stoi(firstParam));
+			stringResultIsset = true;
+		}
+		else if (typeOfRs == MODIFIES_RS) {
+			stringResult = PKB::getAllVariablesModifiedByStmtNo(stoi(firstParam));
+			stringResultIsset = true;
+		}
+		else if (typeOfRs == FOLLOWS_RS) {
+			intResult = PKB::getStmtNoThatFollows(stoi(firstParam), clause.hasTransitiveClosure);
+			intResultIsset = true;
+		}
+		else if (typeOfRs == PARENT_RS) {
+			intResult = PKB::getStmtNoThatIsChildOf(stoi(firstParam), clause.hasTransitiveClosure);
+			intResultIsset = true;
+		}
+	}
+	else if (paramType == make_pair(PROC_NAME, SYNONYM) || paramType == make_pair(PROC_NAME, UNDERSCORE)) {
+		if (typeOfRs == USES_RS) {
+			stringResult = PKB::getAllVariablesUsedByProcedures(firstParam);
+			stringResultIsset = true;
+		}
+		else if (typeOfRs == MODIFIES_RS) {
+			stringResult = PKB::getAllVariablesModifiedByProcedures(firstParam);
+			stringResultIsset = true;
+		}
+	}
+	// Check here onwards
+	else if (paramType == make_pair(SYNONYM, STMT_NO) || paramType == make_pair(SYNONYM, UNDERSCORE)) {
+		if (typeOfRs == FOLLOWS_RS) {
+			intResult = PKB::getStmtNoThatIsFollowedBy(stoi(secondParam), clause.hasTransitiveClosure);
+			intResultIsset = true;
+		}
+		else if (typeOfRs == PARENT_RS) {
+			intResult = PKB::getStmtNoThatIsParentOf(stoi(secondParam), clause.hasTransitiveClosure);
+			intResultIsset = true;
+		}
 	}
 	else if (paramType == make_pair(SYNONYM, VARIABLE)) {
-		if (synonymTable[firstParam] == ASSIGNMENT_VAR) return "getAllAssignmentThatUsesVariable(string variable)";
-		else if (synonymTable[firstParam] == STMT_VAR) return "getAllStmtThatUsesVariable(string variable)";
-		else if (synonymTable[firstParam] == PROC_VAR) return " getAllProcedureThatUsesVariable(string variable)";
-
-		return "";
+		if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
+			if (typeOfRs == USES_RS) {
+				intResult = PKB::getAllAssignmentThatUses(secondParam);
+				intResultIsset = true;
+			}
+			else if (typeOfRs == MODIFIES_RS) {
+				intResult = PKB::getAllAssignmentThatModifies(secondParam);
+				intResultIsset = true;
+			}
+		}
+		else if (synonymTable[firstParam] == STMT_VAR) {
+			if (typeOfRs == USES_RS) {
+				intResult = PKB::getAllStmtThatUses(secondParam);
+				intResultIsset = true;
+			}
+			else if (typeOfRs == MODIFIES_RS) {
+				intResult = PKB::getAllStmtThatModifies(secondParam);
+				intResultIsset = true;
+			}
+		}
+		else if (synonymTable[firstParam] == PROC_VAR) {
+			if (typeOfRs == USES_RS) {
+				stringResult = PKB::getAllProcedureThatUses(secondParam);
+				stringResultIsset = true;
+			}
+			else if (typeOfRs == MODIFIES_RS) {
+				stringResult = PKB::getAllProcedureThatModifies(secondParam);
+				stringResultIsset = true;
+			}
+		}
+		else if (synonymTable[firstParam] == IF_VAR) {
+			if (typeOfRs == USES_RS) {
+				intResult = PKB::getAllIfThatUses(secondParam);
+				intResultIsset = true;
+			}
+			else if (typeOfRs == MODIFIES_RS) {
+				intResult = PKB::getAllIfThatModifies(secondParam);
+				intResultIsset = true;
+			}
+		}
+		else if (synonymTable[firstParam] == WHILE_VAR) {
+			if (typeOfRs == USES_RS) {
+				intResult = PKB::getAllWhileThatUses(secondParam);
+				intResultIsset = true;
+			}
+			else if (typeOfRs == MODIFIES_RS) {
+				intResult = PKB::getAllWhileThatModifies(secondParam);
+				intResultIsset = true;
+			}
+		}
+		else if (synonymTable[firstParam] == READ_VAR) {
+			if (typeOfRs == MODIFIES_RS) {
+				intResult = PKB::getAllReadThatModifies(secondParam);
+				intResultIsset = true;
+			}
+		}
+		else if (synonymTable[firstParam] == PRINT_VAR) {
+			if (typeOfRs == USES_RS) {
+				intResult = PKB::getAllPrintThatUses(secondParam);
+				intResultIsset = true;
+			}
+		}
 	}
 
-	return "";
+	if (stringResultIsset) {
+		if (stringResult.size() > 0) {
+			if(synonymIsFoundInParam(clause)) return stringVectorToString(stringResult);
+			else return selectImmediateResults();
+		}
+		else return noResult();
+	}
+	else {
+		if (intResult.size() > 0) {
+			if (synonymIsFoundInParam(clause)) return intVectorToString(intResult);
+			else return selectImmediateResults();
+		}
+		else return noResult();
+	}
+
 }
 
-string QueryEvaluator::evaluateModifiesClause() {
-	return "";
-}
+string QueryEvaluator::evaluateTwoSynonym(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE clause) {
+	vector< pair<int, int> > result;
 
-string QueryEvaluator::evaluateParentClause() {
-	return "";
-}
+	if (typeOfRs == FOLLOWS_RS) {
+		result = PKB::getAllFollowsPair(clause.hasTransitiveClosure);
+	}
+	else if (typeOfRs == PARENT_RS) {
+		result = PKB::getAllParentPair(clause.hasTransitiveClosure);
+	}
 
-string QueryEvaluator::evaluateFollowsClause() {
-	return "";
+	return processTwoSynonymResults(result, clause);
 }
 
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
@@ -113,38 +266,55 @@ pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
 	return paramType;
 }
 
-string QueryEvaluator::selectIntermediateResult(vector<string> result, SUCH_THAT_CLAUSE clause) {
-	// Extract the clause information
-	map<string, string> synonymTable = queryObject->getSynonymTable();
-	string firstParam = clause.firstParameter;
-	string secondParam = clause.secondParameter;
+string QueryEvaluator::processTwoSynonymResults(vector< pair<int, int> > result, SUCH_THAT_CLAUSE clause) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	if (!synonymIsFoundInParam(clause)) return selectImmediateResults();
 
-	// Synonym not found - return select immediate results
-	if (synonymTable.find(firstParam) != synonymTable.end()
-		&& synonymTable.find(secondParam) != synonymTable.end()) {
-		return selectImmediateResults();
-	}
-
-	string selectClause = queryObject->getSelectClause().at(0);
-
-	pair<string, string> paramType = getParamType(clause);
-	if (getParamType(clause) == make_pair(SYNONYM, SYNONYM)) {
-		if(firstParam == selectClause)
-		else if(secondParam == selectClause)
-	}
-	else if (getParamType(clause) == make_pair(SYNONYM, VARIABLE)) {
-
-	}
-	else if (getParamType(clause) == make_pair(VARIABLE, SYNONYM)) {
-
-	}
-
-	// Synonym found in param 1
-
-	// Synonym found
-	
+	string extractedResult = selectSynonym == clause.firstParameter ? extractFirstParam(result) : extractSecondParam(result);
+	return extractedResult;
 }
 
 string QueryEvaluator::noResult() {
 	return "";
+}
+
+string QueryEvaluator::stringVectorToString(vector<string> input) {
+	string s = "";
+	for (string i : input) {
+		s += " " + i;
+	}
+
+	return s;
+}
+
+string QueryEvaluator::intVectorToString(vector<int> input) {
+	string s = "";
+	for (int i : input) {
+		s += " " + to_string(i);
+	}
+
+	return s;
+}
+
+string QueryEvaluator::extractFirstParam(vector < pair<int, int> > input) {
+	string s = "";
+	for (pair<int, int> i : input) {
+		s += " " + to_string(i.first);
+	}
+
+	return s;
+}
+
+string QueryEvaluator::extractSecondParam(vector < pair<int, int> > input) {
+	string s = "";
+	for (pair<int, int> i : input) {
+		s += " " + to_string(i.second);
+	}
+
+	return s;
+}
+
+bool QueryEvaluator::synonymIsFoundInParam(SUCH_THAT_CLAUSE clause) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	return (selectSynonym == clause.firstParameter || selectSynonym == clause.secondParameter);
 }
