@@ -18,5 +18,7 @@ public:
 	string evaluateFollowsClause();
 	string evaluateParentClause();
 
-	vector<int> getStmtsThatUsesVariable(vector<int> v, string variable);
+	pair<string, string> getParamType(SUCH_THAT_CLAUSE clause);
+	string selectIntermediateResult(vector<string> result, SUCH_THAT_CLAUSE clause);
+	string noResult();
 };

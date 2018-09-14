@@ -7,6 +7,7 @@
 
 using namespace std;
 using namespace keywords::query;
+using namespace keywords::clauseParamType;
 
 QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 	this->queryObject = queryObject;
@@ -14,10 +15,8 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 
 string QueryEvaluator::evaluateQueryObject() {
 	if (!queryObject->hasClauses()) {
-		cout << "No clauses" << endl;
 		return selectImmediateResults();
 	}
-
 
 	// First milestone - evaluate only one clause
 	if (queryObject->getNumberOfClauses() == 1) return evaluateSingleClause();
@@ -27,12 +26,13 @@ string QueryEvaluator::evaluateQueryObject() {
 
 // Return results immediately if there are no clauses
 string QueryEvaluator::selectImmediateResults() {
-	vector<string> selectSynonyms = queryObject->getSelectClause();
-	
-	/*if (varType == ASSIGNMENT_VAR) return "allAssignmentStmts";
-	else if (varType == VARIABLE_VAR) return "allVariableStmts";
-	else if (varType == STMT_VAR) return "allStmts";
-	else if (varType == PROC_VAR) return "allProcedures";*/
+	string selectSynonym = queryObject->getSelectClause().at(0);	// Only one select synonym for iteration 1
+	string synonymType = queryObject->getSynonymTable()[selectSynonym];
+
+	if (synonymType == ASSIGNMENT_VAR) return "allAssignmentStmts";
+	else if (synonymType == VARIABLE_VAR) return "allVariableStmts";
+	else if (synonymType == STMT_VAR) return "allStmts";
+	else if (synonymType == PROC_VAR) return "allProcedures";
 
 	return "";
 }
@@ -45,33 +45,41 @@ string QueryEvaluator::evaluateSingleClause() {
 }
 
 string QueryEvaluator::evaluateUsesClause() {
-	vector<SUCH_THAT_CLAUSE> usesClause = queryObject->getUsesClause();
-	vector<SUCH_THAT_CLAUSE>::iterator it;
-	/*for (it = usesClause.begin(); it != usesClause.end(); it++) {
-		string firstParam = it->firstParameter;
-		string secondParam = it->secondParameter;
+	SUCH_THAT_CLAUSE useClause = queryObject->getUsesClause().at(0);
 
-		if (Utility::isInteger(firstParam)) {
-			int stmtNo = stoi(firstParam);
-			if(PKB::isUses(stmtNo, secondParam))
-		}
-	}*/
-
-	//string firstEntity = usesClause.firstParameter; // check if the first parameter is a stmtNo or synonym
-	//string variable = usesClause.secondParameter;
-
-	/*if (Utility::isInteger(firstEntity)) {
-		int parsedFirstEntity = stoi(firstEntity);
-		// return the "select" immediately if its true
-		if(PKB::isUses(parsedFirstEntity, variable)) return selectImmediateResults();
-		else return ""; // clause is false hence return immediately
+	// Extract the clause information
+	map<string, string> synonymTable = queryObject->getSynonymTable();
+	string firstParam = useClause.firstParameter;
+	string secondParam = useClause.secondParameter;
+	pair<string, string> paramType = getParamType(useClause);
+	
+	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
+		return "getAllVariablesUsedBy(int stmtNo)";
 	}
-	else {
-		vector<int> stmtsThatUsesVariable = getStmtsThatUsesVariable(PKB::getAllStmtThatUses(variable)
-			, variable);
-		if(stmtsThatUsesVariable.size !=0 ) cout << getStmtsThatUsesVariable << endl;
-		else return "";
-	}*/
+	else if (paramType == make_pair(STMT_NO, VARIABLE)) {
+		if (PKB::isUses(stoi(firstParam), secondParam)) return noResult();
+		else return selectImmediateResults();
+	} 
+	else if (paramType == make_pair(PROC_NAME, SYNONYM) || paramType == make_pair(PROC_NAME, UNDERSCORE)) {
+		return "getAllProceduresUsedBy(string proc_name)";
+	}
+	else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
+		return "isProcUses(string proc_name, string variable)";
+	} 
+	else if (paramType == make_pair(SYNONYM, SYNONYM) || paramType == make_pair(SYNONYM, UNDERSCORE)) {
+		if (synonymTable[firstParam] == ASSIGNMENT_VAR) return "getAllAssignmentUsesVariablePairs()";
+		else if (synonymTable[firstParam] == STMT_VAR) return "getAllStmtUsesVariablePairs()";
+		else if (synonymTable[firstParam] == PROC_VAR) return "getAllProcedureUsesVariablePairs()";
+
+		return "";
+	}
+	else if (paramType == make_pair(SYNONYM, VARIABLE)) {
+		if (synonymTable[firstParam] == ASSIGNMENT_VAR) return "getAllAssignmentThatUsesVariable(string variable)";
+		else if (synonymTable[firstParam] == STMT_VAR) return "getAllStmtThatUsesVariable(string variable)";
+		else if (synonymTable[firstParam] == PROC_VAR) return " getAllProcedureThatUsesVariable(string variable)";
+
+		return "";
+	}
 
 	return "";
 }
@@ -88,13 +96,55 @@ string QueryEvaluator::evaluateFollowsClause() {
 	return "";
 }
 
-vector<int> QueryEvaluator::getStmtsThatUsesVariable(vector<int> v, string variable) {
-	vector<int>::iterator it;
-	vector<int> stmtThatUsesVariable;
-	for (it = v.begin(); it != v.end(); it++) {
-		if (PKB::isUses(*it, variable)) {
-			stmtThatUsesVariable.push_back(*it);
-		}
+pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
+	pair<string, string> paramType(SYNONYM, SYNONYM);
+
+	if (!clause.firstParamIsSynonym) {
+		Utility::isInteger(clause.firstParameter) ? paramType.first = STMT_NO : paramType.first = PROC_NAME;
 	}
-	return stmtThatUsesVariable;
+	
+	if (!clause.secondParamIsSynonym) {
+		Utility::isInteger(clause.secondParameter) ? paramType.second = STMT_NO : paramType.second = VARIABLE;
+	}
+
+	if (Utility::isUnderscore(clause.firstParameter)) paramType.first = UNDERSCORE;
+	if (Utility::isUnderscore(clause.secondParameter)) paramType.second = UNDERSCORE;
+
+	return paramType;
+}
+
+string QueryEvaluator::selectIntermediateResult(vector<string> result, SUCH_THAT_CLAUSE clause) {
+	// Extract the clause information
+	map<string, string> synonymTable = queryObject->getSynonymTable();
+	string firstParam = clause.firstParameter;
+	string secondParam = clause.secondParameter;
+
+	// Synonym not found - return select immediate results
+	if (synonymTable.find(firstParam) != synonymTable.end()
+		&& synonymTable.find(secondParam) != synonymTable.end()) {
+		return selectImmediateResults();
+	}
+
+	string selectClause = queryObject->getSelectClause().at(0);
+
+	pair<string, string> paramType = getParamType(clause);
+	if (getParamType(clause) == make_pair(SYNONYM, SYNONYM)) {
+		if(firstParam == selectClause)
+		else if(secondParam == selectClause)
+	}
+	else if (getParamType(clause) == make_pair(SYNONYM, VARIABLE)) {
+
+	}
+	else if (getParamType(clause) == make_pair(VARIABLE, SYNONYM)) {
+
+	}
+
+	// Synonym found in param 1
+
+	// Synonym found
+	
+}
+
+string QueryEvaluator::noResult() {
+	return "";
 }

@@ -45,8 +45,8 @@ void QueryObject::setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause) {
 	usesClauseIsset = true;
 }
 
-void QueryObject::setEntityAliasMap(map<string, string> entityAliases) {
-	this->entityAliases = entityAliases;
+void QueryObject::setSynonymTable(map<string, string> synonymTable) {
+	this->synonymTable = synonymTable;
 }
 
 vector<SUCH_THAT_CLAUSE> QueryObject::getFollowsClause() {
@@ -69,8 +69,8 @@ vector<SUCH_THAT_CLAUSE> QueryObject::getUsesClause() {
 	return usesClause;
 }
 
-map<string, string> QueryObject::getEntityAliases() {
-	return entityAliases;
+map<string, string> QueryObject::getSynonymTable() {
+	return synonymTable;
 }
 
 bool QueryObject::hasClauses() {
@@ -99,6 +99,7 @@ bool QueryObject::hasUsesClause() {
 	return true;
 }
 
+// Changes to be made in iteration 2
 int QueryObject::getNumberOfClauses() {
 	int count = 0;
 

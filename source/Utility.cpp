@@ -13,6 +13,10 @@ bool Utility::isInteger(string s)
 	return !s.empty() && it == s.end();*/
 }
 
+bool Utility::isUnderscore(string s) {
+	return s == "_";
+}
+
 bool Utility::matchesDesignEntityKeyword(string s) {
 	for (size_t i = 0; i < keywords::query::DESIGN_ENTITY.size(); i++) {
 		if (s == keywords::query::DESIGN_ENTITY[i]) {

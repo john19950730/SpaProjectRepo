@@ -13,6 +13,7 @@ class Utility {
 public:
 	static bool isValidVariableName(string s);
 	static bool isInteger(string s);
+	static bool isUnderscore(string s);
 	static bool matchesDesignEntityKeyword(string s);
 	static vector<string> splitByDelimiter(string s, string delimiter);
 	static vector<string> splitByRegex(string s, regex delimiters);

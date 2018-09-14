@@ -14,7 +14,7 @@ private:
 	vector<SUCH_THAT_CLAUSE> usesClause;
 	vector<SUCH_THAT_CLAUSE> followsClause;
 	vector<SUCH_THAT_CLAUSE> parentClause;
-	map<string, string> entityAliases;
+	map<string, string> synonymTable;
 
 	bool selectClauseIsset;
 	bool modifiesClauseIsset;
@@ -33,7 +33,7 @@ public:
 	void setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause);
 	void setFollowsClause(vector<SUCH_THAT_CLAUSE> followsClause);
 	void setParentClause(vector<SUCH_THAT_CLAUSE> parentClause);
-	void setEntityAliasMap(map<string, string> entityAliases);
+	void setSynonymTable(map<string, string> synonymTable);
 
 	// Getter methods
 	vector<string> getSelectClause();
@@ -41,7 +41,7 @@ public:
 	vector<SUCH_THAT_CLAUSE> getUsesClause();
 	vector<SUCH_THAT_CLAUSE> getFollowsClause();
 	vector<SUCH_THAT_CLAUSE> getParentClause();
-	map<string, string> getEntityAliases();
+	map<string, string> getSynonymTable();
 
 	// Checking methods
 	bool hasClauses();
