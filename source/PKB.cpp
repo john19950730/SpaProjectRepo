@@ -238,31 +238,37 @@ bool PKB::isModifies(int stmtNo1, string varName)
 
 vector<pair<int, int>> PKB::getAllFollowsPair(bool star)
 {
+	//TODO
 	return vector<pair<int, int>>();
 }
 
 vector<int> PKB::getStmtNoThatFollows(int stmtNo, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
 vector<int> PKB::getStmtNoThatIsFollowedBy(int stmtNo, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
 vector<pair<int, int>> PKB::getAllParentPair(bool star)
 {
+	//TODO
 	return vector<pair<int, int>>();
 }
 
 vector<int> PKB::getStmtNoThatIsChildOf(int stmtNo, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
 vector<int> PKB::getStmtNoThatIsParentOf(int stmtNo, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
@@ -302,6 +308,7 @@ vector<int> PKB::getAllWhileThatUses(string varName)
 
 vector<string> PKB::getAllProcedureThatUses(string varName)
 {
+	//TODO
 	return vector<string>();
 }
 
@@ -341,6 +348,7 @@ vector<int> PKB::getAllWhileThatModifies(string varName)
 
 vector<string> PKB::getAllProcedureThatModifies(string varName)
 {
+	//TODO
 	return vector<string>();
 }
 
