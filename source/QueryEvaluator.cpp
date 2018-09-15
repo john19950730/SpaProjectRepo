@@ -221,7 +221,7 @@ string QueryEvaluator::evaluateOneSynonym(string typeOfRs, pair<string, string> 
 
 	if (stringResultIsset) {
 		if (stringResult.size() > 0) {
-			if(synonymIsFoundInParam(clause)) return stringVectorToString(stringResult);
+			if (synonymIsFoundInParam(clause)) return stringVectorToString(stringResult);
 			else return selectImmediateResults();
 		}
 		else return noResult();
@@ -233,19 +233,60 @@ string QueryEvaluator::evaluateOneSynonym(string typeOfRs, pair<string, string> 
 		}
 		else return noResult();
 	}
-
 }
 
 string QueryEvaluator::evaluateTwoSynonym(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE clause) {
-	vector< pair<int, int> > result;
+	if (typeOfRs == FOLLOWS_RS || typeOfRs == PARENT_RS) return getIntIntPair(typeOfRs, clause);
+	else if(paramType.first == PROC_NAME) return getStringStringPair(typeOfRs, clause);
+	else if(paramType.first == STMT_NO) return getIntStringPair(typeOfRs, clause);
+}
 
+string QueryEvaluator::getIntIntPair(string typeOfRs, SUCH_THAT_CLAUSE clause) {
+	if (clause.firstParameter == clause.secondParameter) return noResult();	// Same synonym follows(s1,s1) is false
+
+	vector< pair<int, int> > result;
 	if (typeOfRs == FOLLOWS_RS) {
 		result = PKB::getAllFollowsPair(clause.hasTransitiveClosure);
 	}
 	else if (typeOfRs == PARENT_RS) {
 		result = PKB::getAllParentPair(clause.hasTransitiveClosure);
 	}
+	return processTwoSynonymResults(result, clause);
+}
 
+string QueryEvaluator::getStringStringPair(string typeOfRs, SUCH_THAT_CLAUSE clause) {
+	vector< pair<string, string> > result;
+
+	if (typeOfRs == MODIFIES_RS) {
+		result = PKB::getAllProcedureModifiesVariablePairs();
+	}
+	else if (typeOfRs == USES_RS) {
+		result = PKB::getAllProcedureUsesVariablePairs();
+	}
+	return processTwoSynonymResults(result, clause);
+}
+
+string QueryEvaluator::getIntStringPair(string typeOfRs, SUCH_THAT_CLAUSE clause) {
+	map<string, string> synonymTable = queryObject->getSynonymTable();
+	string firstParam = clause.firstParameter;
+	vector< pair<int, string> > result;
+
+	if (typeOfRs == MODIFIES_RS) {
+		if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
+			result = PKB::getAllAssignmentModifiesVariablePairs();
+		}
+		else if (synonymTable[firstParam] == STMT_VAR) {
+			result = PKB::getAllStmtModifiesVariablePairs();
+		}
+	}
+	else if (typeOfRs == USES_RS) {
+		if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
+			result = PKB::getAllAssignmentUsesVariablePairs();
+		}
+		else if (synonymTable[firstParam] == STMT_VAR) {
+			result = PKB::getAllStmtUsesVariablePairs();
+		}
+	}
 	return processTwoSynonymResults(result, clause);
 }
 
@@ -267,6 +308,25 @@ pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
 }
 
 string QueryEvaluator::processTwoSynonymResults(vector< pair<int, int> > result, SUCH_THAT_CLAUSE clause) {
+	if (result.empty()) return noResult();
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	if (!synonymIsFoundInParam(clause)) return selectImmediateResults();
+
+	string extractedResult = selectSynonym == clause.firstParameter ? extractFirstParam(result) : extractSecondParam(result);
+	return extractedResult;
+}
+
+string QueryEvaluator::processTwoSynonymResults(vector< pair<string, string> > result, SUCH_THAT_CLAUSE clause) {
+	if (result.empty()) return noResult();
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	if (!synonymIsFoundInParam(clause)) return selectImmediateResults();
+
+	string extractedResult = selectSynonym == clause.firstParameter ? extractFirstParam(result) : extractSecondParam(result);
+	return extractedResult;
+}
+
+string QueryEvaluator::processTwoSynonymResults(vector< pair<int, string> > result, SUCH_THAT_CLAUSE clause) {
+	if (result.empty()) return noResult();
 	string selectSynonym = queryObject->getSelectClause().at(0);
 	if (!synonymIsFoundInParam(clause)) return selectImmediateResults();
 
@@ -309,6 +369,42 @@ string QueryEvaluator::extractSecondParam(vector < pair<int, int> > input) {
 	string s = "";
 	for (pair<int, int> i : input) {
 		s += " " + to_string(i.second);
+	}
+
+	return s;
+}
+
+string QueryEvaluator::extractFirstParam(vector < pair<string, string> > input) {
+	string s = "";
+	for (pair<string, string> i : input) {
+		s += " " + i.first;
+	}
+
+	return s;
+}
+
+string QueryEvaluator::extractSecondParam(vector < pair<string, string> > input) {
+	string s = "";
+	for (pair<string, string> i : input) {
+		s += " " + i.second;
+	}
+
+	return s;
+}
+
+string QueryEvaluator::extractFirstParam(vector < pair<int, string> > input) {
+	string s = "";
+	for (pair<int, string> i : input) {
+		s += " " + to_string(i.first);
+	}
+
+	return s;
+}
+
+string QueryEvaluator::extractSecondParam(vector < pair<int, string> > input) {
+	string s = "";
+	for (pair<int, string> i : input) {
+		s += " " + i.second;
 	}
 
 	return s;
