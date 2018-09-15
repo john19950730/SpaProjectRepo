@@ -14,6 +14,7 @@ private:
 	vector<SUCH_THAT_CLAUSE> usesClause;
 	vector<SUCH_THAT_CLAUSE> followsClause;
 	vector<SUCH_THAT_CLAUSE> parentClause;
+	vector<PATTERN_CLAUSE> patternClause;
 	map<string, string> synonymTable;
 
 	bool selectClauseIsset;
@@ -21,6 +22,7 @@ private:
 	bool usesClauseIsset;
 	bool followsClauseIsset;
 	bool parentClauseIsset;
+	bool patternClauseIsset;
 public:
 	// Constructors
 	QueryObject();
@@ -33,6 +35,7 @@ public:
 	void setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause);
 	void setFollowsClause(vector<SUCH_THAT_CLAUSE> followsClause);
 	void setParentClause(vector<SUCH_THAT_CLAUSE> parentClause);
+	void setPatternClause(vector<PATTERN_CLAUSE> patternClause);
 	void setSynonymTable(map<string, string> synonymTable);
 
 	// Getter methods
@@ -41,6 +44,7 @@ public:
 	vector<SUCH_THAT_CLAUSE> getUsesClause();
 	vector<SUCH_THAT_CLAUSE> getFollowsClause();
 	vector<SUCH_THAT_CLAUSE> getParentClause();
+	vector<PATTERN_CLAUSE> getPatternClause();
 	map<string, string> getSynonymTable();
 
 	// Checking methods
@@ -49,7 +53,8 @@ public:
 	bool hasUsesClause();
 	bool hasFollowsClause();
 	bool hasParentClause();
+	bool hasPatternClause();
 
 	// Counting methods
-	int getNumberOfClauses();
+	int getNumberOfSuchThatClauses();
 };

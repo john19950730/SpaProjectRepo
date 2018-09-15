@@ -45,6 +45,11 @@ void QueryObject::setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause) {
 	usesClauseIsset = true;
 }
 
+void QueryObject::setPatternClause(vector<PATTERN_CLAUSE> patternClause) {
+	this->patternClause = patternClause;
+	patternClauseIsset = true;
+}
+
 void QueryObject::setSynonymTable(map<string, string> synonymTable) {
 	this->synonymTable = synonymTable;
 }
@@ -69,12 +74,16 @@ vector<SUCH_THAT_CLAUSE> QueryObject::getUsesClause() {
 	return usesClause;
 }
 
+vector<PATTERN_CLAUSE> QueryObject::getPatternClause() {
+	return patternClause;
+}
+
 map<string, string> QueryObject::getSynonymTable() {
 	return synonymTable;
 }
 
 bool QueryObject::hasClauses() {
-	if (!modifiesClauseIsset && !usesClauseIsset && !followsClauseIsset && !parentClauseIsset)
+	if (!modifiesClauseIsset && !usesClauseIsset && !followsClauseIsset && !parentClauseIsset && !patternClauseIsset)
 		return false;
 	return true;
 }
@@ -95,8 +104,12 @@ bool QueryObject::hasUsesClause() {
 	return usesClauseIsset;
 }
 
+bool QueryObject::hasPatternClause() {
+	return patternClauseIsset;
+}
+
 // Changes to be made in iteration 2
-int QueryObject::getNumberOfClauses() {
+int QueryObject::getNumberOfSuchThatClauses() {
 	int count = 0;
 
 	if (hasUsesClause()) count++;

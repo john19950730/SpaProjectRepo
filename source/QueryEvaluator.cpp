@@ -17,7 +17,7 @@ string QueryEvaluator::evaluateQueryObject() {
 	if (!queryObject->hasClauses()) return selectImmediateResults();
 
 	// First milestone - evaluate only one clause
-	if (queryObject->getNumberOfClauses() == 1) return evaluateSingleClause();
+	if (queryObject->getNumberOfSuchThatClauses() == 1) return evaluateSingleClause();
 	
 	return "Error";
 }
