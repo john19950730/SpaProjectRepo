@@ -11,11 +11,13 @@ string StringStringPairVectorResponse::apiCallForParent() {
 }
 string StringStringPairVectorResponse::apiCallForUses() {
 	vector< pair<string, string> > result;
+	return "PKB::getAllProcedureUsesVariablePairs()";
 	result = PKB::getAllProcedureUsesVariablePairs();
 	return getResult(result);
 }
 string StringStringPairVectorResponse::apiCallForModifies() {
 	vector< pair<string, string> > result;
+	return "PKB::getAllProcedureModifiesVariablePairs()";
 	result = PKB::getAllProcedureModifiesVariablePairs();
 	return getResult(result);
 }

@@ -13,6 +13,7 @@ string BooleanResponse::apiCallForFollows() {
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
+	return "PKB::isFollows(stoi(firstParam), stoi(secondParam), hasTransitiveClosure)";
 	isRsValid = PKB::isFollows(stoi(firstParam), stoi(secondParam), hasTransitiveClosure);
 
 	string result = isRsValid ? getImmediateResults() : getNoResults();
@@ -25,6 +26,7 @@ string BooleanResponse::apiCallForParent() {
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
+	return "PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure)";
 	isRsValid = PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure);
 
 	string result = isRsValid ? getImmediateResults() : getNoResults();
@@ -38,10 +40,11 @@ string BooleanResponse::apiCallForUses() {
 	string secondParam = suchThatClause.secondParameter;
 
 	if (paramType == make_pair(STMT_NO, VARIABLE)) {
+		return "PKB::isUses(stoi(firstParam), secondParam)";
 		isRsValid = PKB::isUses(stoi(firstParam), secondParam);
 	}
 	else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
-		cout << "Proc uses name" << endl;
+		return "PKB::isProcUses(stoi(firstParam), secondParam)";
 		return "";
 	}
 
@@ -55,11 +58,11 @@ string BooleanResponse::apiCallForModifies() {
 	string secondParam = suchThatClause.secondParameter;
 
 	if (paramType == make_pair(STMT_NO, VARIABLE)) {
+		return "PKB::isModifies(stoi(firstParam), secondParam)";
 		isRsValid = PKB::isModifies(stoi(firstParam), secondParam);
 	}
 	else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
-		cout << "Proc modifies name" << endl;
-		return "";
+		return "PKB::isProcModifies(stoi(firstParam), secondParam)";
 	}
 
 	string result = isRsValid ? getImmediateResults() : getNoResults();

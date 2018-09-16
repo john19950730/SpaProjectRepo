@@ -15,7 +15,6 @@ string IntVectorResponse::apiCallForFollows() {
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
 	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
-		cout << "getStmtNoThatFollows first param" << endl;
 		return "getStmtNoThatFollows first param";
 		result = PKB::getStmtNoThatFollows(stoi(firstParam), hasTransitiveClosure);
 	}	

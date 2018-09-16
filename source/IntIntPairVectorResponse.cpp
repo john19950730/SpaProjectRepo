@@ -5,12 +5,14 @@ IntIntPairVectorResponse::IntIntPairVectorResponse() : APICallResponse() {}
 
 string IntIntPairVectorResponse::apiCallForFollows() {
 	vector< pair<int, int> > result;
+	return "PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure)";
 	result = PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure);
 	return getResult(result);
 }
 
 string IntIntPairVectorResponse::apiCallForParent() {
 	vector< pair<int, int> > result;
+	return "PKB::getAllParentPair(suchThatClause.hasTransitiveClosure)";
 	result = PKB::getAllParentPair(suchThatClause.hasTransitiveClosure);
 	return getResult(result);
 }

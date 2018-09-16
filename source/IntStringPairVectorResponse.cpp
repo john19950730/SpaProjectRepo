@@ -18,9 +18,11 @@ string IntStringPairVectorResponse::apiCallForUses() {
 	string secondParam = suchThatClause.secondParameter;
 
 	if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
+		return "PKB::getAllAssignmentUsesVariablePairs()";
 		result = PKB::getAllAssignmentUsesVariablePairs();
 	}
 	else if (synonymTable[firstParam] == STMT_VAR) {
+		return "PKB::getAllStmtUsesVariablePairs()";
 		result = PKB::getAllStmtUsesVariablePairs();
 	}
 	return getResult(result);
@@ -31,9 +33,11 @@ string IntStringPairVectorResponse::apiCallForModifies() {
 	string secondParam = suchThatClause.secondParameter;
 
 	if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
+		return "PKB::getAllAssignmentModifiesVariablePairs()";
 		result = PKB::getAllAssignmentModifiesVariablePairs();
 	}
 	else if (synonymTable[firstParam] == STMT_VAR) {
+		return "PKB::getAllStmtModifiesVariablePairs()";
 		result = PKB::getAllStmtModifiesVariablePairs();
 	}
 	return getResult(result);
