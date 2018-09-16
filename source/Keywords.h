@@ -19,5 +19,6 @@ namespace keywords {
 		const std::string PRINT_VAR = "print";
 		const std::string CALL_VAR = "call";
 		const std::vector<string> STATEMENTS = { STMT_VAR, ASSIGNMENT_VAR, IF_VAR, WHILE_VAR, READ_VAR, PRINT_VAR, CALL_VAR };
+		const std::vector<string> PATTERN_TYPES = { ASSIGNMENT_VAR, IF_VAR, WHILE_VAR };
 	}
 };

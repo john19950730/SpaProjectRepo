@@ -9,24 +9,30 @@ QueryPreprocessor::QueryPreprocessor()
 	relParamTypes = {};
 	queryObject = new QueryObject();
 
-	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_NAME" };
-	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_NAME" };
+	vector<SUCH_THAT_CLAUSE> usesClauses;
+	vector<SUCH_THAT_CLAUSE> modifiesClauses;
+	vector<SUCH_THAT_CLAUSE> followsClauses;
+	vector<SUCH_THAT_CLAUSE> parentClauses;
+
+	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_QUOTED" };
+	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_QUOTED" };
 	vector<string> followsParentParam1 = { keywords::query::STMT_VAR, "_UNDERSCORE" };
 	vector<string> followsParentParam2 = { keywords::query::STMT_VAR, "_UNDERSCORE" };
+
+	vector<string> patternParam1 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_QUOTED" };
+	vector<string> patternParam2 = { "_UNDERSCORE", "_SUBEXPRESSION", "_QUOTED" };
 
 	relParamTypes["Uses"] = make_pair(usesModParam1, usesModParam2);
 	relParamTypes["Modifies"] = make_pair(usesModParam1, usesModParam2);
 	relParamTypes["Follows"] = make_pair(followsParentParam1, followsParentParam2);
 	relParamTypes["Parent"] = make_pair(followsParentParam1, followsParentParam2);
-}
 
-QueryObject* QueryPreprocessor::getQueryObject() {
-	return this->queryObject;
+	relParamTypes["pattern"] = make_pair(patternParam1, patternParam2);
 }
 
 bool QueryPreprocessor::parseQuery(string query)
 {
-	if (!isValidQuerySyntax(query)) {
+	if (!isQuerySyntaxValid(query)) {
 		cout << endl << endl << "##### Query syntax is invalid!" << endl;
 		cout << endl << "### Example usage:  variable v; procedure v; select v such that Uses(1, v)" << endl;
 		cout << "#### keywords are case-sensitive i.e. relationships must begin with an upper-case letter, but 'select' and 'Select' are both accepted" << endl;
@@ -44,27 +50,42 @@ bool QueryPreprocessor::parseQuery(string query)
 	return true;
 }
 
+QueryObject* QueryPreprocessor::getQueryObject() {
+	return this->queryObject;
+}
+
 bool QueryPreprocessor::buildQueryObject(string query) {
-	if (!isValidResultsClause(query)) {
+	if (!setResultsClauseInQueryObject(query))
+		return false;
+	if(!setRelationhipClausesInQueryObject(query))
+		return false;
+	if (!setPatternClausesInQueryObject(query))
+		return false;
+
+	return true;
+}
+
+bool QueryPreprocessor::setResultsClauseInQueryObject(string query) {
+	if (!isResultsClauseValid(query)) {
 		cout << endl << endl << "### Check that you have declared all used synonyms";
 		return false;
 	}
 	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
 
-	vector<SUCH_THAT_CLAUSE> usesClauses;
-	vector<SUCH_THAT_CLAUSE> modifiesClauses;
-	vector<SUCH_THAT_CLAUSE> followsClauses;
-	vector<SUCH_THAT_CLAUSE> parentClauses;
+	return true;
+}
 
+bool QueryPreprocessor::setRelationhipClausesInQueryObject(string query) {
 	regex relSyntax(REL_REGEX);
 	smatch matches;
-	while (regex_search(query, matches, relSyntax)){
+	while (regex_search(query, matches, relSyntax)) {
 		string relationship = matches[1];
 		string param1 = matches[2];
 		string param2 = matches[3];
+
 		SUCH_THAT_CLAUSE clause;
-		if (isRelationshipParamsValid(relationship, param1, param2)) {
+		if (areRelationshipParamsValid(relationship, param1, param2)) {
 			if (relationship == "Uses") {
 				clause = createSuchThatClause(relationship, param1, param2);
 				usesClauses.push_back(clause);
@@ -94,8 +115,27 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 	return true;
 }
 
+bool QueryPreprocessor::setPatternClausesInQueryObject(string query) {
+	regex patternSyntax(PATTERN);
+	smatch matches;
+	while (regex_search(query, matches, patternSyntax)) {
+		string patternSynonym = matches[1];
+		string param1 = matches[2];
+		string param2 = matches[3];
+		if (isPatternSynonymValid(patternSynonym) && arePatternParamsValid(param1, param2)) {
+			cout << ">> " + patternSynonym + '(' + param1 + ", " + param2 + ')' << endl;
+			// convert param2 into postfix
+			// pattern clause
+		}
+		else return false;
+
+		query = matches.suffix();
+	}
+	return true;
+}
+
 // Checks if query syntax is valid
-bool QueryPreprocessor::isValidQuerySyntax(string query) {	
+bool QueryPreprocessor::isQuerySyntaxValid(string query) {	
 	regex querySyntax(QUERY_SYNTAX_REGEX);
 	return regex_match(query, querySyntax);
 }
@@ -118,7 +158,7 @@ bool QueryPreprocessor::extractSynonymsFromDeclaration(string query) {
 	return true;
 }
 
-bool QueryPreprocessor::isValidResultsClause(string query) {
+bool QueryPreprocessor::isResultsClauseValid(string query) {
 	regex resultSyntax(RESULT_REGEX);
 	smatch matches;
 	if (regex_search(query, matches, resultSyntax)) {
@@ -156,13 +196,10 @@ SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, st
 	return clause;
 }
 
-bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string param1, string param2) {
+bool QueryPreprocessor::areRelationshipParamsValid(string relationship, string param1, string param2) {
 	string paramType1 = getParameterType(param1);
 	string paramType2 = getParameterType(param2);
-	/*cout << "param1: " << param1 << endl;
-	cout << "param2: " << param2 << endl;
-	cout << "paramType1: " << paramType1 << endl;
-	cout << "paramType2: " << paramType2 << endl;*/
+	cout << ">> " + relationship + '(' + param1 + ':' + paramType1 + ", " + param2 + ':' + paramType2 + ')' << endl;
 	if (paramType1 == "" || paramType2 == "") return false;
 
 	regex rel("([a-zA-Z]+)[*]?");
@@ -196,6 +233,41 @@ bool QueryPreprocessor::isRelationshipParamsValid(string relationship, string pa
 	return paramValid1 && paramValid2;
 }
 
+bool QueryPreprocessor::arePatternParamsValid(string param1, string param2) {
+	string paramType1 = getParameterType(param1);
+	string paramType2 = getParameterType(param2);
+	if (paramType1 == "" || paramType2 == "") return false;
+
+	bool paramValid1 = false;
+	bool paramValid2 = false;
+	vector<string> expectedParam1 = relParamTypes["pattern"].first;
+	vector<string> expectedParam2 = relParamTypes["pattern"].second;
+	for (size_t i = 0; i < expectedParam1.size(); i++) {
+		if (paramType1 == expectedParam1[i]) {
+			paramValid1 = true;
+			break;
+		}
+	}
+
+	for (size_t i = 0; i < expectedParam2.size(); i++) {
+		if (paramType2 == expectedParam2[i]) {
+			paramValid2 = true;
+			break;
+		}
+	}
+
+	if (paramType2 != "_UNDERSCORE") {
+		regex exprSyntax(EXPRESSION);
+		if (!regex_match(param2, exprSyntax))
+			paramValid2 = false;
+	}
+
+	if (!paramValid1) cout << endl << endl << "### 1st parameter in pattern is invalid";
+	if (!paramValid2) cout << endl << endl << "### 2nd parameter in pattern is invalid";
+
+	return paramValid1 && paramValid2;
+}
+
 string QueryPreprocessor::getParameterType(string param) {
 	if (Utility::isInteger(param)) {
 		return keywords::query::STMT_VAR;
@@ -203,12 +275,14 @@ string QueryPreprocessor::getParameterType(string param) {
 	if (param == "_") {
 		return "_UNDERSCORE";
 	}
-	regex doubleQuotes("[\"].*[\"]");
-	if (regex_match(param, doubleQuotes)) {
-		return "_NAME";
+	if (param.front() == '"') {
+		return "_QUOTED";
+	}
+	if (param.front() == '_') {
+		return "_SUBEXPRESSION";
 	}
 	if (isSynonym(param)) {
-		if (isTypeOfStatement(synonymTable[param])) {
+		if (isATypeOfStatement(synonymTable[param])) {
 			// is a type of statement e.g. assign, while, if, etc.
 			return keywords::query::STMT_VAR;
 		}
@@ -227,11 +301,23 @@ bool QueryPreprocessor::isSynonym(string param) {
 	return false;
 }
 
-bool QueryPreprocessor::isTypeOfStatement(string param) {
+bool QueryPreprocessor::isPatternSynonymValid(string synonym) {
+	if (isSynonym(synonym)) {
+		vector<string> patternTypes = keywords::query::PATTERN_TYPES;
+		for (size_t i = 0; i < patternTypes.size(); i++)
+		{
+			if (patternTypes[i] == synonymTable[synonym])
+				return true;
+		}
+	}
+	return false;
+}
+
+bool QueryPreprocessor::isATypeOfStatement(string paramType) {
 	vector<string> statementTypes = keywords::query::STATEMENTS;
 	for (size_t i = 0; i < statementTypes.size(); i++)
 	{
-		if (param == statementTypes[i])
+		if (paramType == statementTypes[i])
 			return true;
 	}
 	return false;
