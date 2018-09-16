@@ -7,10 +7,6 @@ using namespace keywords::query;
 
 IntVectorResponse::IntVectorResponse() : APICallResponse() {}
 
-IntVectorResponse::IntVectorResponse(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE suchThatClause,
-	string selectSynonym, map<string, string> synonymTable)
-	: APICallResponse(typeOfRs, paramType, suchThatClause, selectSynonym, synonymTable) {}
-
 string IntVectorResponse::apiCallForFollows() {
 	cout << "Inside intvector follows" << endl;
 	vector<int> result;

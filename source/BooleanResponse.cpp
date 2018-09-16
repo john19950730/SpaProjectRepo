@@ -5,12 +5,7 @@
 
 using namespace keywords::clauseParamType;
 
-BooleanResponse::BooleanResponse() : APICallResponse() {
-}
-
-BooleanResponse::BooleanResponse(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE suchThatClause, 
-	string selectSynonym, map<string, string> synonymTable) 
-	: APICallResponse(typeOfRs, paramType, suchThatClause, selectSynonym, synonymTable) {}
+BooleanResponse::BooleanResponse() : APICallResponse() {}
 
 string BooleanResponse::apiCallForFollows() {
 	bool isRsValid = false;

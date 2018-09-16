@@ -20,9 +20,8 @@ protected:
 	string selectSynonym;
 	map<string, string> synonymTable;
 
+	// Constructor
 	APICallResponse();
-	APICallResponse(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE suchThatClause, 
-		string selectSynonym, map<string, string> synonymTable);
 
 	// Setter methods
 	void setTypeOfRs(string typeOfRs);

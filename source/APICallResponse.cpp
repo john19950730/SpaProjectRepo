@@ -14,15 +14,6 @@ using namespace keywords::clauseParamType;
 
 APICallResponse::APICallResponse() {}
 
-APICallResponse::APICallResponse(string typeOfRs, pair<string, string> paramType, SUCH_THAT_CLAUSE suchThatClause,
-	string selectSynonym, map<string, string> synonymTable) {
-	this->typeOfRs = typeOfRs;
-	this->paramType = paramType;
-	this->suchThatClause = suchThatClause;
-	this->selectSynonym = selectSynonym;
-	this->synonymTable = synonymTable;
-}
-
 void APICallResponse::setTypeOfRs(string typeOfRs) {
 	this->typeOfRs = typeOfRs;
 }
