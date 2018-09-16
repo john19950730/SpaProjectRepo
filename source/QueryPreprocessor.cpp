@@ -72,6 +72,7 @@ bool QueryPreprocessor::setResultsClauseInQueryObject(string query) {
 	}
 	vector<string> resultsClause = createResultsClause(query);
 	queryObject->setSelectClause(resultsClause);
+	queryObject->setSynonymTable(synonymTable);
 
 	return true;
 }

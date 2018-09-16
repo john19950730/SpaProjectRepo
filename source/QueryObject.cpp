@@ -45,8 +45,13 @@ void QueryObject::setUsesClause(vector<SUCH_THAT_CLAUSE> usesClause) {
 	usesClauseIsset = true;
 }
 
-void QueryObject::setEntityAliasMap(map<string, string> entityAliases) {
-	this->entityAliases = entityAliases;
+void QueryObject::setPatternClause(vector<PATTERN_CLAUSE> patternClause) {
+	this->patternClause = patternClause;
+	patternClauseIsset = true;
+}
+
+void QueryObject::setSynonymTable(map<string, string> synonymTable) {
+	this->synonymTable = synonymTable;
 }
 
 vector<SUCH_THAT_CLAUSE> QueryObject::getFollowsClause() {
@@ -69,37 +74,42 @@ vector<SUCH_THAT_CLAUSE> QueryObject::getUsesClause() {
 	return usesClause;
 }
 
-map<string, string> QueryObject::getEntityAliases() {
-	return entityAliases;
+vector<PATTERN_CLAUSE> QueryObject::getPatternClause() {
+	return patternClause;
+}
+
+map<string, string> QueryObject::getSynonymTable() {
+	return synonymTable;
 }
 
 bool QueryObject::hasClauses() {
-	if (!modifiesClauseIsset && !usesClauseIsset && !followsClauseIsset && !parentClauseIsset)
+	if (!modifiesClauseIsset && !usesClauseIsset && !followsClauseIsset && !parentClauseIsset && !patternClauseIsset)
 		return false;
 	return true;
 }
 
 bool QueryObject::hasFollowsClause() {
-	if (followsClauseIsset) return false;
-	return true;
+	return followsClauseIsset;
 }
 
 bool QueryObject::hasModifiesClause() {
-	if (modifiesClauseIsset) return false;
-	return true;
+	return modifiesClauseIsset;
 }
 
 bool QueryObject::hasParentClause() {
-	if (parentClauseIsset) return false;
-	return true;
+	return parentClauseIsset;
 }
 
 bool QueryObject::hasUsesClause() {
-	if (usesClauseIsset) return false;
-	return true;
+	return usesClauseIsset;
 }
 
-int QueryObject::getNumberOfClauses() {
+bool QueryObject::hasPatternClause() {
+	return patternClauseIsset;
+}
+
+// Changes to be made in iteration 2
+int QueryObject::getNumberOfSuchThatClauses() {
 	int count = 0;
 
 	if (hasUsesClause()) count++;

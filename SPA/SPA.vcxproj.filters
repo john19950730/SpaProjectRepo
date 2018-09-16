@@ -39,10 +39,10 @@
     <ClCompile Include="..\source\QueryObjStructures.h">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\Utility.cpp">
+    <ClCompile Include="..\source\LineOfCodeData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\LineOfCodeData.cpp">
+    <ClCompile Include="..\source\Utility.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,13 +68,13 @@
     <ClInclude Include="..\source\QueryObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\Utility.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\LineOfCodeData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\DesignExtractor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

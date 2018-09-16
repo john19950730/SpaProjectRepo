@@ -20,5 +20,18 @@ namespace keywords {
 		const std::string CALL_VAR = "call";
 		const std::vector<string> STATEMENTS = { STMT_VAR, ASSIGNMENT_VAR, IF_VAR, WHILE_VAR, READ_VAR, PRINT_VAR, CALL_VAR };
 		const std::vector<string> PATTERN_TYPES = { ASSIGNMENT_VAR, IF_VAR, WHILE_VAR };
+
+		const std::string USES_RS = "uses";
+		const std::string MODIFIES_RS = "modifies";
+		const std::string FOLLOWS_RS = "follows";
+		const std::string PARENT_RS = "parent";
+	}
+	
+	namespace clauseParamType {
+		const std::string SYNONYM = "syn";
+		const std::string STMT_NO = "stmtNo";
+		const std::string PROC_NAME = "procName";
+		const std::string VARIABLE = "variable";
+		const std::string UNDERSCORE = "underscore";
 	}
 };

@@ -19,12 +19,11 @@
     <ClCompile Include="..\source\QueryObject.cpp" />
     <ClCompile Include="..\source\QueryObjStructures.h" />
     <ClCompile Include="..\source\QueryPreprocessor.cpp" />
-    <ClCompile Include="..\source\Utility.cpp" />
     <ClCompile Include="..\source\TNode.cpp" />
+    <ClCompile Include="..\source\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\CodeParser.h" />
-    <ClInclude Include="..\source\Utility.h" />
     <ClInclude Include="..\source\DesignExtractor.h" />
     <ClInclude Include="..\source\Keywords.h" />
     <ClInclude Include="..\source\LineOfCodeData.h" />
@@ -33,6 +32,7 @@
     <ClInclude Include="..\source\QueryObject.h" />
     <ClInclude Include="..\source\QueryPreprocessor.h" />
     <ClInclude Include="..\source\TNode.h" />
+    <ClInclude Include="..\source\Utility.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DC21A1EA-D2C6-4D14-A2B4-E025B64BDE81}</ProjectGuid>
