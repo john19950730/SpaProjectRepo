@@ -9,11 +9,11 @@ using namespace std;
 class APICallResponse {
 public:
 	string executeApiCall();
+	static string executeApiCallForNoClauses(string synonymType);
 	static APICallResponse* getApiCallResponse(string typeOfRs, pair<string, string> paramType,
 		SUCH_THAT_CLAUSE suchThatClause, string selectSynonym, map<string, string> synonymTable);
-
-// Virtual methods without implementation - Derived classes to implement this
 protected:
+	// Attributes
 	string typeOfRs;
 	pair<string, string> paramType;
 	SUCH_THAT_CLAUSE suchThatClause;
@@ -34,7 +34,8 @@ protected:
 	// Generic method
 	string getImmediateResults();
 	string getNoResults();
-	
+	static string apiCallForNoClause(string synonymType);
+
 	// Abstracted methods without implementation
 	virtual string apiCallForFollows() = 0;
 	virtual string apiCallForParent() = 0;

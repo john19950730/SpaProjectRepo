@@ -3,7 +3,6 @@
 #include "Utility.h"
 #include "PKB.h"
 #include "APICallResponse.h";
-#include "BooleanResponse.h";
 
 #include <iostream>
 
@@ -16,9 +15,16 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 }
 
 string QueryEvaluator::evaluateQueryObject() {
+	if (!queryObject->hasClauses()) {
+		string synonymType = queryObject->getSynonymTable()[queryObject->getSelectClause().at(0)];
+		return APICallResponse::executeApiCallForNoClauses(synonymType);
+	}
+
 	if (queryObject->getNumberOfSuchThatClauses() == 1) {
 		return evaluateSingleClause();
 	}
+
+	return "Error";
 }
 
 string QueryEvaluator::evaluateSingleClause() {

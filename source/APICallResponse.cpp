@@ -6,6 +6,7 @@
 #include "IntStringPairVectorResponse.h";
 #include "StringStringPairVectorResponse.h"
 #include "Keywords.h"
+
 #include <iostream>
 
 using namespace keywords::query;
@@ -51,9 +52,20 @@ string APICallResponse::executeApiCall() {
 		return "";
 }
 
+string APICallResponse::executeApiCallForNoClauses(string synonymType) {
+	return apiCallForNoClause(synonymType);
+}
+
 string APICallResponse::getImmediateResults() {
 	string synonymType = synonymTable[selectSynonym];
+	return apiCallForNoClause(synonymType);
+}
 
+string APICallResponse::getNoResults() {
+	return "";
+}
+
+string APICallResponse::apiCallForNoClause(string synonymType) {
 	if (synonymType == ASSIGNMENT_VAR) return "allAssignmentStmts";
 	else if (synonymType == VARIABLE_VAR) return "allVariableStmts";
 	else if (synonymType == STMT_VAR) return "allStmts";
@@ -63,10 +75,6 @@ string APICallResponse::getImmediateResults() {
 	else if (synonymType == READ_VAR) return "allReadStmts";
 	else if (synonymType == PRINT_VAR) return "allPrintStmts";
 
-	return "";
-}
-
-string APICallResponse::getNoResults() {
 	return "";
 }
 
