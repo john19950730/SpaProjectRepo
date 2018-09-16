@@ -16,6 +16,16 @@ static vector<string> varList;
 static int varListIndex = 0;
 static vector<int> assignList;
 static int assignListIndex = 0;
+static vector<int> readList;
+static int readListIndex = 0;
+static vector<int> printList;
+static int printListIndex = 0;
+static vector<int> ifList;
+static int ifListIndex = 0;
+static vector<int> whileList;
+static int whileListIndex = 0;
+static vector< pair<string, pair<int, int> > > procedureList;
+static int procedureListIndex = 0;
 
 // element at index i means Follows(i, element) holds
 static vector<int> followsList;
@@ -45,15 +55,54 @@ int PKB::addAssign(int stmtNo)
 	return assignListIndex++;
 }
 
+int PKB::addRead(int stmtNo)
+{
+	readList.push_back(stmtNo);
+	return readListIndex++;
+}
+
+int PKB::addPrint(int stmtNo)
+{
+	printList.push_back(stmtNo);
+	return printListIndex++;
+}
+
+int PKB::addIf(int stmtNo)
+{
+	ifList.push_back(stmtNo);
+	return ifListIndex++;
+}
+
+int PKB::addWhile(int stmtNo)
+{
+	whileList.push_back(stmtNo);
+	return whileListIndex++;
+}
+
+int PKB::addProcedure(string procName, pair<int, int> startEndLine)
+{
+	procedureList.push_back(make_pair(procName, startEndLine));
+	return procedureListIndex++;
+}
+
 void PKB::addFollows(int stmtBefore, int stmtAfter)
 {
+	while (followsList.size() <= stmtBefore)
+		followsList.push_back(0);
 	followsList[stmtBefore] = stmtAfter;
+
+	while (followsStarTable.size() <= stmtAfter)
+		followsStarTable.push_back(vector<bool>(stmtAfter));
+	for (unsigned int i = 0; i < followsStarTable.size(); ++i) {
+		while (followsStarTable[i].size() <= stmtAfter)
+			followsStarTable[i].push_back(false);
+	}
 
 	followsStarTable[stmtBefore][stmtAfter] = true;
 	followsStarTable[stmtBefore][stmtBefore] = false;
 	followsStarTable[stmtAfter][stmtAfter] = false;
 	
-	int i;
+	unsigned int i;
 	for (i = 1; i <= stmtBefore; ++i) {
 		followsStarTable[i][stmtAfter] = followsStarTable[i][stmtBefore];
 	}
@@ -64,7 +113,16 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 
 void PKB::addParent(int stmtParent, int stmtChild)
 {
+	while (parentList.size() <= stmtChild)
+		parentList.push_back(0);
 	parentList[stmtChild] = stmtParent;
+
+	while (parentStarTable.size() <= stmtChild)
+		parentStarTable.push_back(vector<bool>(stmtChild));
+	for (unsigned int i = 0; i < parentStarTable.size(); ++i) {
+		while (parentStarTable[i].size() <= stmtChild)
+			parentStarTable[i].push_back(false);
+	}
 
 	parentStarTable[stmtParent][stmtChild] = true;
 	parentStarTable[stmtParent][stmtParent] = false;
@@ -78,11 +136,15 @@ void PKB::addParent(int stmtParent, int stmtChild)
 
 void PKB::addUses(int stmtNo, string varName)
 {
+	while (usesTable.size() <= (unsigned int)stmtNo)
+		usesTable.push_back(vector<string>());
 	usesTable[stmtNo].push_back(varName);
 }
 
 void PKB::addModifies(int stmtNo, string varName)
 {
+	while (modifiesTable.size() <= (unsigned int)stmtNo)
+		modifiesTable.push_back(vector<string>());
 	modifiesTable[stmtNo].push_back(varName);
 }
 
@@ -96,6 +158,45 @@ bool PKB::isFollows(int stmtNo1, int stmtNo2, bool star)
 	}
 }
 
+vector< pair<int, string> > PKB::getAllAssignmentUsesVariablePairs()
+{
+	vector< pair<int, string> > result;
+	for_each(assignList.begin(), assignList.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+vector< pair<int, string> > PKB::getAllStmtUsesVariablePairs()
+{
+	vector<int> stmts(usesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<int, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
+{
+	// TODO: Be able to check line numbers enclosed by procedures (for multi-procedure support)
+	vector<int> stmts(usesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<string, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
+	return result;
+}
+vector<string> PKB::getAllVariablesUsedByStmtNo(int stmtNo)
+{
+	return vector<string>();
+}
+vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
+{
+	return vector<string>();
+}
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
 	if (!star) {
@@ -116,6 +217,158 @@ bool PKB::isModifies(int stmtNo1, string varName)
 	return find(modifiesTable[stmtNo1].begin(), modifiesTable[stmtNo1].end(), varName) != modifiesTable[stmtNo1].end();
 }
 
+vector<pair<int, int>> PKB::getAllFollowsPair(bool star)
+{
+	return vector<pair<int, int>>();
+}
+
+vector<int> PKB::getStmtNoThatFollows(int stmtNo, bool star)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getStmtNoThatIsFollowedBy(int stmtNo, bool star)
+{
+	return vector<int>();
+}
+
+vector<pair<int, int>> PKB::getAllParentPair(bool star)
+{
+	return vector<pair<int, int>>();
+}
+
+vector<int> PKB::getStmtNoThatIsChildOf(int stmtNo, bool star)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getStmtNoThatIsParentOf(int stmtNo, bool star)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllStmtThatUses(string v)
+{
+	vector<int> stmts(usesTable.size());
+	vector<int> result;
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n;});
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
+		[=](int stmtNo) { return PKB::isUses(stmtNo, v); });
+	return result;
+}
+
+vector<int> PKB::getAllAssignmentThatUses(string v)
+{
+	vector<int> result;
+	copy_if(assignList.begin(), assignList.end(), back_inserter(result),
+		[=](int assignStmtNo) { return PKB::isUses(assignStmtNo, v); });
+	return result;
+}
+
+vector<int> PKB::getAllPrintThatUses(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllIfThatUses(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllWhileThatUses(string varName)
+{
+	return vector<int>();
+}
+
+vector<string> PKB::getAllProcedureThatUses(string varName)
+{
+	return vector<string>();
+}
+
+vector<int> PKB::getAllStmtThatModifies(string v)
+{
+	vector<int> stmts(modifiesTable.size());
+	vector<int> result;
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
+		[=](int stmtNo) { return PKB::isModifies(stmtNo, v); });
+	return result;
+}
+
+vector<int> PKB::getAllAssignmentThatModifies(string v)
+{
+	vector<int> result;
+	copy_if(assignList.begin(), assignList.end(), back_inserter(result),
+		[=](int assignStmtNo) { return PKB::isModifies(assignStmtNo, v); });
+	return result;
+}
+
+vector<int> PKB::getAllReadThatModifies(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllIfThatModifies(string varName)
+{
+	return vector<int>();
+}
+
+vector<int> PKB::getAllWhileThatModifies(string varName)
+{
+	return vector<int>();
+}
+
+vector<string> PKB::getAllProcedureThatModifies(string varName)
+{
+	return vector<string>();
+}
+
+vector< pair<int, string> > PKB::getAllAssignmentModifiesVariablePairs()
+{
+	vector< pair<int, string> > result;
+	for_each(assignList.begin(), assignList.end(),
+		[&](int stmtNo) { for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+
+vector< pair<int, string> > PKB::getAllStmtModifiesVariablePairs()
+{
+	vector<int> stmts(modifiesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<int, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+	return result;
+}
+
+vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
+{
+	// TODO: Be able to check line numbers enclosed by procedures (for multi-procedure support)
+	vector<int> stmts(usesTable.size());
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	vector< pair<string, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<string, string>(procedureList[0].first, varName)); }); });
+	return result;
+}
+
+vector<string> PKB::getAllVariablesModifiedByStmtNo(int stmtNo)
+{
+	return vector<string>();
+}
+
+vector<string> PKB::getAllVariablesModifiedByProcedures(string procName)
+{
+	return vector<string>();
+}
+
 vector<string> PKB::getVariables()
 {
 	return varList;
@@ -124,4 +377,29 @@ vector<string> PKB::getVariables()
 vector<int> PKB::getAssigns()
 {
 	return assignList;
+}
+
+vector<int> PKB::getReads()
+{
+	return readList;
+}
+
+vector<int> PKB::getPrints()
+{
+	return printList;
+}
+
+vector<int> PKB::getIfs()
+{
+	return ifList;
+}
+
+vector<int> PKB::getWhiles()
+{
+	return whileList;
+}
+
+vector< pair<string, pair<int, int> > > PKB::getProcedures()
+{
+	return procedureList;
 }
