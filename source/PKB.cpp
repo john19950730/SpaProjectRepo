@@ -215,6 +215,7 @@ vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
 			if (find(result.begin(), result.end(), varName) == result.end())
 				result.push_back(varName);
 		}); });
+	return result;
 }
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
@@ -414,6 +415,7 @@ vector<string> PKB::getAllVariablesModifiedByProcedures(string procName)
 			if (find(result.begin(), result.end(), varName) == result.end())
 				result.push_back(varName);
 	}); });
+	return result;
 }
 
 vector<string> PKB::getVariables()
@@ -449,4 +451,13 @@ vector<int> PKB::getWhiles()
 unordered_map<string, pair<int, int> > PKB::getProcedures()
 {
 	return procedureMap;
+}
+
+vector<string> PKB::getProcedureNames()
+{
+	vector<string> result;
+	for_each(procedureMap.begin(), procedureMap.end(), [&] (pair<string, pair<int, int> > procedurePair) {
+		result.push_back(procedurePair.first);
+	});
+	return result;
 }

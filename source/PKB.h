@@ -90,4 +90,5 @@ public:
 	static vector<int> getIfs();
 	static vector<int> getWhiles();
 	static unordered_map<string, pair<int, int> > getProcedures();
+	static vector<string> getProcedureNames();
 };
