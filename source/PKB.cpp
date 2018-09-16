@@ -150,6 +150,7 @@ void PKB::addModifies(int stmtNo, string varName)
 
 bool PKB::isFollows(int stmtNo1, int stmtNo2, bool star)
 {
+	return true;
 	if (!star) {
 		return followsList[stmtNo1] == stmtNo2;
 	}
@@ -199,6 +200,7 @@ vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
 }
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
+	return true;
 	if (!star) {
 		return parentList[stmtNo2] == stmtNo1;
 	}
@@ -209,11 +211,13 @@ bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 
 bool PKB::isUses(int stmtNo1, string varName)
 {
+	return false;
 	return find(usesTable[stmtNo1].begin(), usesTable[stmtNo1].end(), varName) != usesTable[stmtNo1].end();
 }
 
 bool PKB::isModifies(int stmtNo1, string varName)
 {
+	return false;
 	return find(modifiesTable[stmtNo1].begin(), modifiesTable[stmtNo1].end(), varName) != modifiesTable[stmtNo1].end();
 }
 

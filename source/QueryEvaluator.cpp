@@ -2,6 +2,8 @@
 #include "Keywords.h"
 #include "Utility.h"
 #include "PKB.h"
+#include "APICallResponse.h";
+#include "BooleanResponse.h";
 
 #include <iostream>
 
@@ -13,7 +15,37 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 	this->queryObject = queryObject;
 }
 
-string QueryEvaluator::evaluateQueryObject() {	
+string QueryEvaluator::evaluateQueryObject() {
+	string selectClause = queryObject->getSelectClause().at(0);
+	map<string, string> synonymTable = queryObject->getSynonymTable();
+	SUCH_THAT_CLAUSE clause;
+	string typeOfRs;
+
+	if (queryObject->hasUsesClause()) {
+		cout << "Uses" << endl;
+		clause = queryObject->getUsesClause().at(0);
+		typeOfRs = USES_RS;
+	}
+	else if (queryObject->hasModifiesClause()) {
+		cout << "Modifies" << endl;
+		clause = queryObject->getModifiesClause().at(0);
+		typeOfRs = MODIFIES_RS;
+	}
+	else if (queryObject->hasParentClause()) {
+		cout << "Parent" << endl;
+		clause = queryObject->getParentClause().at(0);
+		typeOfRs = PARENT_RS;
+	}
+	else if (queryObject->hasFollowsClause()) {
+		cout << "Follows" << endl;
+		clause = queryObject->getFollowsClause().at(0);
+		typeOfRs = FOLLOWS_RS;
+	}
+
+	APICallResponse* apiCallResponse = 
+		APICallResponse::getApiCallResponse(typeOfRs, getParamType(clause), clause, selectClause, synonymTable);
+	return apiCallResponse->executeApiCall();
+
 	if (!queryObject->hasClauses()) return selectImmediateResults();
 
 	// First milestone - evaluate only one clause
