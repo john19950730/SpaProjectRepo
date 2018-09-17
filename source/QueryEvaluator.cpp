@@ -36,22 +36,18 @@ string QueryEvaluator::evaluateSingleClause() {
 	string typeOfRs;
 
 	if (queryObject->hasUsesClause()) {
-		cout << "Uses" << endl;
 		clause = queryObject->getUsesClause().at(0);
 		typeOfRs = USES_RS;
 	}
 	else if (queryObject->hasModifiesClause()) {
-		cout << "Modifies" << endl;
 		clause = queryObject->getModifiesClause().at(0);
 		typeOfRs = MODIFIES_RS;
 	}
 	else if (queryObject->hasParentClause()) {
-		cout << "Parent" << endl;
 		clause = queryObject->getParentClause().at(0);
 		typeOfRs = PARENT_RS;
 	}
 	else if (queryObject->hasFollowsClause()) {
-		cout << "Follows" << endl;
 		clause = queryObject->getFollowsClause().at(0);
 		typeOfRs = FOLLOWS_RS;
 	}
