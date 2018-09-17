@@ -11,20 +11,6 @@ namespace UnitTesting
 	{
 	public:
 
-		//TEST_METHOD(ParseTest)
-		//{
-		//	int parseVal;
-		//	parseVal = CodeParser::parse("TestingString");
-		//	Assert::AreEqual(0, parseVal);
-		//}
-
-		//TEST_METHOD(ProcessLineTest) 
-		//{
-		//	int processLineVal;
-		//	processLineVal = CodeParser::processLine("Test1", 1);
-		//	Assert::AreEqual(0, processLineVal);
-		//}
-
 		TEST_METHOD(CheckModifiesTest) 
 		{
 			string checkModifiesOutput;
@@ -40,12 +26,12 @@ namespace UnitTesting
 			Assert::AreNotEqual(intendedOutput, checkModifiesOutput);
 
 			// Testing for Read
-			checkModifiesOutput = CodeParser::checkModifies("read", "a");
+			checkModifiesOutput = CodeParser::checkModifies("read", "read a;");
 			intendedOutput = "a";
 			Assert::AreEqual(intendedOutput, checkModifiesOutput);
 
 			// Testing for wrong input of Read
-			checkModifiesOutput = CodeParser::checkModifies("read", "aa");
+			checkModifiesOutput = CodeParser::checkModifies("read", "read aa;");
 			intendedOutput = "a";
 			Assert::AreNotEqual(intendedOutput, checkModifiesOutput);
 		}
@@ -79,6 +65,21 @@ namespace UnitTesting
 		{
 			bool checkIs_Duplicate;
 			std::vector<std::string> sampleVector;
+			// loading the vector with data
+			sampleVector.push_back("a");
+			sampleVector.push_back("apple");
+
+			// Test if it returns True if an Item is found in the vector
+			checkIs_Duplicate = CodeParser::is_duplicate("a",sampleVector);
+			Assert::IsTrue(checkIs_Duplicate);
+			checkIs_Duplicate = CodeParser::is_duplicate("apple", sampleVector);
+			Assert::IsTrue(checkIs_Duplicate);
+
+			// Test if it returns False if an Item cannot be found in the vector
+			checkIs_Duplicate = CodeParser::is_duplicate("b", sampleVector);
+			Assert::IsFalse(checkIs_Duplicate);
+			checkIs_Duplicate = CodeParser::is_duplicate("ap", sampleVector);
+			Assert::IsFalse(checkIs_Duplicate);
 		}
 
 		TEST_METHOD(Is_AppearTest) 
