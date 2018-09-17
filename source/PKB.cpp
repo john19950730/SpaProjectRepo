@@ -12,6 +12,8 @@ using namespace std;
 #include "PKB.h"
 #include "TNode.h"
 
+static const char synonyms[] = { 'a', 'r', 'p', 'i', 'w', 'p' };
+
 static vector<string> varList;
 static int varListIndex = 0;
 static vector<int> assignList;
@@ -45,6 +47,8 @@ static vector< vector<string> > modifiesTable;
 
 int PKB::addVariable(string varName)
 {
+	if (find(varList.begin(), varList.end(), varName) != varList.end())
+		return varListIndex;
 	varList.push_back(varName);
 	return varListIndex++;
 }
@@ -138,13 +142,15 @@ void PKB::addUses(int stmtNo, string varName)
 {
 	while (usesTable.size() <= (unsigned int)stmtNo)
 		usesTable.push_back(vector<string>());
-	usesTable[stmtNo].push_back(varName);
+	if (find(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), varName) == usesTable[stmtNo].end())
+		usesTable[stmtNo].push_back(varName);
 }
 
 void PKB::addModifies(int stmtNo, string varName)
 {
 	while (modifiesTable.size() <= (unsigned int)stmtNo)
 		modifiesTable.push_back(vector<string>());
+	if (find(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), varName) == modifiesTable[stmtNo].end())
 	modifiesTable[stmtNo].push_back(varName);
 }
 
