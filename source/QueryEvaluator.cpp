@@ -2,9 +2,9 @@
 #include "Keywords.h"
 #include "Utility.h"
 #include "PKB.h"
-#include "APICallSuchThatClause.h";
+#include "APICallSuchThatClause.h"
 #include "APICall.h"
-#include "APICallPatternClause.h";
+#include "APICallPatternClause.h"
 
 #include <iostream>
 
@@ -37,6 +37,8 @@ vector<string> QueryEvaluator::evaluateQueryObject() {
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && queryObject->hasPatternClause()) {
 		return evaluateSuchThatAndPatternClause();
 	}
+
+	return vector<string>();
 }
 
 vector<string> QueryEvaluator::evaluateSuchThatClause() {

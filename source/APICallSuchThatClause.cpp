@@ -3,7 +3,7 @@
 #include "IntVectorResponse.h"
 #include "StringVectorResponse.h"
 #include "IntIntPairVectorResponse.h"
-#include "IntStringPairVectorResponse.h";
+#include "IntStringPairVectorResponse.h"
 #include "StringStringPairVectorResponse.h"
 #include "Keywords.h"
 
