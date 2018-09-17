@@ -44,10 +44,35 @@ namespace UnitTesting
 			intendedOutput = "a";
 			Assert::AreEqual(intendedOutput, checkModifiesOutput);
 
-			// Testing for 
+			// Testing for wrong input of Read
 			checkModifiesOutput = CodeParser::checkModifies("read", "aa");
 			intendedOutput = "a";
 			Assert::AreNotEqual(intendedOutput, checkModifiesOutput);
+		}
+
+		TEST_METHOD(Is_NumberTest) 
+		{
+			bool checkIs_Number;
+
+			// Test if it returns True when input is Number
+			checkIs_Number = CodeParser::is_number("1900");
+			Assert::IsTrue(checkIs_Number);
+
+			// Test if it returns False when input contains only Characters
+			checkIs_Number = CodeParser::is_number("Hello");
+			Assert::IsFalse(checkIs_Number);
+
+			// Test if it returns False when input contains mixture of Numbers and Characters
+			checkIs_Number = CodeParser::is_number("1H900");
+			Assert::IsFalse(checkIs_Number);
+
+			// Test if it returns False when input contains mixture of Numbers and Characters
+			checkIs_Number = CodeParser::is_number("H1900");
+			Assert::IsFalse(checkIs_Number);
+
+			// Test if it returns False when input contains mixture of Numbers and Characters
+			checkIs_Number = CodeParser::is_number("1900H");
+			Assert::IsFalse(checkIs_Number);
 		}
 
 	};
