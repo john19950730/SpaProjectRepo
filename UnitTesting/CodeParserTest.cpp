@@ -11,7 +11,7 @@ namespace UnitTesting
 	{
 	public:
 
-		TEST_METHOD(CheckModifiesTest) 
+		TEST_METHOD(CheckModifiesTest)
 		{
 			string checkModifiesOutput;
 
@@ -36,7 +36,7 @@ namespace UnitTesting
 			Assert::AreNotEqual(intendedOutput, checkModifiesOutput);
 		}
 
-		TEST_METHOD(Is_NumberTest) 
+		TEST_METHOD(Is_NumberTest)
 		{
 			bool checkIs_Number;
 
@@ -61,7 +61,7 @@ namespace UnitTesting
 			Assert::IsFalse(checkIs_Number);
 		}
 
-		TEST_METHOD(Is_DuplicateTest) 
+		TEST_METHOD(Is_DuplicateTest)
 		{
 			bool checkIs_Duplicate;
 			std::vector<std::string> sampleVector;
@@ -70,7 +70,7 @@ namespace UnitTesting
 			sampleVector.push_back("apple");
 
 			// Test if it returns True if an Item is found in the vector
-			checkIs_Duplicate = CodeParser::is_duplicate("a",sampleVector);
+			checkIs_Duplicate = CodeParser::is_duplicate("a", sampleVector);
 			Assert::IsTrue(checkIs_Duplicate);
 			checkIs_Duplicate = CodeParser::is_duplicate("apple", sampleVector);
 			Assert::IsTrue(checkIs_Duplicate);
@@ -82,7 +82,7 @@ namespace UnitTesting
 			Assert::IsFalse(checkIs_Duplicate);
 		}
 
-		TEST_METHOD(Is_AppearTest) 
+		TEST_METHOD(Is_AppearTest)
 		{
 			bool checkIs_Appear;
 
@@ -105,6 +105,36 @@ namespace UnitTesting
 			// Test if it returns False if a character does not contain within a long String
 			checkIs_Appear = CodeParser::is_appeared('a', "movie");
 			Assert::IsFalse(checkIs_Appear);
+
+		}
+
+		TEST_METHOD(CheckUsesTest)
+		{
+			std::vector<std::string> checkUsesOutput;
+			std::vector<std::string> checkUsesExpectedOutPut;
+
+			// Test if the ouput of CheckUses is the same as expected
+			checkUsesExpectedOutPut.push_back("a,b");
+			checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
+			Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+
+			// Clear the vectors
+			checkUsesExpectedOutPut.clear();
+			checkUsesOutput.clear();
+
+			// Test if the output of CheckUses is the same with duplicated variable
+			checkUsesExpectedOutPut.push_back("a,b,c");
+			checkUsesOutput = CodeParser::checkUses("while", "x=a*b+b+c");
+			Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+
+			// Clear the vectors
+			checkUsesExpectedOutPut.clear();
+			checkUsesOutput.clear();
+
+			// Test if ouput of CheckUses is different as expected
+			checkUsesExpectedOutPut.push_back("b,a");
+			checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
+			Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
 
 		}
 
