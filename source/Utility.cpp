@@ -43,7 +43,7 @@ string Utility::convertInfixToPostfix(string infix)
 	stringstream output;
 
 	for (unsigned i = 0; i < infix.length(); i++) {
-		if (infix[i] == '+' || infix[i] == '-' || infix[i] == '*' || infix[i] == '/' || infix[i] == '^') {
+		if (infix[i] == '+' || infix[i] == '-' || infix[i] == '*' || infix[i] == '/' || infix[i] == '^' || infix[i] == '%') {
 			while (!operator_stack.empty() && priority(operator_stack.top()) <= priority(infix[i])) {
 				output << operator_stack.top();
 				operator_stack.pop();
@@ -54,7 +54,7 @@ string Utility::convertInfixToPostfix(string infix)
 			operator_stack.push(infix[i]);
 		}
 		else if (infix[i] == ')') {
-			while (operator_stack.top() != '(') {
+			while (!operator_stack.empty() && operator_stack.top() != '(') {
 				output << operator_stack.top();
 				operator_stack.pop();
 			}
@@ -74,13 +74,15 @@ string Utility::convertInfixToPostfix(string infix)
 }
 
 int Utility::priority(char a) {
-	int temp;
+	int temp = 0;
 	if (a == '^')
 		temp = 1;
-	else  if (a == '*' || a == '/')
+	else  if (a == '*' || a == '/' || a == '%')
 		temp = 2;
 	else  if (a == '+' || a == '-')
 		temp = 3;
+	else if (a == '(')
+		temp = 4;
 	return temp;
 }
 
