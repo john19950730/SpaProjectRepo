@@ -75,5 +75,37 @@ namespace UnitTesting
 			Assert::IsFalse(checkIs_Number);
 		}
 
+		TEST_METHOD(Is_DuplicateTest) 
+		{
+			bool checkIs_Duplicate;
+			std::vector<std::string> sampleVector;
+		}
+
+		TEST_METHOD(Is_AppearTest) 
+		{
+			bool checkIs_Appear;
+
+			// Test if it returns True if a character is contain within a single character String
+			checkIs_Appear = CodeParser::is_appeared('a', "a");
+			Assert::IsTrue(checkIs_Appear);
+
+			// Test if it returns True if a character is contain within a long String with 'a' at the start
+			checkIs_Appear = CodeParser::is_appeared('a', "apple");
+			Assert::IsTrue(checkIs_Appear);
+
+			// Test if it returns True if a character is contain within a long String with 'a' within the string
+			checkIs_Appear = CodeParser::is_appeared('a', "balloon");
+			Assert::IsTrue(checkIs_Appear);
+
+			// Test if it returns False if a character is does not contain within a single character String
+			checkIs_Appear = CodeParser::is_appeared('a', "b");
+			Assert::IsFalse(checkIs_Appear);
+
+			// Test if it returns False if a character does not contain within a long String
+			checkIs_Appear = CodeParser::is_appeared('a', "movie");
+			Assert::IsFalse(checkIs_Appear);
+
+		}
+
 	};
 }
