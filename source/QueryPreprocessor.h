@@ -67,7 +67,7 @@ private:
 	bool areRelationshipParamsValid(string relationship, string param1, string param2);
 	bool arePatternParamsValid(string param1, string param2);
 	
-	bool isSynonym(string param);
+	bool existsInSynonymTable(string param);
 	bool isPatternSynonymValid(string synonym);
 	bool isATypeOfStatement(string paramType);
 	string getParameterType(string param);

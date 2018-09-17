@@ -40,7 +40,10 @@ bool QueryPreprocessor::parseQuery(string query)
 		return false;
 	}
 	
-	extractSynonymsFromDeclaration(query);
+	if (!extractSynonymsFromDeclaration(query)) {
+		cout << endl << endl << "##### Duplicate synonyms declared! Please check again!" << endl << endl;
+		return false;
+	}
 
 	if (!buildQueryObject(query)) {
 		cout << endl << "##### Query is invalid!" << endl << endl;
@@ -148,10 +151,12 @@ bool QueryPreprocessor::extractSynonymsFromDeclaration(string query) {
 	while (regex_search(query, matches, declarationSyntax)) {
 		string designEntity = matches[1];
 		string synonymStr = matches[2];
-		vector<string> synVctr = Utility::splitByDelimiter(synonymStr, ",");
-		for (size_t i = 0; i < synVctr.size(); i++)
+		vector<string> synonymVctr = Utility::splitByDelimiter(synonymStr, ",");
+		for (size_t i = 0; i < synonymVctr.size(); i++)
 		{
-			synonymTable[synVctr[i]] = designEntity;
+			if (existsInSynonymTable(synonymVctr[i]))
+				return false;
+			synonymTable[synonymVctr[i]] = designEntity;
 		}
 		query = matches.suffix();
 	}
@@ -190,8 +195,8 @@ SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, st
 	if (regex_search(relationship, matches, transSyntax)) {
 		hasTransitiveClosure = true;
 	}
-	bool paramIsSynonym1 = isSynonym(param1);
-	bool paramIsSynonym2 = isSynonym(param2);
+	bool paramIsSynonym1 = existsInSynonymTable(param1);
+	bool paramIsSynonym2 = existsInSynonymTable(param2);
 	clause = { stripDoubleQuotes(param1), stripDoubleQuotes(param2),
 		hasTransitiveClosure, paramIsSynonym1, paramIsSynonym2 };
 	return clause;
@@ -282,7 +287,7 @@ string QueryPreprocessor::getParameterType(string param) {
 	if (param.front() == '_') {
 		return "_SUBEXPRESSION";
 	}
-	if (isSynonym(param)) {
+	if (existsInSynonymTable(param)) {
 		if (isATypeOfStatement(synonymTable[param])) {
 			// is a type of statement e.g. assign, while, if, etc.
 			return keywords::query::STMT_VAR;
@@ -295,15 +300,15 @@ string QueryPreprocessor::getParameterType(string param) {
 	return "";
 }
 
-bool QueryPreprocessor::isSynonym(string param) {
-	if (synonymTable.count(param) == 1) {
+bool QueryPreprocessor::existsInSynonymTable(string synonym) {
+	if (synonymTable.count(synonym) == 1) {
 		return true;
 	}
 	return false;
 }
 
 bool QueryPreprocessor::isPatternSynonymValid(string synonym) {
-	if (isSynonym(synonym)) {
+	if (existsInSynonymTable(synonym)) {
 		vector<string> patternTypes = keywords::query::PATTERN_TYPES;
 		for (size_t i = 0; i < patternTypes.size(); i++)
 		{
