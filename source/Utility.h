@@ -21,9 +21,10 @@ public:
 	static vector<string> splitByRegex(string s, regex delimiters);
 
 	static string convertInfixToPostfix(string infixExpression);
-	static int priority(char a);
+	static int getOperatorPriority(char c);
 	static bool validateInfixExpression(string expression);
 
+	static string removeAllWhitespaces(string & s);
 	static void ltrim(string &s);
 	static void rtrim(std::string &s);
 	static string trim_copy(string s);
