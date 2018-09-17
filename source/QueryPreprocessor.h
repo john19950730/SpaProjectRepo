@@ -18,7 +18,6 @@ const string SYNONYM = "[a-zA-Z][a-zA-Z0-9]*";		// Synonym
 const string NUMBER = "[0-9]+";						// Number
 const string UNDERSCORE = "[_]";					// Underscore
 const string STRING = "\"[^\"]*\"";					// One or more characters enclosed in double quotes
-const string STRING_CONTENTS = "\"([^\"]*)\"";
 
 const string DECL_DE = "assign|variable|stmt|procedure|while|if|read|print|call|constant";		// Design entities
 const string REL = "Uses|Modifies";																// Relationships (that don't support transitive closure)
@@ -34,7 +33,8 @@ const string SUCH_THAT = SPACE + "such" + SPACE + "that" + SPACE + "(?:" + REL_R
 const string PATTERN = SPACE + "pattern" + SPACE + '(' + SYNONYM + ')' + BRACKET_O + '(' + REL_PARAM + ')' + COMMA + '(' + PATTERN_PARAM + ')' + BRACKET_C;
 const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT + '|' + PATTERN + ")*)*)" + SEMICOLON_OPT + '$';
 
-const string TRANS_REGEX = "[*]$";	// To check for transitive closure
+const string TRANS_REGEX = "[*]$";					// To check for transitive closure
+const string STRING_CONTENTS = "\"([^\"]*)\"";		// Used to extract text between double quotes
 
 struct SUCH_THAT_CLAUSE;
 struct PATTERN_CLAUSE;
