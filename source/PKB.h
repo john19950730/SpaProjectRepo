@@ -18,25 +18,25 @@ class VarTable;  // no need to #include "VarTable.h" as all I need is pointer
 class PKB {
 public:
 	// SPA relationships table
-	static void addFollows(int stmtBefore, int stmtAfter);
-	static void addParent(int stmtParent, int stmtChild);
-	static void addUses(int stmtNo, string varName);
-	static void addModifies(int stmtNo, string varName);
+	static void addFollows(unsigned int stmtBefore, unsigned int stmtAfter);
+	static void addParent(unsigned int stmtParent, unsigned int stmtChild);
+	static void addUses(unsigned int stmtNo, string varName);
+	static void addModifies(unsigned int stmtNo, string varName);
 
 	// SPA synonyms table
 	static int addVariable(string varName);
-	static int addAssign(int stmtNo);
-	static int addRead(int stmtNo);
-	static int addPrint(int stmtNo);
-	static int addIf(int stmtNo);
-	static int addWhile(int stmtNo);
-	static int addProcedure(string procName, pair<int, int> startEndLine);
+	static int addAssign(unsigned int stmtNo);
+	static int addRead(unsigned int stmtNo);
+	static int addPrint(unsigned int stmtNo);
+	static int addIf(unsigned int stmtNo);
+	static int addWhile(unsigned int stmtNo);
+	static int addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine);
 
 	// SPA basic relationships query
-	static bool isFollows(int stmtNo1, int stmtNo2, bool star);
-	static bool isParent(int stmtNo1, int stmtNo2, bool star);
-	static bool isUses(int stmtNo1, string varName);
-	static bool isModifies(int stmtNo1, string varName);
+	static bool isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star);
+	static bool isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star);
+	static bool isUses(unsigned int stmtNo1, string varName);
+	static bool isModifies(unsigned int stmtNo1, string varName);
 
 	// SPA advanced Follows query
 	static vector< pair<int, int> > getAllFollowsPair(bool star);
@@ -62,7 +62,7 @@ public:
 	static vector< pair<string, string> > getAllProcedureUsesVariablePairs();
 
 	// SPA Uses(stmtNo/procName, b) query
-	static vector<string> getAllVariablesUsedByStmtNo(int stmtNo);
+	static vector<string> getAllVariablesUsedByStmtNo(unsigned int stmtNo);
 	static vector<string> getAllVariablesUsedByProcedures(string procName);
 
 	// SPA Modifies(a, "b") query
@@ -79,7 +79,7 @@ public:
 	static vector< pair<string, string> > getAllProcedureModifiesVariablePairs();
 
 	// SPA Modifies(stmtNo/procName, b) query
-	static vector<string> getAllVariablesModifiedByStmtNo(int stmtNo);
+	static vector<string> getAllVariablesModifiedByStmtNo(unsigned int stmtNo);
 	static vector<string> getAllVariablesModifiedByProcedures(string procName);
 
 	// SPA synonyms query
@@ -89,5 +89,6 @@ public:
 	static vector<int> getPrints();
 	static vector<int> getIfs();
 	static vector<int> getWhiles();
-	static vector< pair<string, pair<int, int> > > getProcedures();
+	static unordered_map<string, pair<int, int> > getProcedures();
+	static vector<string> getProcedureNames();
 };

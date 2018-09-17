@@ -11,9 +11,10 @@ using namespace std;
 #include "Keywords.h"
 #include <regex>
 #include <stack>
+#include <utility>
 
 int LineOfCodeData::store(string type, string aData
-	, std::stack <std::string> nestlevel) {
+	, std::stack <std::pair<int, string>> nestlevel) {
 
 	typeOfData = type;
 	actualData = aData;
