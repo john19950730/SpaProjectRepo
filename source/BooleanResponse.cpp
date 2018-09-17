@@ -26,7 +26,7 @@ vector<string> BooleanResponse::apiCallForParent() {
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
-	isRsValid = PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure);
+	//isRsValid = PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure);
 
 	vector<string> result = isRsValid ? getImmediateResults() : getNoResults();
 	result.push_back("PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure)");
@@ -61,7 +61,7 @@ vector<string> BooleanResponse::apiCallForModifies() {
 
 	if (paramType == make_pair(STMT_NO, VARIABLE)) {
 		forTesting = "PKB::isModifies(stoi(firstParam), secondParam)";
-		isRsValid = PKB::isModifies(stoi(firstParam), secondParam);
+		//isRsValid = PKB::isModifies(stoi(firstParam), secondParam);
 	}
 	else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
 		forTesting = "PKB::isProcModifies(stoi(firstParam), secondParam)";
