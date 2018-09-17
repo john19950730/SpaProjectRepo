@@ -1,54 +1,54 @@
 #include "IntIntPairVectorResponse.h"
 #include "PKB.h"
 
-IntIntPairVectorResponse::IntIntPairVectorResponse() : APICallResponse() {}
+IntIntPairVectorResponse::IntIntPairVectorResponse() : APICallSuchThatClause() {}
 
-string IntIntPairVectorResponse::apiCallForFollows() {
+vector<string> IntIntPairVectorResponse::apiCallForFollows() {
 	vector< pair<int, int> > result;
-	return "PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure)";
-	result = PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure);
+	cout << "PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure)" << endl;
+	//result = PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure);
 	return getResult(result);
 }
 
-string IntIntPairVectorResponse::apiCallForParent() {
+vector<string> IntIntPairVectorResponse::apiCallForParent() {
 	vector< pair<int, int> > result;
-	return "PKB::getAllParentPair(suchThatClause.hasTransitiveClosure)";
-	result = PKB::getAllParentPair(suchThatClause.hasTransitiveClosure);
+	cout << "PKB::getAllParentPair(suchThatClause.hasTransitiveClosure)" << endl;
+	//result = PKB::getAllParentPair(suchThatClause.hasTransitiveClosure);
 	return getResult(result);
 }
 
-string IntIntPairVectorResponse::apiCallForUses() {
-	return "";
+vector<string> IntIntPairVectorResponse::apiCallForUses() {
+	return vector<string>();
 }
 
-string IntIntPairVectorResponse::apiCallForModifies() {
-	return "";
+vector<string> IntIntPairVectorResponse::apiCallForModifies() {
+	return vector<string>();
 }
 
-string IntIntPairVectorResponse::getResult(vector<pair<int, int>> result) {
+vector<string> IntIntPairVectorResponse::getResult(vector<pair<int, int>> result) {
 	if (result.empty()) return getNoResults();
 	if (!selectSynonymIsFoundInParam()) return getImmediateResults();
 	return extractedResults(result);
 }
 
-string IntIntPairVectorResponse::extractedResults(vector<pair<int, int>> result) {
-	string extractedResult = selectSynonym == suchThatClause.firstParameter 
+vector<string> IntIntPairVectorResponse::extractedResults(vector<pair<int, int>> result) {
+	vector<string> extractedResult = selectSynonym == suchThatClause.firstParameter
 		? extractFirstParam(result) : extractSecondParam(result);
 	return extractedResult;
 }
 
-string IntIntPairVectorResponse::extractFirstParam(vector<pair<int, int>> input) {
-	string s = "";
+vector<string> IntIntPairVectorResponse::extractFirstParam(vector<pair<int, int>> input) {
+	vector<string> strVector;
 	for (pair<int, int> i : input) {
-		s += " " + to_string(i.first);
+		strVector.push_back(to_string(i.first));
 	}
-	return s;
+	return strVector;
 }
 
-string IntIntPairVectorResponse::extractSecondParam(vector<pair<int, int>> input) {
-	string s = "";
+vector<string> IntIntPairVectorResponse::extractSecondParam(vector<pair<int, int>> input) {
+	vector<string> strVector;
 	for (pair<int, int> i : input) {
-		s += " " + to_string(i.second);
+		strVector.push_back(to_string(i.second));
 	}
-	return s;
+	return strVector;
 }

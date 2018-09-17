@@ -1,13 +1,13 @@
 #pragma once
-#include "APICallResponse.h"
+#include "APICallSuchThatClause.h"
 #include "QueryObjStructures.h"
 
-class BooleanResponse : public APICallResponse {
+class BooleanResponse : public APICallSuchThatClause {
 public:
 	BooleanResponse();
 private:
-	string apiCallForFollows();
-	string apiCallForParent();
-	string apiCallForUses();
-	string apiCallForModifies();
+	vector<string> apiCallForFollows();
+	vector<string> apiCallForParent();
+	vector<string> apiCallForUses();
+	vector<string> apiCallForModifies();
 };

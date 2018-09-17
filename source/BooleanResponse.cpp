@@ -5,66 +5,69 @@
 
 using namespace keywords::clauseParamType;
 
-BooleanResponse::BooleanResponse() : APICallResponse() {}
+BooleanResponse::BooleanResponse() : APICallSuchThatClause() {}
 
-string BooleanResponse::apiCallForFollows() {
+vector<string> BooleanResponse::apiCallForFollows() {
 	bool isRsValid = false;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
-	return "PKB::isFollows(stoi(firstParam), stoi(secondParam), hasTransitiveClosure)";
-	isRsValid = PKB::isFollows(stoi(firstParam), stoi(secondParam), hasTransitiveClosure);
+	//isRsValid = PKB::isFollows(stoi(firstParam), stoi(secondParam), hasTransitiveClosure);
 
-	string result = isRsValid ? getImmediateResults() : getNoResults();
+	vector<string> result = isRsValid ? getImmediateResults() : getNoResults();
+	result.push_back("PKB::isFollows(stoi(firstParam), stoi(secondParam), hasTransitiveClosure)");
 	return result;
 }
 
-string BooleanResponse::apiCallForParent() {
+vector<string> BooleanResponse::apiCallForParent() {
 	bool isRsValid = false;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
-	return "PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure)";
 	isRsValid = PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure);
 
-	string result = isRsValid ? getImmediateResults() : getNoResults();
+	vector<string> result = isRsValid ? getImmediateResults() : getNoResults();
+	result.push_back("PKB::isParent(stoi(firstParam), stoi(secondParam), hasTransitiveClosure)");
 	return result;
 }
 
-string BooleanResponse::apiCallForUses() {
+vector<string> BooleanResponse::apiCallForUses() {
 	cout << "API Call for uses" << endl;
 	bool isRsValid = false;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
+	string forTesting;
 
 	if (paramType == make_pair(STMT_NO, VARIABLE)) {
-		return "PKB::isUses(stoi(firstParam), secondParam)";
-		isRsValid = PKB::isUses(stoi(firstParam), secondParam);
+		forTesting = "PKB::isUses(stoi(firstParam), secondParam)";
+		//isRsValid = PKB::isUses(stoi(firstParam), secondParam);
 	}
 	else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
-		return "PKB::isProcUses(stoi(firstParam), secondParam)";
-		return "";
+		forTesting = "PKB::isProcUses(stoi(firstParam), secondParam)";
 	}
 
-	string result = isRsValid ? getImmediateResults() : getNoResults();
+	vector<string> result = isRsValid ? getImmediateResults() : getNoResults();
+	result.push_back(forTesting);
 	return result;
 }
 
-string BooleanResponse::apiCallForModifies() {
+vector<string> BooleanResponse::apiCallForModifies() {
 	bool isRsValid = false;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
+	string forTesting;
 
 	if (paramType == make_pair(STMT_NO, VARIABLE)) {
-		return "PKB::isModifies(stoi(firstParam), secondParam)";
+		forTesting = "PKB::isModifies(stoi(firstParam), secondParam)";
 		isRsValid = PKB::isModifies(stoi(firstParam), secondParam);
 	}
 	else if (paramType == make_pair(PROC_NAME, VARIABLE)) {
-		return "PKB::isProcModifies(stoi(firstParam), secondParam)";
+		forTesting = "PKB::isProcModifies(stoi(firstParam), secondParam)";
 	}
 
-	string result = isRsValid ? getImmediateResults() : getNoResults();
+	vector<string> result = isRsValid ? getImmediateResults() : getNoResults();
+	result.push_back(forTesting);
 	return result;
 }

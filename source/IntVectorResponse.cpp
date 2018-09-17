@@ -5,9 +5,9 @@
 using namespace keywords::clauseParamType;
 using namespace keywords::query;
 
-IntVectorResponse::IntVectorResponse() : APICallResponse() {}
+IntVectorResponse::IntVectorResponse() : APICallSuchThatClause() {}
 
-string IntVectorResponse::apiCallForFollows() {
+vector<string> IntVectorResponse::apiCallForFollows() {
 	cout << "Inside intvector follows" << endl;
 	vector<int> result;
 	string firstParam = suchThatClause.firstParameter;
@@ -15,20 +15,22 @@ string IntVectorResponse::apiCallForFollows() {
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
 	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
-		return "getStmtNoThatFollows first param";
-		result = PKB::getStmtNoThatFollows(stoi(firstParam), hasTransitiveClosure);
+		cout << "getStmtNoThatFollows first param" << endl;
+		result.push_back(1);
+		//result = PKB::getStmtNoThatFollows(stoi(firstParam), hasTransitiveClosure);
 	}	
 	else if (paramType == make_pair(SYNONYM, STMT_NO) || paramType == make_pair(UNDERSCORE, STMT_NO)) {
-		return "getStmtNoThatIsFollowedBy second param";
-		result = PKB::getStmtNoThatIsFollowedBy(stoi(secondParam), hasTransitiveClosure);
+		cout << "getStmtNoThatIsFollowedBy second param" << endl;
+		result.push_back(1);
+		//result = PKB::getStmtNoThatIsFollowedBy(stoi(secondParam), hasTransitiveClosure);
 	}
 	else {
-		return "Error in apicallforfollow()";
+		return vector<string>();
 	}
 	return getResults(result);
 }
 
-string IntVectorResponse::apiCallForParent() {
+vector<string> IntVectorResponse::apiCallForParent() {
 	cout << "Inside intvector parent" << endl;
 	vector<int> result;
 	string firstParam = suchThatClause.firstParameter;
@@ -36,20 +38,20 @@ string IntVectorResponse::apiCallForParent() {
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 
 	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
-		return "getStmtNoThatIsChildOf first param";
+		cout << "getStmtNoThatIsChildOf first param" << endl;
 		result = PKB::getStmtNoThatIsChildOf(stoi(firstParam), hasTransitiveClosure);
 	}	
 	else if (paramType == make_pair(SYNONYM, STMT_NO) || paramType == make_pair(UNDERSCORE, STMT_NO)) {
-		return "getStmtNoThatIsParentOf second param";
+		cout << "getStmtNoThatIsParentOf second param" << endl;
 		result = PKB::getStmtNoThatIsParentOf(stoi(secondParam), hasTransitiveClosure);
 	}
 	else {
-		return "Error in apicallforparent()";
+		return vector<string>();
 	}
 	return getResults(result);
 }
 
-string IntVectorResponse::apiCallForUses() {
+vector<string> IntVectorResponse::apiCallForUses() {
 	cout << "Inside apiCallForUses" << endl;
 	vector<int> result;
 	string firstParam = suchThatClause.firstParameter;
@@ -58,31 +60,36 @@ string IntVectorResponse::apiCallForUses() {
 
 	if (paramType == make_pair(SYNONYM, VARIABLE)) {
 		if (synonymType == ASSIGNMENT_VAR) {
-			return "getAllAssignmentThatUses(secondParam)";
-			result = PKB::getAllAssignmentThatUses(secondParam);
+			cout << "getAllAssignmentThatUses(secondParam)" << endl;
+			result.push_back(1);
+			//result = PKB::getAllAssignmentThatUses(secondParam);
 		}
 		else if (synonymType == STMT_VAR) {
-			return "getAllStmtThatUses(secondParam)";
-			result = PKB::getAllStmtThatUses(secondParam);
+			cout << "getAllStmtThatUses(secondParam)" << endl;
+			result.push_back(1);
+			//result = PKB::getAllStmtThatUses(secondParam);
 		}
 		else if (synonymType == IF_VAR) {
-			return "getAllIfThatUses(secondParam)";
-			result = PKB::getAllIfThatUses(secondParam);
+			cout << "getAllIfThatUses(secondParam)" << endl;
+			result.push_back(1);
+			//result = PKB::getAllIfThatUses(secondParam);
 		}
 		else if (synonymType == WHILE_VAR) {
-			return "getAllWhileThatUses(secondParam)";
-			result = PKB::getAllWhileThatUses(secondParam);
+			cout << "getAllWhileThatUses(secondParam)" << endl;
+			result.push_back(1);
+			//result = PKB::getAllWhileThatUses(secondParam);
 		}
 		else if (synonymType == PRINT_VAR) {
-			return "getAllPrintThatUses(secondParam)";
-			result = PKB::getAllPrintThatUses(secondParam);
+			cout << "getAllPrintThatUses(secondParam)" << endl;
+			result.push_back(1);
+			//result = PKB::getAllPrintThatUses(secondParam);
 		}
 		return getResults(result);
 	}
-	return "Error apiCallForUses()";
+	return vector<string>();
 }
 
-string IntVectorResponse::apiCallForModifies() {
+vector<string> IntVectorResponse::apiCallForModifies() {
 	cout << "Inside apiCallForModifies" << endl;
 	vector<int> result;
 	string firstParam = suchThatClause.firstParameter;
@@ -91,28 +98,34 @@ string IntVectorResponse::apiCallForModifies() {
 
 	if (paramType == make_pair(SYNONYM, VARIABLE)) {
 		if (synonymType == ASSIGNMENT_VAR) {
-			return "getAllAssignmentThatModifies(secondParam)";
-			result = PKB::getAllAssignmentThatModifies(secondParam);
+			result.push_back(1);
+			cout << "getAllAssignmentThatModifies(secondParam)" << endl;
+			//result = PKB::getAllAssignmentThatModifies(secondParam);
 		}
 		else if (synonymType == STMT_VAR) {
-			return "getAllStmtThatModifies(secondParam)";
-			result = PKB::getAllStmtThatModifies(secondParam);
+			result.push_back(2);
+			cout << "getAllStmtThatModifies(secondParam)" << endl;
+			//result = PKB::getAllStmtThatModifies(secondParam);
 		}
 		else if (synonymType == IF_VAR) {
-			return "getAllIfThatModifies(secondParam)";
-			result = PKB::getAllIfThatModifies(secondParam);
+			result.push_back(3);
+			cout << "getAllIfThatModifies(secondParam)" << endl;
+			//result = PKB::getAllIfThatModifies(secondParam);
 		}
 		else if (synonymType == WHILE_VAR) {
-			return "getAllWhileThatModifies(secondParam)";
-			result = PKB::getAllWhileThatModifies(secondParam);
+			result.push_back(4);
+			cout << "getAllWhileThatModifies(secondParam)" << endl;
+			//result = PKB::getAllWhileThatModifies(secondParam);
 		}
 		else if (synonymType == READ_VAR) {
-			return "getAllReadThatModifies(secondParam)";
-			result = PKB::getAllReadThatModifies(secondParam);
+			result.push_back(5);
+			cout << "getAllReadThatModifies(secondParam)" << endl;
+			//result = PKB::getAllReadThatModifies(secondParam);
 		}
 		return getResults(result);
 	}
-	return "Error apiCallForModifies()";
+
+	return vector<string>();
 }
 
 string IntVectorResponse::intVectorToString(vector<int> input) {
@@ -123,10 +136,19 @@ string IntVectorResponse::intVectorToString(vector<int> input) {
 	return s;
 }
 
-string IntVectorResponse::getResults(vector<int> result) {
+vector<string> IntVectorResponse::getResults(vector<int> result) {
 	if (!result.empty()) {
 		if (!selectSynonymIsFoundInParam()) return getImmediateResults();
-		else return intVectorToString(result);
+		//else return intVectorToString(result);
+		else return convertVectorIntToVectorStr(result);
 	}
 	else return getNoResults();
+}
+
+vector<string> IntVectorResponse::convertVectorIntToVectorStr(vector<int> input) {
+	vector<string> strVector;
+	for (int i : input) {
+		strVector.push_back(to_string(i));
+	}
+	return strVector;
 }

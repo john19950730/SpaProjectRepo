@@ -2,7 +2,9 @@
 #include "Keywords.h"
 #include "Utility.h"
 #include "PKB.h"
-#include "APICallResponse.h";
+#include "APICallSuchThatClause.h";
+#include "APICall.h"
+#include "APICallPatternClause.h";
 
 #include <iostream>
 
@@ -14,11 +16,11 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 	this->queryObject = queryObject;
 }
 
-string QueryEvaluator::evaluateQueryObject() {
+vector<string> QueryEvaluator::evaluateQueryObject() {
 	// No clauses
 	if (!queryObject->hasClauses()) {
 		string synonymType = queryObject->getSynonymTable()[queryObject->getSelectClause().at(0)];
-		return APICallResponse::executeApiCallForNoClauses(synonymType);
+		return APICall::apiCallForNoClause(synonymType);
 	}
 
 	// One such that clause only
@@ -28,17 +30,20 @@ string QueryEvaluator::evaluateQueryObject() {
 
 	// One pattern clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 0 && queryObject->hasPatternClause()) {
-
+		return evaluatePatternClause();
 	}
 
-	return "Error";
+	// One such that clause and one pattern clause
+	if (queryObject->getNumberOfSuchThatClauses() == 1 && queryObject->hasPatternClause()) {
+		return evaluateSuchThatAndPatternClause();
+	}
 }
 
-string QueryEvaluator::evaluateSuchThatClause() {
+vector<string> QueryEvaluator::evaluateSuchThatClause() {
 	string selectClause = queryObject->getSelectClause().at(0);
 	map<string, string> synonymTable = queryObject->getSynonymTable();
 
-	APICallResponse* apiCallResponse;
+	APICallSuchThatClause* apiCallResponse;
 	SUCH_THAT_CLAUSE clause;
 	string typeOfRs;
 
@@ -59,12 +64,34 @@ string QueryEvaluator::evaluateSuchThatClause() {
 		typeOfRs = FOLLOWS_RS;
 	}
 
-	apiCallResponse = APICallResponse::getApiCallResponse(typeOfRs, getParamType(clause), clause, selectClause, synonymTable);
+	apiCallResponse = APICallSuchThatClause::getApiCallResponse(typeOfRs, getParamType(clause), clause, selectClause, synonymTable);
 	return apiCallResponse->executeApiCall();
 }
 
-string QueryEvaluator::evaluatePatternClause() {
+vector<string> QueryEvaluator::evaluatePatternClause() {
+	PATTERN_CLAUSE patternClause = queryObject->getPatternClause().at(0);
+	APICallPatternClause *apiCallPatternClause = new APICallPatternClause(getParamType(patternClause),
+		patternClause, queryObject->getSelectClause().at(0), queryObject->getSynonymTable());
+	return apiCallPatternClause->executeApiCall();
+}
 
+vector<string> QueryEvaluator::evaluateSuchThatAndPatternClause() {
+	vector<string> suchThatClauseResult = evaluateSuchThatClause();
+	vector<string> patternClauseResult = evaluatePatternClause();
+
+	if (suchThatClauseResult.empty() || patternClauseResult.empty()) {
+		return vector<string>();
+	}
+	else {
+		vector<string> intersection;
+		sort(suchThatClauseResult.begin(), suchThatClauseResult.end());
+		sort(patternClauseResult.begin(), patternClauseResult.end());
+
+		set_intersection(suchThatClauseResult.begin(), suchThatClauseResult.end(),
+			patternClauseResult.begin(), patternClauseResult.end(), back_inserter(intersection));
+
+		return intersection;
+	}
 }
 
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {

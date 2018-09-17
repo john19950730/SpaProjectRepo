@@ -10,9 +10,10 @@ private:
 public:
 	QueryEvaluator(QueryObject *queryObject);
 
-	string evaluateQueryObject();
-	string evaluateSuchThatClause();
-	string evaluatePatternClause();
+	vector<string> evaluateQueryObject();
+	vector<string> evaluateSuchThatClause();
+	vector<string> evaluatePatternClause();
+	vector<string> evaluateSuchThatAndPatternClause();
 	
 	pair<string, string> getParamType(SUCH_THAT_CLAUSE clause);
 	pair<string, string> getParamType(PATTERN_CLAUSE clause);

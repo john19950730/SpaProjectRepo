@@ -1,28 +1,57 @@
-#include "ApiCallPatternClause.h"
+#include "APICallPatternClause.h"
 #include "Keywords.h"
 
 using namespace keywords::clauseParamType;
 
-ApiCallPatternClause::ApiCallPatternClause(pair<string, string> paramType, PATTERN_CLAUSE patternClause, string selectSynonym) {
-	this->paramType = paramType;
+APICallPatternClause::APICallPatternClause(pair<string, string> paramType, PATTERN_CLAUSE patternClause, string selectSynonym, map<string, string> synonymTable) {
 	this->patternClause = patternClause;
-	this->selectSynonym = selectSynonym;
+	this->setParamType(paramType);
+	this->setSelectSynonym(selectSynonym);
+	this->setSynonymTable(synonymTable);
 }
 
-string ApiCallPatternClause::executeApiCall() {
-	if (paramType == make_pair(SYNONYM, EXPRESSION) || paramType == make_pair(SYNONYM, UNDERSCORE)) {
+vector<string> APICallPatternClause::executeApiCall() {
+	if (paramType == make_pair(SYNONYM, EXPRESSION) || paramType == make_pair(UNDERSCORE, EXPRESSION)) {
 
-	} 
+	}
+	else if (paramType == make_pair(SYNONYM, SYNONYM) || paramType == make_pair(UNDERSCORE, UNDERSCORE)) {
+
+	}
+	else if (paramType == make_pair(VARIABLE, EXPRESSION)) {
+
+	}
+	else if (paramType == make_pair(VARIABLE, UNDERSCORE)) {
+
+	}
+
+	return vector<string>();
 }
 
-string ApiCallPatternClause::selectResults(bool hasResults, vector<int> results) {
+vector<string> APICallPatternClause::selectResults(bool hasResults, vector<int> results) {
 	string patternSynonym = patternClause.synonym;
+	if (!hasResults) return getNoResults();
+
 	if (patternSynonym != selectSynonym) {
-		// check if there is results	
+		return getImmediateResults();
 	}
 	else {
-		// select the results - convert vector<int> into string
+		//return intVectorToString(results); // select the results - convert vector<int> into string
+		return convertVectorIntToVectorStr(results);
 	}
+}
 
-	return "";
+string APICallPatternClause::intVectorToString(vector<int> input) {
+	string s = "";
+	for (int i : input) {
+		s += " " + to_string(i);
+	}
+	return s;
+}
+
+vector<string> APICallPatternClause::convertVectorIntToVectorStr(vector<int> input) {
+	vector<string> strVector;
+	for (int i : input) {
+		strVector.push_back(to_string(i));
+	}
+	return strVector;
 }

@@ -11,7 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\source\APICallResponse.cpp" />
+    <ClCompile Include="..\source\APICall.cpp" />
+    <ClCompile Include="..\source\APICallPatternClause.cpp" />
+    <ClCompile Include="..\source\APICallSuchThatClause.cpp" />
     <ClCompile Include="..\source\BooleanResponse.cpp" />
     <ClCompile Include="..\source\DesignExtractor.cpp" />
     <ClCompile Include="..\source\CodeParser.cpp" />
@@ -30,7 +32,9 @@
     <ClCompile Include="..\source\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\source\APICallResponse.h" />
+    <ClInclude Include="..\source\APICall.h" />
+    <ClInclude Include="..\source\APICallPatternClause.h" />
+    <ClInclude Include="..\source\APICallSuchThatClause.h" />
     <ClInclude Include="..\source\BooleanResponse.h" />
     <ClInclude Include="..\source\CodeParser.h" />
     <ClInclude Include="..\source\DesignExtractor.h" />

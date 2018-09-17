@@ -1,16 +1,16 @@
 #pragma once
-#include "APICallResponse.h"
+#include "APICallSuchThatClause.h"
 #include <vector>
 
-class StringVectorResponse : public APICallResponse {
+class StringVectorResponse : public APICallSuchThatClause {
 public:
 	StringVectorResponse();
 private:
-	string apiCallForFollows();
-	string apiCallForParent();
-	string apiCallForUses();
-	string apiCallForModifies();
+	vector<string> apiCallForFollows();
+	vector<string> apiCallForParent();
+	vector<string> apiCallForUses();
+	vector<string> apiCallForModifies();
 
 	string strVectorToString(vector<string> input);
-	string getResults(vector<string> result);
+	vector<string> getResults(vector<string> result);
 };

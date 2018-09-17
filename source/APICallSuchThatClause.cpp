@@ -1,4 +1,4 @@
-#include "APICallResponse.h"
+#include "APICallSuchThatClause.h"
 #include "BooleanResponse.h"
 #include "IntVectorResponse.h"
 #include "StringVectorResponse.h"
@@ -12,25 +12,17 @@
 using namespace keywords::query;
 using namespace keywords::clauseParamType;
 
-APICallResponse::APICallResponse() {}
+APICallSuchThatClause::APICallSuchThatClause() {}
 
-void APICallResponse::setTypeOfRs(string typeOfRs) {
+void APICallSuchThatClause::setTypeOfRs(string typeOfRs) {
 	this->typeOfRs = typeOfRs;
 }
-void APICallResponse::setParamType(pair<string, string> paramType) {
-	this->paramType = paramType;
-}
-void APICallResponse::setSuchThatClause(SUCH_THAT_CLAUSE suchThatClause) {
+
+void APICallSuchThatClause::setSuchThatClause(SUCH_THAT_CLAUSE suchThatClause) {
 	this->suchThatClause = suchThatClause;
 }
-void APICallResponse::setSelectSynonym(string selectSynonym) {
-	this->selectSynonym = selectSynonym;
-}
-void APICallResponse::setSynonymTable(map<string, string> synonymTable) {
-	this->synonymTable = synonymTable;
-}
 
-string APICallResponse::executeApiCall() {
+vector<string> APICallSuchThatClause::executeApiCall() {
 	if (typeOfRs == USES_RS)
 		return apiCallForUses();
 	else if (typeOfRs == MODIFIES_RS)
@@ -40,40 +32,14 @@ string APICallResponse::executeApiCall() {
 	else if (typeOfRs == PARENT_RS)
 		return apiCallForParent();
 	else
-		return "";
+		return vector<string>();
 }
 
-string APICallResponse::executeApiCallForNoClauses(string synonymType) {
-	return apiCallForNoClause(synonymType);
-}
-
-string APICallResponse::getImmediateResults() {
-	string synonymType = synonymTable[selectSynonym];
-	return apiCallForNoClause(synonymType);
-}
-
-string APICallResponse::getNoResults() {
-	return "";
-}
-
-string APICallResponse::apiCallForNoClause(string synonymType) {
-	if (synonymType == ASSIGNMENT_VAR) return "allAssignmentStmts";
-	else if (synonymType == VARIABLE_VAR) return "allVariableStmts";
-	else if (synonymType == STMT_VAR) return "allStmts";
-	else if (synonymType == PROC_VAR) return "allProcedures";
-	else if (synonymType == IF_VAR) return "allIfStmts";
-	else if (synonymType == WHILE_VAR) return "allWhileStmts";
-	else if (synonymType == READ_VAR) return "allReadStmts";
-	else if (synonymType == PRINT_VAR) return "allPrintStmts";
-
-	return "";
-}
-
-APICallResponse* APICallResponse::getApiCallResponse(string typeOfRs, pair<string, string> paramType, 
+APICallSuchThatClause* APICallSuchThatClause::getApiCallResponse(string typeOfRs, pair<string, string> paramType, 
 	SUCH_THAT_CLAUSE suchThatClause, string selectSynonym, map<string, string> synonymTable) {	
 	
-	map<string, map<pair<string, string>, APICallResponse*>> functionMap = buildFunctionMap(suchThatClause, synonymTable);
-	APICallResponse* responseType = functionMap[typeOfRs][paramType];
+	map<string, map<pair<string, string>, APICallSuchThatClause*>> functionMap = buildFunctionMap(suchThatClause, synonymTable);
+	APICallSuchThatClause* responseType = functionMap[typeOfRs][paramType];
 	
 	responseType->setTypeOfRs(typeOfRs);
 	responseType->setParamType(paramType);
@@ -84,22 +50,22 @@ APICallResponse* APICallResponse::getApiCallResponse(string typeOfRs, pair<strin
 	return responseType;
 }
 
-bool APICallResponse::selectSynonymIsFoundInParam() {
+bool APICallSuchThatClause::selectSynonymIsFoundInParam() {
 	return (selectSynonym == suchThatClause.firstParameter || selectSynonym == suchThatClause.secondParameter);
 }
 
-bool APICallResponse::underscoreIsFoundInParam() {
+bool APICallSuchThatClause::underscoreIsFoundInParam() {
 	return (paramType.first == UNDERSCORE || paramType.second == UNDERSCORE);
 }
 
-bool APICallResponse::synonymIsStatementType(string synonymType) {
+bool APICallSuchThatClause::synonymIsStatementType(string synonymType) {
 	return (synonymType == ASSIGNMENT_VAR || synonymType == STMT_VAR || synonymType == IF_VAR 
 		|| synonymType == WHILE_VAR || synonymType == READ_VAR);
 }
 
-map<pair<string, string>, APICallResponse*> APICallResponse::buildModifiesUsesMap(SUCH_THAT_CLAUSE suchThatClause, 
+map<pair<string, string>, APICallSuchThatClause*> APICallSuchThatClause::buildModifiesUsesMap(SUCH_THAT_CLAUSE suchThatClause, 
 	map<string, string> synonymTable) {
-	map<pair<string, string>, APICallResponse*> modifiesUsesTable;
+	map<pair<string, string>, APICallSuchThatClause*> modifiesUsesTable;
 
 	modifiesUsesTable[make_pair(STMT_NO, VARIABLE)] = new BooleanResponse();
 	modifiesUsesTable[make_pair(PROC_NAME, VARIABLE)] = new BooleanResponse();
@@ -124,8 +90,8 @@ map<pair<string, string>, APICallResponse*> APICallResponse::buildModifiesUsesMa
 	return modifiesUsesTable;
 }
 
-map<pair<string, string>, APICallResponse*> APICallResponse::buildFollowsParentMap() {
-	map<pair<string, string>, APICallResponse*> followsParentTable;
+map<pair<string, string>, APICallSuchThatClause*> APICallSuchThatClause::buildFollowsParentMap() {
+	map<pair<string, string>, APICallSuchThatClause*> followsParentTable;
 
 	followsParentTable[make_pair(STMT_NO, STMT_NO)] = new BooleanResponse();
 	
@@ -142,9 +108,9 @@ map<pair<string, string>, APICallResponse*> APICallResponse::buildFollowsParentM
 	return followsParentTable;
 }
 
-map<string, map<pair<string, string>, APICallResponse*>> APICallResponse::buildFunctionMap(SUCH_THAT_CLAUSE suchThatClause,
+map<string, map<pair<string, string>, APICallSuchThatClause*>> APICallSuchThatClause::buildFunctionMap(SUCH_THAT_CLAUSE suchThatClause,
 	map<string, string> synonymTable) {
-	map<string, map<pair<string, string>, APICallResponse*>> functionMap;
+	map<string, map<pair<string, string>, APICallSuchThatClause*>> functionMap;
 
 	functionMap[USES_RS] = buildModifiesUsesMap(suchThatClause, synonymTable);
 	functionMap[MODIFIES_RS] = buildModifiesUsesMap(suchThatClause, synonymTable);

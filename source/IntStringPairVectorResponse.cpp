@@ -4,69 +4,72 @@
 
 using namespace keywords::query;
 
-IntStringPairVectorResponse::IntStringPairVectorResponse() : APICallResponse() {}
+IntStringPairVectorResponse::IntStringPairVectorResponse() : APICallSuchThatClause() {}
 
-string IntStringPairVectorResponse::apiCallForFollows() {
-	return "";
+vector<string> IntStringPairVectorResponse::apiCallForFollows() {
+	return vector<string>();
 }
-string IntStringPairVectorResponse::apiCallForParent() {
-	return "";
+
+vector<string> IntStringPairVectorResponse::apiCallForParent() {
+	return vector<string>();
 }
-string IntStringPairVectorResponse::apiCallForUses() {
+
+vector<string> IntStringPairVectorResponse::apiCallForUses() {
 	vector< pair<int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 
 	if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
-		return "PKB::getAllAssignmentUsesVariablePairs()";
-		result = PKB::getAllAssignmentUsesVariablePairs();
+		cout << "PKB::getAllAssignmentUsesVariablePairs()" << endl;
+		//result = PKB::getAllAssignmentUsesVariablePairs();
 	}
 	else if (synonymTable[firstParam] == STMT_VAR) {
-		return "PKB::getAllStmtUsesVariablePairs()";
-		result = PKB::getAllStmtUsesVariablePairs();
+		cout << "PKB::getAllStmtUsesVariablePairs()" << endl;
+		//result = PKB::getAllStmtUsesVariablePairs();
 	}
 	return getResult(result);
 }
-string IntStringPairVectorResponse::apiCallForModifies() {
+
+vector<string> IntStringPairVectorResponse::apiCallForModifies() {
 	vector< pair<int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 
 	if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
-		return "PKB::getAllAssignmentModifiesVariablePairs()";
-		result = PKB::getAllAssignmentModifiesVariablePairs();
+		cout << "PKB::getAllAssignmentModifiesVariablePairs()" << endl;
+		//result = PKB::getAllAssignmentModifiesVariablePairs();
 	}
 	else if (synonymTable[firstParam] == STMT_VAR) {
-		return "PKB::getAllStmtModifiesVariablePairs()";
-		result = PKB::getAllStmtModifiesVariablePairs();
+		cout << "PKB::getAllStmtModifiesVariablePairs()" << endl;
+		//result = PKB::getAllStmtModifiesVariablePairs();
 	}
 	return getResult(result);
 }
 
-string IntStringPairVectorResponse::getResult(vector<pair<int, string>> result) {
+vector<string> IntStringPairVectorResponse::getResult(vector<pair<int, string>> result) {
 	if (result.empty()) return getNoResults();
 	if (!selectSynonymIsFoundInParam()) return getImmediateResults();
 	return extractedResults(result);
 }
 
-string IntStringPairVectorResponse::extractedResults(vector<pair<int, string>> result) {
-	string extractedResult = selectSynonym == suchThatClause.firstParameter
+vector<string> IntStringPairVectorResponse::extractedResults(vector<pair<int, string>> result) {
+	vector<string> extractedResult = selectSynonym == suchThatClause.firstParameter
 		? extractFirstParam(result) : extractSecondParam(result);
 	return extractedResult;
 }
 
-string IntStringPairVectorResponse::extractFirstParam(vector<pair<int, string>> input) {
-	string s = "";
+vector<string> IntStringPairVectorResponse::extractFirstParam(vector<pair<int, string>> input) {
+	vector<string> strVector;
 	for (pair<int, string> i : input) {
-		s += " " + to_string(i.first);
+		strVector.push_back(to_string(i.first));
 	}
-	return s;
+	return strVector;
 }
 
-string IntStringPairVectorResponse::extractSecondParam(vector<pair<int, string>> input) {
-	string s = "";
+vector<string> IntStringPairVectorResponse::extractSecondParam(vector<pair<int, string>> input) {
+	vector<string> strVector;
 	for (pair<int, string> i : input) {
-		s += " " + i.second;
+		strVector.push_back(i.second);
 	}
-	return s;
+	return strVector;
 }

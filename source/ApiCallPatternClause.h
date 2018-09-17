@@ -1,18 +1,21 @@
 #pragma once
 #include "QueryObjStructures.h"
+#include "APICall.h"
+
 #include <string>
 #include <vector>
 
 using namespace std;
 
-class ApiCallPatternClause {
+class APICallPatternClause : public APICall {
 public:
-	ApiCallPatternClause(pair<string, string> paramType, PATTERN_CLAUSE patternClause, string selectSynonym);
-	string executeApiCall();
+	APICallPatternClause(pair<string, string> paramType, PATTERN_CLAUSE patternClause,
+		string selectSynonym, map<string, string> synonymTable);
+	vector<string> executeApiCall();
 private:
-	pair<string, string> paramType;
 	PATTERN_CLAUSE patternClause;
-	string selectSynonym;
 
-	string selectResults(bool hasResults, vector<int> results);
+	vector<string> selectResults(bool hasResults, vector<int> results);
+	string intVectorToString(vector<int> input);
+	vector<string> convertVectorIntToVectorStr(vector<int> input);
 };
