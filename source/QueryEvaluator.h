@@ -11,7 +11,9 @@ public:
 	QueryEvaluator(QueryObject *queryObject);
 
 	string evaluateQueryObject();
-	string evaluateSingleClause();
+	string evaluateSuchThatClause();
+	string evaluatePatternClause();
 	
 	pair<string, string> getParamType(SUCH_THAT_CLAUSE clause);
+	pair<string, string> getParamType(PATTERN_CLAUSE clause);
 };

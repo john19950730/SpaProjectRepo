@@ -1,6 +1,4 @@
 #pragma once
-
-#pragma once
 #include <string>
 #include <vector>
 
@@ -32,5 +30,6 @@ namespace keywords {
 		const std::string PROC_NAME = "procName";
 		const std::string VARIABLE = "variable";
 		const std::string UNDERSCORE = "underscore";
+		const std::string EXPRESSION = "expression";
 	}
 };

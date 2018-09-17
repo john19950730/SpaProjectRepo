@@ -14,6 +14,7 @@ typedef struct SUCH_THAT_CLAUSE {
 typedef struct PATTERN_CLAUSE {
 	string synonym;
 	string firstParam;
-	string postfixExpr;
-	bool isPartialExpr;
+	string secondParam;
+	bool secondParamIsPartialExpr;
+	bool firstParamIsSynonym;
 } PATTERN_CLAUSE;

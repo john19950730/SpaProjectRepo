@@ -15,19 +15,26 @@ QueryEvaluator::QueryEvaluator(QueryObject *queryObject) {
 }
 
 string QueryEvaluator::evaluateQueryObject() {
+	// No clauses
 	if (!queryObject->hasClauses()) {
 		string synonymType = queryObject->getSynonymTable()[queryObject->getSelectClause().at(0)];
 		return APICallResponse::executeApiCallForNoClauses(synonymType);
 	}
 
-	if (queryObject->getNumberOfSuchThatClauses() == 1) {
-		return evaluateSingleClause();
+	// One such that clause only
+	if (queryObject->getNumberOfSuchThatClauses() == 1 && !queryObject->hasPatternClause()) {
+		return evaluateSuchThatClause();
+	}
+
+	// One pattern clause only
+	if (queryObject->getNumberOfSuchThatClauses() == 0 && queryObject->hasPatternClause()) {
+
 	}
 
 	return "Error";
 }
 
-string QueryEvaluator::evaluateSingleClause() {
+string QueryEvaluator::evaluateSuchThatClause() {
 	string selectClause = queryObject->getSelectClause().at(0);
 	map<string, string> synonymTable = queryObject->getSynonymTable();
 
@@ -56,6 +63,10 @@ string QueryEvaluator::evaluateSingleClause() {
 	return apiCallResponse->executeApiCall();
 }
 
+string QueryEvaluator::evaluatePatternClause() {
+
+}
+
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
 	pair<string, string> paramType(SYNONYM, SYNONYM);
 
@@ -69,6 +80,19 @@ pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
 
 	if (Utility::isUnderscore(clause.firstParameter)) paramType.first = UNDERSCORE;
 	if (Utility::isUnderscore(clause.secondParameter)) paramType.second = UNDERSCORE;
+
+	return paramType;
+}
+
+pair<string, string> QueryEvaluator::getParamType(PATTERN_CLAUSE clause) {
+	pair<string, string> paramType(SYNONYM, EXPRESSION);
+	
+	if (!clause.firstParamIsSynonym) {
+		paramType.first = VARIABLE;
+	}
+
+	if (Utility::isUnderscore(clause.firstParam)) paramType.first = UNDERSCORE;
+	if (Utility::isUnderscore(clause.secondParam)) paramType.second = UNDERSCORE;
 
 	return paramType;
 }
