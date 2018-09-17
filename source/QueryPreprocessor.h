@@ -18,7 +18,7 @@ const string SYNONYM = "[a-zA-Z][a-zA-Z0-9]*";		// Synonym
 const string NUMBER = "[0-9]+";						// Number
 const string UNDERSCORE = "[_]";					// Underscore
 const string STRING = "\"[^\"]*\"";					// One or more characters enclosed in double quotes
-const string EXPRESSION = "^[_]?[\"]((?:" + NUMBER + '|' + SYNONYM + ")(?:[\+\*-/](?:" + NUMBER + '|' + SYNONYM + "))*)[\"][_]?$";
+const string STRING_CONTENTS = "\"([^\"]*)\"";
 
 const string DECL_DE = "assign|variable|stmt|procedure|while|if|read|print|call|constant";		// Design entities
 const string REL = "Uses|Modifies";																// Relationships (that don't support transitive closure)

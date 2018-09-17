@@ -213,17 +213,20 @@ PATTERN_CLAUSE QueryPreprocessor::createPatternClause(string patternSynonym, str
 	// check if param1 is synonym
 
 	// convert param2 into postfix
-	regex exprSyntax(EXPRESSION);
+	regex exprSyntax(STRING_CONTENTS);
 	smatch exprMatches;
-	regex_match(param2, exprMatches, exprSyntax);
+	regex_search(param2, exprMatches, exprSyntax);
 	string paramExpr = exprMatches[1].str();
 	string postfix = Utility::convertInfixToPostfix(paramExpr);
+	cout << "postfix: " << postfix << endl;
 
 	// check if it's a partial expression
 	bool isPartialExpr = false;
 	if (param2 != "_" && param2.front() == '_') {
 		isPartialExpr = true;
 	}
+
+	cout << "isPartialExpr: " << isPartialExpr << endl;
 
 	clause = { patternSynonym, stripDoubleQuotes(param1), postfix, isPartialExpr };
 	return clause;
@@ -290,9 +293,13 @@ bool QueryPreprocessor::arePatternParamsValid(string param1, string param2) {
 	}
 
 	if (paramType2 != "_UNDERSCORE") {
-		regex exprSyntax(EXPRESSION);
-		if (!regex_match(param2, exprSyntax))
+		regex exprSyntax(STRING_CONTENTS);
+		smatch matches;
+		regex_search(param2, matches, exprSyntax);
+		string expr = matches[1].str();
+		if (!Utility::validateInfixExpression(expr)) {
 			paramValid2 = false;
+		}
 	}
 
 	if (!paramValid1) cout << endl << endl << "### 1st parameter in pattern is invalid";

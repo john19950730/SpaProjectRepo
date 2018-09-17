@@ -23,6 +23,7 @@ public:
 
 	static string convertInfixToPostfix(string infixExpression);
 	static int priority(char a);
+	static bool validateInfixExpression(string expression);
 
 	static void ltrim(string &s);
 	static void rtrim(std::string &s);
