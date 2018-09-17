@@ -46,9 +46,12 @@ string Utility::convertInfixToPostfix(string infix)
 	stack<char> operator_stack;
 	stringstream output;
 
+	// remove all white spaces before parsing
+	infix = removeAllWhitespaces(infix);
+
 	for (unsigned i = 0; i < infix.length(); i++) {
-		if (infix[i] == '+' || infix[i] == '-' || infix[i] == '*' || infix[i] == '/' || infix[i] == '^') {
-			while (!operator_stack.empty() && priority(operator_stack.top()) <= priority(infix[i])) {
+		if (infix[i] == '+' || infix[i] == '-' || infix[i] == '*' || infix[i] == '/' || infix[i] == '^' || infix[i] == '%') {
+			while (!operator_stack.empty() && getOperatorPriority(operator_stack.top()) <= getOperatorPriority(infix[i])) {
 				output << operator_stack.top();
 				operator_stack.pop();
 			}
@@ -58,7 +61,7 @@ string Utility::convertInfixToPostfix(string infix)
 			operator_stack.push(infix[i]);
 		}
 		else if (infix[i] == ')') {
-			while (operator_stack.top() != '(') {
+			while (!operator_stack.empty() && operator_stack.top() != '(') {
 				output << operator_stack.top();
 				operator_stack.pop();
 			}
@@ -77,15 +80,126 @@ string Utility::convertInfixToPostfix(string infix)
 	return output.str();
 }
 
-int Utility::priority(char a) {
-	int temp;
-	if (a == '^')
-		temp = 1;
-	else  if (a == '*' || a == '/')
-		temp = 2;
-	else  if (a == '+' || a == '-')
-		temp = 3;
-	return temp;
+int Utility::getOperatorPriority(char c) {
+	int priority = 0;
+	if (c == '^')
+		priority = 1;
+	else  if (c == '*' || c == '/' || c == '%')
+		priority = 2;
+	else  if (c == '+' || c == '-')
+		priority = 3;
+	else if (c == '(')
+		priority = 4;
+	return priority;
+}
+
+bool Utility::validateInfixExpression(string expression)
+{
+	int previous = 0;
+	int previous1 = 0;
+	string expEvaluated = "";
+	int operatorOperand = 1;
+
+	// remove all white spaces before parsing
+	expression = removeAllWhitespaces(expression);
+
+	for (int i = 0; i < expression.length(); i++)
+	{
+		char c = expression[i];
+		if (c != ')') {
+			if (c == '(')
+			{
+				int j = expression.find(')', i);
+				if (j == -1)
+					return false;
+
+				string substring = expression.substr(i + 1, j - i - 1);
+
+				while (count(substring.begin(), substring.end(), '(') != count(substring.begin(), substring.end(), ')'))
+				{
+					if (j < expression.length() - 1)
+						j = expression.find(')', j + 1);
+					else
+						break;
+
+					substring = expression.substr(i + 1, j - i - 1);
+				}
+
+				i = j - 1; //Changing the counter i to point to the next character
+				//validating the sub expression
+				if (validateInfixExpression(substring) == true)
+				{
+					if (previous != 0 && previous1 != 0 && previous > previous1)
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+						previous = 0;
+					}
+					else if (previous != 0 && previous1 != 0 && previous <= previous1)
+					{
+						return false;
+					}
+					else if (previous1 != 0)
+					{
+						return false;
+					}
+					else
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+				if (c == '+'
+					|| c == '-'
+					|| c == '*'
+					|| c == '/'
+					|| c == '%')
+				{
+					if (previous != 0)
+					{
+						return false;
+					}
+					previous = operatorOperand;
+					operatorOperand++;
+				}
+				else
+				{
+					if (previous != 0 && previous1 != 0 && previous > previous1)
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+						previous = 0;
+					}
+					else if (previous != 0 && previous1 != 0 && previous <= previous1)
+					{
+						return false;
+					}
+					else if (previous1 != 0)
+					{
+						return false;
+					}
+					else
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+					}
+				}
+		}
+	}
+	if (previous != 0)
+		return false;
+	return true;
+}
+
+string Utility::removeAllWhitespaces(string &s) {
+	s.erase(remove_if(s.begin(), s.end(), isspace), s.end());
+	return s;
 }
 
 // trim from start (in place)
