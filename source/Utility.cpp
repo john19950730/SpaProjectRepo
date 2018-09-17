@@ -42,9 +42,12 @@ string Utility::convertInfixToPostfix(string infix)
 	stack<char> operator_stack;
 	stringstream output;
 
+	// remove all white spaces before parsing
+	infix = removeAllWhitespaces(infix);
+
 	for (unsigned i = 0; i < infix.length(); i++) {
-		if (infix[i] == '+' || infix[i] == '-' || infix[i] == '*' || infix[i] == '/' || infix[i] == '^') {
-			while (!operator_stack.empty() && priority(operator_stack.top()) <= priority(infix[i])) {
+		if (infix[i] == '+' || infix[i] == '-' || infix[i] == '*' || infix[i] == '/' || infix[i] == '^' || infix[i] == '%') {
+			while (!operator_stack.empty() && getOperatorPriority(operator_stack.top()) <= getOperatorPriority(infix[i])) {
 				output << operator_stack.top();
 				operator_stack.pop();
 			}
@@ -54,7 +57,7 @@ string Utility::convertInfixToPostfix(string infix)
 			operator_stack.push(infix[i]);
 		}
 		else if (infix[i] == ')') {
-			while (operator_stack.top() != '(') {
+			while (!operator_stack.empty() && operator_stack.top() != '(') {
 				output << operator_stack.top();
 				operator_stack.pop();
 			}
@@ -73,15 +76,17 @@ string Utility::convertInfixToPostfix(string infix)
 	return output.str();
 }
 
-int Utility::priority(char a) {
-	int temp;
-	if (a == '^')
-		temp = 1;
-	else  if (a == '*' || a == '/')
-		temp = 2;
-	else  if (a == '+' || a == '-')
-		temp = 3;
-	return temp;
+int Utility::getOperatorPriority(char c) {
+	int priority = 0;
+	if (c == '^')
+		priority = 1;
+	else  if (c == '*' || c == '/' || c == '%')
+		priority = 2;
+	else  if (c == '+' || c == '-')
+		priority = 3;
+	else if (c == '(')
+		priority = 4;
+	return priority;
 }
 
 bool Utility::validateInfixExpression(string expression)
@@ -92,7 +97,7 @@ bool Utility::validateInfixExpression(string expression)
 	int operatorOperand = 1;
 
 	// remove all white spaces before parsing
-	expression.erase(remove_if(expression.begin(), expression.end(), isspace), expression.end());
+	expression = removeAllWhitespaces(expression);
 
 	for (int i = 0; i < expression.length(); i++)
 	{
@@ -186,6 +191,11 @@ bool Utility::validateInfixExpression(string expression)
 	if (previous != 0)
 		return false;
 	return true;
+}
+
+string Utility::removeAllWhitespaces(string &s) {
+	s.erase(remove_if(s.begin(), s.end(), isspace), s.end());
+	return s;
 }
 
 // trim from start (in place)
