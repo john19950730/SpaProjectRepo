@@ -13,6 +13,7 @@ QueryPreprocessor::QueryPreprocessor()
 	vector<SUCH_THAT_CLAUSE> modifiesClauses;
 	vector<SUCH_THAT_CLAUSE> followsClauses;
 	vector<SUCH_THAT_CLAUSE> parentClauses;
+	vector<PATTERN_CLAUSE> patternClauses;
 
 	vector<string> usesModParam1 = { keywords::query::STMT_VAR, keywords::query::PROC_VAR, "_QUOTED" };
 	vector<string> usesModParam2 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_QUOTED" };
@@ -122,14 +123,17 @@ bool QueryPreprocessor::setRelationhipClausesInQueryObject(string query) {
 bool QueryPreprocessor::setPatternClausesInQueryObject(string query) {
 	regex patternSyntax(PATTERN);
 	smatch matches;
+	PATTERN_CLAUSE clause;
 	while (regex_search(query, matches, patternSyntax)) {
 		string patternSynonym = matches[1];
 		string param1 = matches[2];
 		string param2 = matches[3];
 		if (isPatternSynonymValid(patternSynonym) && arePatternParamsValid(param1, param2)) {
 			cout << ">> " + patternSynonym + '(' + param1 + ", " + param2 + ')' << endl;
-			// convert param2 into postfix
-			// pattern clause
+			// create pattern clause
+			clause = createPatternClause(patternSynonym, param1, param2);
+			patternClauses.push_back(clause);
+			queryObject->setPatternClause(patternClauses);
 		}
 		else return false;
 
@@ -199,6 +203,29 @@ SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, st
 	bool paramIsSynonym2 = existsInSynonymTable(param2);
 	clause = { stripDoubleQuotes(param1), stripDoubleQuotes(param2),
 		hasTransitiveClosure, paramIsSynonym1, paramIsSynonym2 };
+	return clause;
+}
+
+PATTERN_CLAUSE QueryPreprocessor::createPatternClause(string patternSynonym, string param1, string param2)
+{
+	PATTERN_CLAUSE clause;
+
+	// check if param1 is synonym
+
+	// convert param2 into postfix
+	regex exprSyntax(EXPRESSION);
+	smatch exprMatches;
+	regex_match(param2, exprMatches, exprSyntax);
+	string paramExpr = exprMatches[1].str();
+	string postfix = Utility::convertInfixToPostfix(paramExpr);
+
+	// check if it's a partial expression
+	bool isPartialExpr = false;
+	if (param2 != "_" && param2.front() == '_') {
+		isPartialExpr = true;
+	}
+
+	clause = { patternSynonym, stripDoubleQuotes(param1), postfix, isPartialExpr };
 	return clause;
 }
 

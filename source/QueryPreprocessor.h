@@ -37,6 +37,7 @@ const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT
 const string TRANS_REGEX = "[*]$";	// To check for transitive closure
 
 struct SUCH_THAT_CLAUSE;
+struct PATTERN_CLAUSE;
 
 class QueryObject;
 
@@ -50,6 +51,7 @@ public:
 	vector<SUCH_THAT_CLAUSE> modifiesClauses;
 	vector<SUCH_THAT_CLAUSE> followsClauses;
 	vector<SUCH_THAT_CLAUSE> parentClauses;
+	vector<PATTERN_CLAUSE> patternClauses;
 
 private:
 	QueryObject *queryObject;
@@ -75,5 +77,6 @@ private:
 
 	vector<string> createResultsClause(string query);
 	SUCH_THAT_CLAUSE createSuchThatClause(string relationship, string param1, string param2);
+	PATTERN_CLAUSE createPatternClause(string patternSynonym, string param1, string param2);
 
 };
