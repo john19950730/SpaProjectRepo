@@ -64,9 +64,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 	int foundElse = std::regex_search(lineOfCode, else_regex);
 	int foundRead = std::regex_search(lineOfCode, read_regex);
 	int foundPrint = std::regex_search(lineOfCode, print_regex);
-
 	int foundClose = std::regex_search(lineOfCode, close_regex); //finds close bracket, means nesting level has ended
-
 	int foundEquals = std::regex_search(lineOfCode, equals_regex);
 
 	if (foundProcedure == 1) {
@@ -79,10 +77,13 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
 		CodeParser::nesting_level.push(make_pair(lineNumber, "while"));
-		//std::vector<std::string> variables = checkUses("while", lineOfCode);
-		//for (int i = 0; i < variables.size(); i++) { //for every variable being used
-			//PKB::addUses(lineNumber, variables.at(i));
-		//}
+		//find var being used
+		std::vector<std::string> variables = checkUses("while", lineOfCode);
+		for (int i = 0; i < variables.size(); i++) { //for every variable being used
+			PKB::addUses(lineNumber, variables.at(i));
+		}
+		//check if being used in parent nesting
+		checkForNestingUses(variables);
 	}
 	if (foundIf == 1 && foundThen == 1) {
 		LineOfCodeData lcd;
@@ -90,24 +91,25 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
 		CodeParser::nesting_level.push(make_pair(lineNumber, "if"));
-		//std::vector<std::string> variables = checkUses("if", lineOfCode);
-		//for (int i = 0; i < variables.size(); i++) { //for every variable being used
-			//PKB::addUses(lineNumber, variables.at(i));
-		//}
+		//find var being used
+		std::vector<std::string> variables = checkUses("if", lineOfCode);
+		for (int i = 0; i < variables.size(); i++) { //for every variable being used
+			PKB::addUses(lineNumber, variables.at(i));
+		}
+		//check if being used in parent nesting
+		checkForNestingUses(variables);
 	}
 	if (foundClose == 1 && foundElse != 1) {
 		CodeParser::nesting_level.pop();
-	}
-	if (foundElse == 1) {
-		//CodeParser::nesting_level.push("else");
-		std::cout << nesting_level.size();
 	}
 	if (foundRead == 1) {
 		LineOfCodeData lcd;
 		lcd.store("read", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
+		//find var being modified
 		PKB::addModifies(lineNumber,checkModifies("read",lineOfCode));
+		//check if being modifies in parent nesting
 		checkForNestingModifies("read", lineOfCode);
 	}
 	if (foundPrint == 1) {
@@ -115,8 +117,10 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lcd.store("print", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
+		//find var being used
 		std::vector<std::string> variables = checkUses("print", lineOfCode);
-		PKB::addUses(lineNumber, variables.at(0));
+		PKB::addUses(lineNumber, variables.at(0)); //only one variable
+		//check if being used in parent nesting
 		checkForNestingUses(variables);
 	}
 	if (foundProcedure != 1 && foundWhile != 1 && foundIf != 1 && foundThen != 1 && foundElse != 1
@@ -133,6 +137,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		for (int i = 0; i < variables.size(); i++) { //for every variable being used
 			PKB::addUses(lineNumber, variables.at(i));
 		}
+		//check if being used/modifies in parent nesting
 		checkForNestingModifies("assignment", lineOfCode);
 		checkForNestingUses(variables);
 	}
@@ -149,6 +154,24 @@ std::vector<std::string> CodeParser::checkUses(string stmtType, string stmt) { /
 
 	std::vector<std::string> vars;
 	string token = "";
+	if (stmtType == "while") {
+		std::regex pattern(stmtType); // pattern= "while"
+		token = std::regex_replace(stmt, pattern, ""); //removes "while from the stmt"
+		token.erase(std::remove(token.begin(), token.end(), ' '), token.end()); //removes space
+		token.erase(std::remove(token.begin(), token.end(), '\t'), token.end());//remove tab
+		token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());//remove nextline
+		token.erase(std::remove(token.begin(), token.end(), ';'), token.end());
+		vars = splitWhileIfConditions(token);
+	}
+	if (stmtType == "if") {
+		std::regex pattern(stmtType); // pattern= "if"
+		token = std::regex_replace(stmt, pattern, ""); //removes "if from the stmt"
+		token.erase(std::remove(token.begin(), token.end(), ' '), token.end()); //removes space
+		token.erase(std::remove(token.begin(), token.end(), '\t'), token.end());//remove tab
+		token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());//remove nextline
+		token.erase(std::remove(token.begin(), token.end(), ';'), token.end());
+		vars = splitWhileIfConditions(token);
+	}
 	if (stmtType == "print") {
 		std::regex pattern(stmtType);
 		token = std::regex_replace(stmt, pattern, "");
@@ -181,17 +204,58 @@ std::vector<std::string> CodeParser::checkUses(string stmtType, string stmt) { /
 	return vars;
 }
 
+std::vector<std::string> CodeParser::splitWhileIfConditions(string s) {
+	std::vector<std::string> splitted;
+	string delim = "*+-/%!=&|<>()";
+	string unbrokenString = "";
+	char nextChar = ' ';
+	for (int i = 0; i < s.length(); i++) {
+		if(i != s.length()-1){ //not the last character
+			nextChar = s.at(i + 1);
+		}
+		else {
+			nextChar = ' '; //no last character end of string
+		}
+		if (!is_appeared(s.at(i), delim)) { // if curr char position is NOT a delim
+			//its a character
+			unbrokenString += s.at(i);
+				if (is_appeared(nextChar, delim)) { //if my next char is a delim
+					//save variable so far
+					if (!is_number(unbrokenString)) { //not a num
+						if (!is_duplicate(unbrokenString, splitted)) { //not a duplicate in vector
+							//add it into splitted
+							splitted.push_back(unbrokenString);
+						}
+					}
+					unbrokenString = "";//reset temp
+				}
+		}
+			
+	}
+
+
+	return splitted;
+}
+
+bool CodeParser::is_appeared(char c, string s) { //if c appears in cA, return true
+	for (int i = 0; i < s.length(); i++) {
+		if (c == s.at(i)) {
+			return true;
+		}
+	}
+	return false;
+}
+
 std::vector<std::string> CodeParser::split(string s) {
 	//split a string e.g. cenX+x+1*y/x;
 	//eliminate duplicate variables
 	//eliminate int constants
 	std::vector<std::string> splitted;
-	string delim = "*+-/%";
+	string delim = "*+-/%;";
 
 	string temp = "";
 		for (char& c : s) {
-			for (char& d : delim) {
-				if (c != d) {
+				if (!is_appeared(c,delim)) { //if curr character is not a delim
 					temp += c;
 				}
 				else { //delimiter encountered
@@ -204,7 +268,6 @@ std::vector<std::string> CodeParser::split(string s) {
 					}
 					temp = "";//reset temp
 				}
-			}
 		}
 
 	return splitted;

@@ -21,8 +21,10 @@ public:
 	static int CodeParser::checkForNestingModifies(string stmtType, string stmt);
 	static int CodeParser::checkForNestingUses(std::vector<std::string> vars);
 	static std::vector<std::string> CodeParser::split(string s);
+	static std::vector<std::string> CodeParser::splitWhileIfConditions(string s);
 	static bool is_number(string s);
 	static bool is_duplicate(string s, std::vector<std::string> list);
+	static bool CodeParser::is_appeared(char c, string s);
 private:
 	static vector<LineOfCodeData> CodeParser::lineData;
 	static int CodeParser::lineNumber;
