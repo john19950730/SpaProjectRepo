@@ -49,11 +49,7 @@ public:
 	static vector<int> getStmtNoThatIsParentOf(int stmtNo, bool star);
 
 	// SPA Uses(a, "b") query
-	static vector<int> getAllStmtThatUses(string varName);
-	static vector<int> getAllAssignmentThatUses(string varName);
-	static vector<int> getAllPrintThatUses(string varName);
-	static vector<int> getAllIfThatUses(string varName);
-	static vector<int> getAllWhileThatUses(string varName);
+	static vector<unsigned int> getAllStmtThatUses(char synonym, string varName);
 	static vector<string> getAllProcedureThatUses(string varName);
 
 	// SPA Uses(a, b) query
@@ -84,11 +80,15 @@ public:
 
 	// SPA synonyms query
 	static vector<string> getVariables();
-	static vector<int> getAssigns();
-	static vector<int> getReads();
-	static vector<int> getPrints();
-	static vector<int> getIfs();
-	static vector<int> getWhiles();
-	static unordered_map<string, pair<int, int> > getProcedures();
+	static vector<unsigned int> getAssigns();
+	static vector<unsigned int> getReads();
+	static vector<unsigned int> getPrints();
+	static vector<unsigned int> getIfs();
+	static vector<unsigned int> getWhiles();
+	static unordered_map<string, pair<unsigned int, unsigned int> > getProcedures();
 	static vector<string> getProcedureNames();
+
+private:
+	static vector<unsigned int> getAllStmts();
+	static vector<unsigned int> getAllStmtsThatFitSynonnym(char synonym);
 };

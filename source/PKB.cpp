@@ -12,22 +12,25 @@ using namespace std;
 #include "PKB.h"
 #include "TNode.h"
 
-static const char synonyms[] = { 'a', 'r', 'p', 'i', 'w', 'p' };
+// Assign, Read, Print, If, While
+static const char synonyms[] = {'a', 'r', 'p', 'i', 'w'};
+
+static unsigned int totalLines = 0;
 
 static vector<string> varList;
-static int varListIndex = 0;
-static vector<int> assignList;
-static int assignListIndex = 0;
-static vector<int> readList;
-static int readListIndex = 0;
-static vector<int> printList;
-static int printListIndex = 0;
-static vector<int> ifList;
-static int ifListIndex = 0;
-static vector<int> whileList;
-static int whileListIndex = 0;
-static unordered_map<string, pair<int, int> > procedureMap;
-static int procedureListIndex = 0;
+static unsigned int varListIndex = 0;
+static vector<unsigned int> assignList;
+static unsigned int assignListIndex = 0;
+static vector<unsigned int> readList;
+static unsigned int readListIndex = 0;
+static vector<unsigned int> printList;
+static unsigned int printListIndex = 0;
+static vector<unsigned int> ifList;
+static unsigned int ifListIndex = 0;
+static vector<unsigned int> whileList;
+static unsigned int whileListIndex = 0;
+static unordered_map<string, pair<unsigned int, unsigned int> > procedureMap;
+static unsigned int procedureListIndex = 0;
 
 // element at index i means Follows(i, element) holds
 static vector<int> followsList;
@@ -210,7 +213,7 @@ vector<string> PKB::getAllVariablesUsedByStmtNo(unsigned int stmtNo)
 }
 vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
 {
-	unordered_map<string, pair<int, int> >::const_iterator procedure = procedureMap.find(procName);
+	unordered_map<string, pair<unsigned int, unsigned int> >::const_iterator procedure = procedureMap.find(procName);
 	if (procedure == procedureMap.end())
 		return vector<string>();
 	vector<string> result;
@@ -287,38 +290,13 @@ vector<int> PKB::getStmtNoThatIsParentOf(int stmtNo, bool star)
 	return vector<int>();
 }
 
-vector<int> PKB::getAllStmtThatUses(string v)
+vector<unsigned int> PKB::getAllStmtThatUses(char synonym, string v)
 {
-	vector<int> stmts(usesTable.size());
-	vector<int> result;
-	int n = 0;
-	generate(stmts.begin(), stmts.end(), [&] {return ++n;});
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonnym(synonym);
+	vector<unsigned int> result;
 	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
-		[=](int stmtNo) { return PKB::isUses(stmtNo, v); });
+		[=](unsigned int stmtNo) { return PKB::isUses(stmtNo, v); });
 	return result;
-}
-
-vector<int> PKB::getAllAssignmentThatUses(string v)
-{
-	vector<int> result;
-	copy_if(assignList.begin(), assignList.end(), back_inserter(result),
-		[=](int assignStmtNo) { return PKB::isUses(assignStmtNo, v); });
-	return result;
-}
-
-vector<int> PKB::getAllPrintThatUses(string varName)
-{
-	return vector<int>();
-}
-
-vector<int> PKB::getAllIfThatUses(string varName)
-{
-	return vector<int>();
-}
-
-vector<int> PKB::getAllWhileThatUses(string varName)
-{
-	return vector<int>();
 }
 
 vector<string> PKB::getAllProcedureThatUses(string varName)
@@ -416,7 +394,7 @@ vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
 
 vector<string> PKB::getAllVariablesModifiedByProcedures(string procName)
 {
-	unordered_map<string, pair<int, int> >::const_iterator procedure = procedureMap.find(procName);
+	unordered_map<string, pair<unsigned int, unsigned int> >::const_iterator procedure = procedureMap.find(procName);
 	if (procedure == procedureMap.end())
 		return vector<string>();
 	vector<string> result;
@@ -437,32 +415,32 @@ vector<string> PKB::getVariables()
 	return varList;
 }
 
-vector<int> PKB::getAssigns()
+vector<unsigned int> PKB::getAssigns()
 {
 	return assignList;
 }
 
-vector<int> PKB::getReads()
+vector<unsigned int> PKB::getReads()
 {
 	return readList;
 }
 
-vector<int> PKB::getPrints()
+vector<unsigned int> PKB::getPrints()
 {
 	return printList;
 }
 
-vector<int> PKB::getIfs()
+vector<unsigned int> PKB::getIfs()
 {
 	return ifList;
 }
 
-vector<int> PKB::getWhiles()
+vector<unsigned int> PKB::getWhiles()
 {
 	return whileList;
 }
 
-unordered_map<string, pair<int, int> > PKB::getProcedures()
+unordered_map<string, pair<unsigned int, unsigned int> > PKB::getProcedures()
 {
 	return procedureMap;
 }
@@ -474,4 +452,40 @@ vector<string> PKB::getProcedureNames()
 		result.push_back(procedurePair.first);
 	});
 	return result;
+}
+
+vector<unsigned int> PKB::getAllStmts()
+{
+	vector<unsigned int> stmts(totalLines);
+	int n = 0;
+	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
+	return stmts;
+}
+
+vector<unsigned int> PKB::getAllStmtsThatFitSynonnym(char synonym)
+{
+	// assigns
+	if (synonym == synonyms[0]) {
+		return getAssigns();
+	}
+	// reads
+	else if (synonym == synonyms[1]) {
+		return getReads();
+	}
+	// prints
+	else if (synonym == synonyms[2]) {
+		return getPrints();
+	}
+	// ifs
+	else if (synonym == synonyms[3]) {
+		return getIfs();
+	}
+	// whiles
+	else if (synonym == synonyms[4]) {
+		return getWhiles();
+	}
+	// all statements
+	else {
+		return getAllStmts();
+	}
 }
