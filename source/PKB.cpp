@@ -12,25 +12,34 @@ using namespace std;
 #include "PKB.h"
 #include "TNode.h"
 
-// Assign, Read, Print, If, While
-static const char synonyms[] = {'a', 'r', 'p', 'i', 'w'};
+static const string STMT_VAR = "stmt";
+static const string ASSIGNMENT_VAR = "assign";
+static const string IF_VAR = "if";
+static const string WHILE_VAR = "while";
+static const string READ_VAR = "read";
+static const string PRINT_VAR = "print";
+static const string CALL_VAR = "call";
+static const string STATEMENTS[] = { STMT_VAR, ASSIGNMENT_VAR, IF_VAR, WHILE_VAR, READ_VAR, PRINT_VAR, CALL_VAR };
 
+static vector<unsigned int> stmtsList;
 static unsigned int totalLines = 0;
-
 static vector<string> varList;
 static unsigned int varListIndex = 0;
 static vector<unsigned int> assignList;
 static unsigned int assignListIndex = 0;
-static vector<unsigned int> readList;
-static unsigned int readListIndex = 0;
-static vector<unsigned int> printList;
-static unsigned int printListIndex = 0;
 static vector<unsigned int> ifList;
 static unsigned int ifListIndex = 0;
 static vector<unsigned int> whileList;
 static unsigned int whileListIndex = 0;
+static vector<unsigned int> readList;
+static unsigned int readListIndex = 0;
+static vector<unsigned int> printList;
+static unsigned int printListIndex = 0;
+static vector<unsigned int> callList;
+static unsigned int callListIndex;
 static unordered_map<string, pair<unsigned int, unsigned int> > procedureMap;
 static unsigned int procedureListIndex = 0;
+static vector<unsigned int> synonymsList[] = { stmtsList, assignList, ifList, whileList, readList, printList, callList };
 
 // element at index i means Follows(i, element) holds
 static vector<int> followsList;
@@ -48,7 +57,7 @@ static vector< vector<string> > usesTable;
 // array at index i of modifiesTable[i] contains list of variables v where Modifies(i, v) holds
 static vector< vector<string> > modifiesTable;
 
-int PKB::addVariable(string varName)
+unsigned int PKB::addVariable(string varName)
 {
 	if (find(varList.begin(), varList.end(), varName) != varList.end())
 		return varListIndex;
@@ -56,37 +65,49 @@ int PKB::addVariable(string varName)
 	return varListIndex++;
 }
 
-int PKB::addAssign(unsigned int stmtNo)
+unsigned int PKB::addAssign(unsigned int stmtNo)
 {
 	assignList.push_back(stmtNo);
+	PKB::addStatement(stmtNo);
 	return assignListIndex++;
 }
 
-int PKB::addRead(unsigned int stmtNo)
-{
-	readList.push_back(stmtNo);
-	return readListIndex++;
-}
-
-int PKB::addPrint(unsigned int stmtNo)
-{
-	printList.push_back(stmtNo);
-	return printListIndex++;
-}
-
-int PKB::addIf(unsigned int stmtNo)
+unsigned int PKB::addIf(unsigned int stmtNo)
 {
 	ifList.push_back(stmtNo);
+	PKB::addStatement(stmtNo);
 	return ifListIndex++;
 }
 
-int PKB::addWhile(unsigned int stmtNo)
+unsigned int PKB::addWhile(unsigned int stmtNo)
 {
 	whileList.push_back(stmtNo);
+	PKB::addStatement(stmtNo);
 	return whileListIndex++;
 }
 
-int PKB::addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine)
+unsigned int PKB::addRead(unsigned int stmtNo)
+{
+	readList.push_back(stmtNo);
+	PKB::addStatement(stmtNo);
+	return readListIndex++;
+}
+
+unsigned int PKB::addPrint(unsigned int stmtNo)
+{
+	printList.push_back(stmtNo);
+	PKB::addStatement(stmtNo);
+	return printListIndex++;
+}
+
+unsigned int PKB::addCall(unsigned int stmtNo)
+{
+	callList.push_back(stmtNo);
+	PKB::addStatement(stmtNo);
+	return callListIndex++;
+}
+
+unsigned int PKB::addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine)
 {
 	procedureMap.insert(make_pair(procName, startEndLine));
 	return procedureListIndex++;
@@ -290,9 +311,9 @@ vector<int> PKB::getStmtNoThatIsParentOf(int stmtNo, bool star)
 	return vector<int>();
 }
 
-vector<unsigned int> PKB::getAllStmtThatUses(char synonym, string v)
+vector<unsigned int> PKB::getAllStmtThatUses(string synonym, string v)
 {
-	vector<unsigned int> stmts = getAllStmtsThatFitSynonnym(synonym);
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
 	vector<unsigned int> result;
 	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
 		[=](unsigned int stmtNo) { return PKB::isUses(stmtNo, v); });
@@ -415,9 +436,24 @@ vector<string> PKB::getVariables()
 	return varList;
 }
 
+vector<unsigned int> PKB::getAllStmts()
+{
+	return stmtsList;
+}
+
 vector<unsigned int> PKB::getAssigns()
 {
 	return assignList;
+}
+
+vector<unsigned int> PKB::getIfs()
+{
+	return ifList;
+}
+
+vector<unsigned int> PKB::getWhiles()
+{
+	return whileList;
 }
 
 vector<unsigned int> PKB::getReads()
@@ -430,14 +466,9 @@ vector<unsigned int> PKB::getPrints()
 	return printList;
 }
 
-vector<unsigned int> PKB::getIfs()
+vector<unsigned int> PKB::getCalls()
 {
-	return ifList;
-}
-
-vector<unsigned int> PKB::getWhiles()
-{
-	return whileList;
+	return callList;
 }
 
 unordered_map<string, pair<unsigned int, unsigned int> > PKB::getProcedures()
@@ -454,38 +485,16 @@ vector<string> PKB::getProcedureNames()
 	return result;
 }
 
-vector<unsigned int> PKB::getAllStmts()
+vector<unsigned int> PKB::getAllStmtsThatFitSynonym(string synonym)
 {
-	vector<unsigned int> stmts(totalLines);
-	int n = 0;
-	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
-	return stmts;
+	string::const_iterator it = find(STATEMENTS->begin(), STATEMENTS->end(), synonym);
+	if (it == STATEMENTS->end())
+		return vector<unsigned int>();
+	return synonymsList[it - STATEMENTS->begin()];
 }
 
-vector<unsigned int> PKB::getAllStmtsThatFitSynonnym(char synonym)
+unsigned int PKB::addStatement(unsigned int stmtNo)
 {
-	// assigns
-	if (synonym == synonyms[0]) {
-		return getAssigns();
-	}
-	// reads
-	else if (synonym == synonyms[1]) {
-		return getReads();
-	}
-	// prints
-	else if (synonym == synonyms[2]) {
-		return getPrints();
-	}
-	// ifs
-	else if (synonym == synonyms[3]) {
-		return getIfs();
-	}
-	// whiles
-	else if (synonym == synonyms[4]) {
-		return getWhiles();
-	}
-	// all statements
-	else {
-		return getAllStmts();
-	}
+	stmtsList.push_back(stmtNo);
+	return totalLines++;
 }

@@ -13,8 +13,6 @@ typedef short PROC;
 template <typename T>
 class TNode;
 
-class VarTable;  // no need to #include "VarTable.h" as all I need is pointer
-
 class PKB {
 public:
 	// SPA relationships table
@@ -24,13 +22,14 @@ public:
 	static void addModifies(unsigned int stmtNo, string varName);
 
 	// SPA synonyms table
-	static int addVariable(string varName);
-	static int addAssign(unsigned int stmtNo);
-	static int addRead(unsigned int stmtNo);
-	static int addPrint(unsigned int stmtNo);
-	static int addIf(unsigned int stmtNo);
-	static int addWhile(unsigned int stmtNo);
-	static int addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine);
+	static unsigned int addVariable(string varName);
+	static unsigned int addAssign(unsigned int stmtNo);
+	static unsigned int addIf(unsigned int stmtNo);
+	static unsigned int addWhile(unsigned int stmtNo);
+	static unsigned int addRead(unsigned int stmtNo);
+	static unsigned int addPrint(unsigned int stmtNo);
+	static unsigned int addCall(unsigned int stmtNo);
+	static unsigned int addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine);
 
 	// SPA basic relationships query
 	static bool isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star);
@@ -49,7 +48,7 @@ public:
 	static vector<int> getStmtNoThatIsParentOf(int stmtNo, bool star);
 
 	// SPA Uses(a, "b") query
-	static vector<unsigned int> getAllStmtThatUses(char synonym, string varName);
+	static vector<unsigned int> getAllStmtThatUses(string synonym, string varName);
 	static vector<string> getAllProcedureThatUses(string varName);
 
 	// SPA Uses(a, b) query
@@ -80,15 +79,17 @@ public:
 
 	// SPA synonyms query
 	static vector<string> getVariables();
+	static vector<unsigned int> getAllStmts();
 	static vector<unsigned int> getAssigns();
-	static vector<unsigned int> getReads();
-	static vector<unsigned int> getPrints();
 	static vector<unsigned int> getIfs();
 	static vector<unsigned int> getWhiles();
+	static vector<unsigned int> getReads();
+	static vector<unsigned int> getPrints();
+	static vector<unsigned int> getCalls();
 	static unordered_map<string, pair<unsigned int, unsigned int> > getProcedures();
 	static vector<string> getProcedureNames();
+	static vector<unsigned int> getAllStmtsThatFitSynonym(string synonym);
 
 private:
-	static vector<unsigned int> getAllStmts();
-	static vector<unsigned int> getAllStmtsThatFitSynonnym(char synonym);
+	static unsigned int addStatement(unsigned int stmtNo);
 };
