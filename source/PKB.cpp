@@ -53,52 +53,52 @@ int PKB::addVariable(string varName)
 	return varListIndex++;
 }
 
-int PKB::addAssign(int stmtNo)
+int PKB::addAssign(unsigned int stmtNo)
 {
 	assignList.push_back(stmtNo);
 	return assignListIndex++;
 }
 
-int PKB::addRead(int stmtNo)
+int PKB::addRead(unsigned int stmtNo)
 {
 	readList.push_back(stmtNo);
 	return readListIndex++;
 }
 
-int PKB::addPrint(int stmtNo)
+int PKB::addPrint(unsigned int stmtNo)
 {
 	printList.push_back(stmtNo);
 	return printListIndex++;
 }
 
-int PKB::addIf(int stmtNo)
+int PKB::addIf(unsigned int stmtNo)
 {
 	ifList.push_back(stmtNo);
 	return ifListIndex++;
 }
 
-int PKB::addWhile(int stmtNo)
+int PKB::addWhile(unsigned int stmtNo)
 {
 	whileList.push_back(stmtNo);
 	return whileListIndex++;
 }
 
-int PKB::addProcedure(string procName, pair<int, int> startEndLine)
+int PKB::addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine)
 {
 	procedureMap.insert(make_pair(procName, startEndLine));
 	return procedureListIndex++;
 }
 
-void PKB::addFollows(int stmtBefore, int stmtAfter)
+void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 {
-	while (followsList.size() <= (unsigned int) stmtBefore)
+	while (followsList.size() <= stmtBefore)
 		followsList.push_back(0);
 	followsList[stmtBefore] = stmtAfter;
 
-	while (followsStarTable.size() <= (unsigned int) stmtAfter)
+	while (followsStarTable.size() <= stmtAfter)
 		followsStarTable.push_back(vector<bool>(stmtAfter));
 	for (unsigned int i = 0; i < followsStarTable.size(); ++i) {
-		while (followsStarTable[i].size() <= (unsigned int) stmtAfter)
+		while (followsStarTable[i].size() <= stmtAfter)
 			followsStarTable[i].push_back(false);
 	}
 
@@ -115,16 +115,16 @@ void PKB::addFollows(int stmtBefore, int stmtAfter)
 	}
 }
 
-void PKB::addParent(int stmtParent, int stmtChild)
+void PKB::addParent(unsigned int stmtParent, unsigned int stmtChild)
 {
-	while (parentList.size() <= (unsigned int) stmtChild)
+	while (parentList.size() <= stmtChild)
 		parentList.push_back(0);
 	parentList[stmtChild] = stmtParent;
 
-	while (parentStarTable.size() <= (unsigned int) stmtChild)
+	while (parentStarTable.size() <= stmtChild)
 		parentStarTable.push_back(vector<bool>(stmtChild));
 	for (unsigned int i = 0; i < parentStarTable.size(); ++i) {
-		while (parentStarTable[i].size() <= (unsigned int) stmtChild)
+		while (parentStarTable[i].size() <= stmtChild)
 			parentStarTable[i].push_back(false);
 	}
 
@@ -138,24 +138,26 @@ void PKB::addParent(int stmtParent, int stmtChild)
 	}
 }
 
-void PKB::addUses(int stmtNo, string varName)
+void PKB::addUses(unsigned int stmtNo, string varName)
 {
-	while (usesTable.size() <= (unsigned int)stmtNo)
+	while (usesTable.size() <= stmtNo)
 		usesTable.push_back(vector<string>());
 	if (find(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), varName) == usesTable[stmtNo].end())
 		usesTable[stmtNo].push_back(varName);
 }
 
-void PKB::addModifies(int stmtNo, string varName)
+void PKB::addModifies(unsigned int stmtNo, string varName)
 {
-	while (modifiesTable.size() <= (unsigned int)stmtNo)
+	while (modifiesTable.size() <= stmtNo)
 		modifiesTable.push_back(vector<string>());
 	if (find(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), varName) == modifiesTable[stmtNo].end())
 	modifiesTable[stmtNo].push_back(varName);
 }
 
-bool PKB::isFollows(int stmtNo1, int stmtNo2, bool star)
+bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
+	if (stmtNo1 >= followsList.size() || stmtNo2 >= followsList.size())
+		return false;
 	if (!star) {
 		return followsList[stmtNo1] == stmtNo2;
 	}
@@ -225,6 +227,8 @@ vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
 }
 bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 {
+	if (stmtNo1 >= followsList.size() || stmtNo2 >= followsList.size())
+		return false;
 	if (!star) {
 		return parentList[stmtNo2] == stmtNo1;
 	}
@@ -233,14 +237,18 @@ bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 	}
 }
 
-bool PKB::isUses(int stmtNo1, string varName)
+bool PKB::isUses(unsigned int stmtNo, string varName)
 {
-	return find(usesTable[stmtNo1].begin(), usesTable[stmtNo1].end(), varName) != usesTable[stmtNo1].end();
+	if (stmtNo >= followsList.size())
+		return false;
+	return find(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), varName) != usesTable[stmtNo].end();
 }
 
-bool PKB::isModifies(int stmtNo1, string varName)
+bool PKB::isModifies(unsigned int stmtNo, string varName)
 {
-	return find(modifiesTable[stmtNo1].begin(), modifiesTable[stmtNo1].end(), varName) != modifiesTable[stmtNo1].end();
+	if (stmtNo >= followsList.size())
+		return false;
+	return find(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), varName) != modifiesTable[stmtNo].end();
 }
 
 vector<pair<int, int>> PKB::getAllFollowsPair(bool star)
