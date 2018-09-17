@@ -20,11 +20,11 @@ const string UNDERSCORE = "[_]";					// Underscore
 const string STRING = "\"[^\"]*\"";					// One or more characters enclosed in double quotes
 const string EXPRESSION = "^[_]?[\"]((?:" + NUMBER + '|' + SYNONYM + ")(?:[\+\*-/](?:" + NUMBER + '|' + SYNONYM + "))*)[\"][_]?$";
 
-const string DECL_DE = "assign|variable|stmt|procedure|while|read|print|call|constant";		// Design entities
-const string REL = "Uses|Modifies";															// Relationships (that don't support transitive closure)
-const string REL_T = "Follows|Parent";														// Relationships (that support transitive closure)
+const string DECL_DE = "assign|variable|stmt|procedure|while|if|read|print|call|constant";		// Design entities
+const string REL = "Uses|Modifies";																// Relationships (that don't support transitive closure)
+const string REL_T = "Follows|Parent";															// Relationships (that support transitive closure)
 const string REL_PARAM = SYNONYM + '|' + UNDERSCORE + '|' + NUMBER + '|' + STRING;								// Possible relationshp parameter
-const string ASTERISK = "[*]?";																// Asterisk to indicate transitive closure
+const string ASTERISK = "[*]?";																	// Asterisk to indicate transitive closure
 const string PATTERN_PARAM = UNDERSCORE + '|' + UNDERSCORE + STRING + UNDERSCORE + '|' + STRING;
 
 const string DECL_REGEX = '(' + DECL_DE + ')' + SPACE + '(' + SYNONYM + "(?:" + COMMA + SYNONYM + ")*)" + SEMICOLON;
