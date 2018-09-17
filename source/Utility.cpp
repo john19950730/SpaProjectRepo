@@ -95,6 +95,9 @@ bool Utility::validateInfixExpression(string expression)
 	string expEvaluated = "";
 	int operatorOperand = 1;
 
+	// remove all white spaces before parsing
+	expression.erase(remove_if(expression.begin(), expression.end(), isspace), expression.end());
+
 	for (int i = 0; i < expression.length(); i++)
 	{
 		char c = expression[i];
