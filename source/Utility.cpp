@@ -84,6 +84,110 @@ int Utility::priority(char a) {
 	return temp;
 }
 
+bool Utility::validateInfixExpression(string expression)
+{
+	int previous = 0;
+	int previous1 = 0;
+	string expEvaluated = "";
+	int operatorOperand = 1;
+
+	// remove all white spaces before parsing
+	expression.erase(remove_if(expression.begin(), expression.end(), isspace), expression.end());
+
+	for (int i = 0; i < expression.length(); i++)
+	{
+		char c = expression[i];
+		if (c != ')') {
+			if (c == '(')
+			{
+				int j = expression.find(')', i);
+				if (j == -1)
+					return false;
+
+				string substring = expression.substr(i + 1, j - i - 1);
+
+				while (count(substring.begin(), substring.end(), '(') != count(substring.begin(), substring.end(), ')'))
+				{
+					if (j < expression.length() - 1)
+						j = expression.find(')', j + 1);
+					else
+						break;
+
+					substring = expression.substr(i + 1, j - i - 1);
+				}
+
+				i = j - 1; //Changing the counter i to point to the next character
+				//validating the sub expression
+				if (validateInfixExpression(substring) == true)
+				{
+					if (previous != 0 && previous1 != 0 && previous > previous1)
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+						previous = 0;
+					}
+					else if (previous != 0 && previous1 != 0 && previous <= previous1)
+					{
+						return false;
+					}
+					else if (previous1 != 0)
+					{
+						return false;
+					}
+					else
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+					}
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+				if (c == '+'
+					|| c == '-'
+					|| c == '*'
+					|| c == '/'
+					|| c == '%')
+				{
+					if (previous != 0)
+					{
+						return false;
+					}
+					previous = operatorOperand;
+					operatorOperand++;
+				}
+				else
+				{
+					if (previous != 0 && previous1 != 0 && previous > previous1)
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+						previous = 0;
+					}
+					else if (previous != 0 && previous1 != 0 && previous <= previous1)
+					{
+						return false;
+					}
+					else if (previous1 != 0)
+					{
+						return false;
+					}
+					else
+					{
+						previous1 = operatorOperand;
+						operatorOperand++;
+					}
+				}
+		}
+	}
+	if (previous != 0)
+		return false;
+	return true;
+}
+
 // trim from start (in place)
 void Utility::ltrim(string &s) {
 	s.erase(s.begin(), find_if(s.begin(), s.end(), [](int ch) {
