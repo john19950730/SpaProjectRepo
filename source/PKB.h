@@ -52,8 +52,7 @@ public:
 	static vector<string> getAllProcedureThatUses(string varName);
 
 	// SPA Uses(a, b) query
-	static vector< pair<int, string> > getAllAssignmentUsesVariablePairs();
-	static vector< pair<int, string> > getAllStmtUsesVariablePairs();
+	static vector< pair<unsigned int, string> > getAllStmtUsesVariablePairs(string synonym);
 	static vector< pair<string, string> > getAllProcedureUsesVariablePairs();
 
 	// SPA Uses(stmtNo/procName, b) query
@@ -61,16 +60,11 @@ public:
 	static vector<string> getAllVariablesUsedByProcedures(string procName);
 
 	// SPA Modifies(a, "b") query
-	static vector<int> getAllStmtThatModifies(string varName);
-	static vector<int> getAllAssignmentThatModifies(string varName);
-	static vector<int> getAllReadThatModifies(string varName);
-	static vector<int> getAllIfThatModifies(string varName);
-	static vector<int> getAllWhileThatModifies(string varName);
+	static vector<unsigned int> getAllStmtThatModifies(string synonym, string varName);
 	static vector<string> getAllProcedureThatModifies(string varName);
 
 	// SPA Modifies(a, b) query
-	static vector< pair<int, string> > getAllAssignmentModifiesVariablePairs();
-	static vector< pair<int, string> > getAllStmtModifiesVariablePairs();
+	static vector< pair<unsigned int, string> > getAllStmtModifiesVariablePairs(string synonym);
 	static vector< pair<string, string> > getAllProcedureModifiesVariablePairs();
 
 	// SPA Modifies(stmtNo/procName, b) query

@@ -190,23 +190,13 @@ bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 	}
 }
 
-vector< pair<int, string> > PKB::getAllAssignmentUsesVariablePairs()
+vector< pair<unsigned int, string> > PKB::getAllStmtUsesVariablePairs(string synonym)
 {
-	vector< pair<int, string> > result;
-	for_each(assignList.begin(), assignList.end(),
-		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
-	return result;
-}
-vector< pair<int, string> > PKB::getAllStmtUsesVariablePairs()
-{
-	vector<int> stmts(usesTable.size());
-	int n = 0;
-	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
-	vector< pair<int, string> > result;
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
+	vector< pair<unsigned int, string> > result;
 	for_each(stmts.begin(), stmts.end(),
 		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+			[&](string varName) { result.push_back(pair<unsigned int, string>(stmtNo, varName)); }); });
 	return result;
 }
 vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
@@ -326,38 +316,15 @@ vector<string> PKB::getAllProcedureThatUses(string varName)
 	return vector<string>();
 }
 
-vector<int> PKB::getAllStmtThatModifies(string v)
+vector<unsigned int> PKB::getAllStmtThatModifies(string synonym, string v)
 {
-	vector<int> stmts(modifiesTable.size());
-	vector<int> result;
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
+	vector<unsigned int> result;
 	int n = 0;
 	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
 	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
-		[=](int stmtNo) { return PKB::isModifies(stmtNo, v); });
+		[=](unsigned int stmtNo) { return PKB::isModifies(stmtNo, v); });
 	return result;
-}
-
-vector<int> PKB::getAllAssignmentThatModifies(string v)
-{
-	vector<int> result;
-	copy_if(assignList.begin(), assignList.end(), back_inserter(result),
-		[=](int assignStmtNo) { return PKB::isModifies(assignStmtNo, v); });
-	return result;
-}
-
-vector<int> PKB::getAllReadThatModifies(string varName)
-{
-	return vector<int>();
-}
-
-vector<int> PKB::getAllIfThatModifies(string varName)
-{
-	return vector<int>();
-}
-
-vector<int> PKB::getAllWhileThatModifies(string varName)
-{
-	return vector<int>();
 }
 
 vector<string> PKB::getAllProcedureThatModifies(string varName)
@@ -366,24 +333,13 @@ vector<string> PKB::getAllProcedureThatModifies(string varName)
 	return vector<string>();
 }
 
-vector< pair<int, string> > PKB::getAllAssignmentModifiesVariablePairs()
+vector< pair<unsigned int, string> > PKB::getAllStmtModifiesVariablePairs(string synonym)
 {
-	vector< pair<int, string> > result;
-	for_each(assignList.begin(), assignList.end(),
-		[&](int stmtNo) { for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
-	return result;
-}
-
-vector< pair<int, string> > PKB::getAllStmtModifiesVariablePairs()
-{
-	vector<int> stmts(modifiesTable.size());
-	int n = 0;
-	generate(stmts.begin(), stmts.end(), [&] {return ++n; });
-	vector< pair<int, string> > result;
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
+	vector< pair<unsigned int, string> > result;
 	for_each(stmts.begin(), stmts.end(),
-		[&](int stmtNo) { for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<int, string>(stmtNo, varName)); }); });
+		[&](unsigned int stmtNo) { for_each(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<unsigned int, string>(stmtNo, varName)); }); });
 	return result;
 }
 
