@@ -94,10 +94,7 @@ bool Utility::validateInfixExpression(string expression)
 	for (int i = 0; i < expression.length(); i++)
 	{
 		char c = expression[i];
-		if (c == ')')
-		{
-		}
-		else
+		if (c != ')') {
 			if (c == '(')
 			{
 				int j = expression.find(')', i);
@@ -149,7 +146,8 @@ bool Utility::validateInfixExpression(string expression)
 				if (c == '+'
 					|| c == '-'
 					|| c == '*'
-					|| c == '/')
+					|| c == '/'
+					|| c == '%')
 				{
 					if (previous != 0)
 					{
@@ -180,6 +178,7 @@ bool Utility::validateInfixExpression(string expression)
 						operatorOperand++;
 					}
 				}
+		}
 	}
 	if (previous != 0)
 		return false;
