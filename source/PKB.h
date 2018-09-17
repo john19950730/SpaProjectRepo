@@ -79,7 +79,7 @@ public:
 	static vector< pair<string, string> > getAllProcedureModifiesVariablePairs();
 
 	// SPA Modifies(stmtNo/procName, b) query
-	static vector<string> getAllVariablesModifiedByStmtNo(int stmtNo);
+	static vector<string> getAllVariablesModifiedByStmtNo(unsigned int stmtNo);
 	static vector<string> getAllVariablesModifiedByProcedures(string procName);
 
 	// SPA synonyms query

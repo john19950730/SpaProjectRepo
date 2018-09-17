@@ -202,7 +202,7 @@ vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 					result.push_back(procVarPair); }); }); });
 	return result;
 }
-vector<string> PKB::getAllVariablesUsedByStmtNo(int stmtNo)
+vector<string> PKB::getAllVariablesUsedByStmtNo(unsigned int stmtNo)
 {
 	if ((unsigned int) stmtNo >= usesTable.size())
 		return vector<string>();
@@ -225,9 +225,9 @@ vector<string> PKB::getAllVariablesUsedByProcedures(string procName)
 		}); });
 	return result;
 }
-bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
+bool PKB::isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	if (stmtNo1 >= followsList.size() || stmtNo2 >= followsList.size())
+	if (stmtNo1 >= parentList.size() || stmtNo2 >= parentList.size())
 		return false;
 	if (!star) {
 		return parentList[stmtNo2] == stmtNo1;
@@ -239,14 +239,14 @@ bool PKB::isParent(int stmtNo1, int stmtNo2, bool star)
 
 bool PKB::isUses(unsigned int stmtNo, string varName)
 {
-	if (stmtNo >= followsList.size())
+	if (stmtNo >= usesTable.size())
 		return false;
 	return find(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), varName) != usesTable[stmtNo].end();
 }
 
 bool PKB::isModifies(unsigned int stmtNo, string varName)
 {
-	if (stmtNo >= followsList.size())
+	if (stmtNo >= modifiesTable.size())
 		return false;
 	return find(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), varName) != modifiesTable[stmtNo].end();
 }
@@ -407,7 +407,7 @@ vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 	return result;
 }
 
-vector<string> PKB::getAllVariablesModifiedByStmtNo(int stmtNo)
+vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
 {
 	if ((unsigned int)stmtNo >= modifiesTable.size())
 		return vector<string>();
