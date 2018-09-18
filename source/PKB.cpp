@@ -224,7 +224,7 @@ void PKB::addProcedureModifies(string procName, string varName)
 
 /****************************************
 |										|
-|			PKB Follows Queries			|
+|	PKB Follows Relations Queries		|
 |										|
 ****************************************/
 
@@ -246,54 +246,6 @@ bool PKB::hasFollows(unsigned int stmtNo1, bool star)
 {
 	//TODO
 	return false;
-}
-
-//represents Uses(a, v)
-vector< pair<unsigned int, string> > PKB::getAllStmtUsesVariablePairs(string synonym)
-{
-	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
-	vector< pair<unsigned int, string> > result;
-	for_each(stmts.begin(), stmts.end(),
-		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
-			[&](string varName) { result.push_back(pair<unsigned int, string>(stmtNo, varName)); }); });
-	return result;
-}
-
-//represents Uses("proc", "var")
-bool PKB::isProcedureUses(string procName, string varName)
-{
-	//TODO
-	return false;
-}
-
-//represents Uses(p, v)
-vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
-{
-	vector< pair<string, string> > result;
-	//TODO
-	return result;
-}
-
-//represents Uses(1, v)
-vector<string> PKB::getAllVariablesUsedByStmtNo(unsigned int stmtNo)
-{
-	if ((unsigned int) stmtNo >= usesTable.size())
-		return vector<string>();
-	return usesTable[stmtNo];
-}
-
-//represents Uses("proc", _)
-bool PKB::hasProcedureUses(string procName)
-{
-	//TODO
-	return false;
-}
-
-//represents Uses("proc", v)
-vector<string> PKB::getAllVariablesUsedByProcedure(string procName)
-{
-	//TODO
-	return vector<string>();
 }
 
 //represents Follows(_, 2) or Follows*(_, 2)
@@ -345,6 +297,12 @@ vector<int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, b
 	return vector<int>();
 }
 
+/****************************************
+|										|
+|		PKB Parent Relations Query		|
+|										|
+****************************************/
+
 //represents: Parent(1, 2) or Parent*(1, 2)
 bool PKB::isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
@@ -393,26 +351,32 @@ vector<int> PKB::getAllParentStmts(string synonym1, bool star)
 	return vector<int>();
 }
 
-//represents: Parent(a, 1) or Parent*(a, 1)
+//represents: Parent(a, 2) or Parent*(a, 2)
 vector<int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned int stmtNo2, bool star)
 {
 	//TODO
 	return vector<int>();
 }
 
-//represents: Parent(_, a) or Parent*(_, a)
+//represents: Parent(_, b) or Parent*(_, b)
 vector<int> PKB::getAllChildStmts(string synonym2, bool star)
 {
 	//TODO
 	return vector<int>();
 }
 
-//represents: Parent(1, a) or Parent*(1, a)
+//represents: Parent(1, b) or Parent*(1, b)
 vector<int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string synonym2, bool star)
 {
 	//TODO
 	return vector<int>();
 }
+
+/****************************************
+|										|
+|		PKB Uses Relations Query		|
+|										|
+****************************************/
 
 //represents: Uses(1, "var")
 bool PKB::isUses(unsigned int stmtNo, string varName)
@@ -429,19 +393,12 @@ bool PKB::hasUses(unsigned int stmtNo1)
 	return false;
 }
 
-//represents: Modifies(1, "var")
-bool PKB::isModifies(unsigned int stmtNo, string varName)
+//represents Uses(1, v)
+vector<string> PKB::getAllVariablesUsedByStmtNo(unsigned int stmtNo)
 {
-	if (stmtNo >= modifiesTable.size())
-		return false;
-	return find(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), varName) != modifiesTable[stmtNo].end();
-}
-
-//represents: Modifies(1, _)
-bool PKB::hasModifies(unsigned int stmtNo1)
-{
-	//TODO
-	return false;
+	if ((unsigned int)stmtNo >= usesTable.size())
+		return vector<string>();
+	return usesTable[stmtNo];
 }
 
 //represents: Uses(a, "var")
@@ -461,6 +418,38 @@ vector<unsigned int> PKB::getAllStmtsThatUses(string synonym)
 	return vector<unsigned int>();
 }
 
+//represents Uses(a, v)
+vector< pair<unsigned int, string> > PKB::getAllStmtUsesVariablePairs(string synonym)
+{
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
+	vector< pair<unsigned int, string> > result;
+	for_each(stmts.begin(), stmts.end(),
+		[&](int stmtNo) { for_each(usesTable[stmtNo].begin(), usesTable[stmtNo].end(),
+			[&](string varName) { result.push_back(pair<unsigned int, string>(stmtNo, varName)); }); });
+	return result;
+}
+
+//represents Uses("proc", "var")
+bool PKB::isProcedureUses(string procName, string varName)
+{
+	//TODO
+	return false;
+}
+
+//represents Uses("proc", _)
+bool PKB::hasProcedureUses(string procName)
+{
+	//TODO
+	return false;
+}
+
+//represents Uses("proc", v)
+vector<string> PKB::getAllVariablesUsedByProcedure(string procName)
+{
+	//TODO
+	return vector<string>();
+}
+
 //represents: Uses(p, "var")
 vector<string> PKB::getAllProceduresThatUsesVariable(string varName)
 {
@@ -473,6 +462,43 @@ vector<string> PKB::getAllProceduresThatUses()
 {
 	//TODO
 	return vector<string>();
+}
+
+//represents Uses(p, v)
+vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
+{
+	vector< pair<string, string> > result;
+	//TODO
+	return result;
+}
+
+/****************************************
+|										|
+|	PKB Modifies Relations Query		|
+|										|
+****************************************/
+
+//represents: Modifies(1, "var")
+bool PKB::isModifies(unsigned int stmtNo, string varName)
+{
+	if (stmtNo >= modifiesTable.size())
+		return false;
+	return find(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), varName) != modifiesTable[stmtNo].end();
+}
+
+//represents: Modifies(1, _)
+bool PKB::hasModifies(unsigned int stmtNo1)
+{
+	//TODO
+	return false;
+}
+
+//represents: Modifies(1, v)
+vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
+{
+	if ((unsigned int)stmtNo >= modifiesTable.size())
+		return vector<string>();
+	return modifiesTable[stmtNo];
 }
 
 //represents: Modifies(a, "var")
@@ -494,20 +520,6 @@ vector<unsigned int> PKB::getAllStmtThatModifies(string synonym)
 	return vector<unsigned int>();
 }
 
-//represents: Modifies(p, "var")
-vector<string> PKB::getAllProceduresThatModifiesVariable(string varName)
-{
-	//TODO
-	return vector<string>();
-}
-
-//represents: Modifies(p, _)
-vector<string> PKB::getAllProceduresThatModifies()
-{
-	//TODO
-	return vector<string>();
-}
-
 //represents: Modifies(a, v)
 vector< pair<unsigned int, string> > PKB::getAllStmtModifiesVariablePairs(string synonym)
 {
@@ -524,26 +536,6 @@ bool PKB::isProcedureModifies(string procName, string varName)
 {
 	//TODO
 	return false;
-}
-
-//represents: Modifies(p, v)
-vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
-{
-	vector< pair<string, string> > result;
-	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [&](pair<string, vector<string> > procModifiesPair) {
-		for_each(procModifiesPair.second.begin(), procModifiesPair.second.end(), [&](string modifies) {
-			result.push_back(make_pair(procModifiesPair.first, modifies));
-		});
-	});
-	return result;
-}
-
-//represents: Modifies(1, v)
-vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
-{
-	if ((unsigned int)stmtNo >= modifiesTable.size())
-		return vector<string>();
-	return modifiesTable[stmtNo];
 }
 
 //represents: Modifies("proc", _)
@@ -563,6 +555,32 @@ vector<string> PKB::getAllVariablesModifiedByProcedure(string procName)
 	if (!hasProcedureModifies(procName))
 		return vector<string>();
 	return procedureModifiesTable[procName];
+}
+
+//represents: Modifies(p, "var")
+vector<string> PKB::getAllProceduresThatModifiesVariable(string varName)
+{
+	//TODO
+	return vector<string>();
+}
+
+//represents: Modifies(p, _)
+vector<string> PKB::getAllProceduresThatModifies()
+{
+	//TODO
+	return vector<string>();
+}
+
+//represents: Modifies(p, v)
+vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
+{
+	vector< pair<string, string> > result;
+	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [&](pair<string, vector<string> > procModifiesPair) {
+		for_each(procModifiesPair.second.begin(), procModifiesPair.second.end(), [&](string modifies) {
+			result.push_back(make_pair(procModifiesPair.first, modifies));
+		});
+	});
+	return result;
 }
 
 /****************************************
