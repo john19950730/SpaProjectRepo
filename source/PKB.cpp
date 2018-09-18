@@ -216,7 +216,7 @@ void PKB::addProcedureModifies(string procName, string varName)
 {
 	if (!procedureExists(procName))
 		return;
-	if (hasProcedureModifies(procName))
+	if (!hasProcedureModifies(procName))
 		procedureModifiesTable.insert(make_pair(procName, vector<string>()));
 	if (find(procedureModifiesTable[procName].begin(), procedureModifiesTable[procName].end(), varName) == procedureModifiesTable[procName].end())
 		procedureModifiesTable[procName].push_back(varName);
@@ -228,6 +228,7 @@ void PKB::addProcedureModifies(string procName, string varName)
 |										|
 ****************************************/
 
+//represents Follows(1, 2) or Follows*(1, 2)
 bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
 	if (stmtNo1 >= followsList.size() || stmtNo2 >= followsList.size())
@@ -240,11 +241,14 @@ bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 	}
 }
 
+//represents Follows(1, _) or Follows*(1, _)
 bool PKB::hasFollows(unsigned int stmtNo1, bool star)
 {
+	//TODO
 	return false;
 }
 
+//represents Uses(a, v)
 vector< pair<unsigned int, string> > PKB::getAllStmtUsesVariablePairs(string synonym)
 {
 	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
@@ -254,59 +258,94 @@ vector< pair<unsigned int, string> > PKB::getAllStmtUsesVariablePairs(string syn
 			[&](string varName) { result.push_back(pair<unsigned int, string>(stmtNo, varName)); }); });
 	return result;
 }
+
+//represents Uses("proc", "var")
 bool PKB::isProcedureUses(string procName, string varName)
 {
+	//TODO
 	return false;
 }
+
+//represents Uses(p, v)
 vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 {
 	vector< pair<string, string> > result;
 	//TODO
 	return result;
 }
+
+//represents Uses(1, v)
 vector<string> PKB::getAllVariablesUsedByStmtNo(unsigned int stmtNo)
 {
 	if ((unsigned int) stmtNo >= usesTable.size())
 		return vector<string>();
 	return usesTable[stmtNo];
 }
+
+//represents Uses("proc", _)
 bool PKB::hasProcedureUses(string procName)
 {
+	//TODO
 	return false;
 }
+
+//represents Uses("proc", v)
 vector<string> PKB::getAllVariablesUsedByProcedure(string procName)
 {
-//TODO
+	//TODO
 	return vector<string>();
 }
+
+//represents Follows(_, 2) or Follows*(_, 2)
 bool PKB::hasFollowedBy(unsigned int stmtNo2, bool star)
 {
+	//TODO
 	return false;
 }
+
+//represents Follows(_, _) or Follows*(_, _)
 bool PKB::hasFollowsPair(bool star)
 {
+	//TODO
 	return false;
 }
+
+//represents Follows(a, b) or Follows*(a, b)
 vector<pair<int, int>> PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
 {
+	//TODO
 	return vector<pair<int, int>>();
 }
+
+//represents Follows(a, _) or Follows*(a, _)
 vector<int> PKB::getAllFollowedStmts(string synonym1, bool star)
 {
+	//TODO
 	return vector<int>();
 }
+
+//represents Follows(a, 2) or Follows*(a, 2)
 vector<int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
+	//TODO
 	return vector<int>();
 }
+
+//represents: Follows(_, b) or Follows*(_, b)
 vector<int> PKB::getAllFollowsStmts(string synonym2, bool star)
 {
+	//TODO
 	return vector<int>();
 }
+
+//represents: Follows(1, b) or Follows*(1, b)
 vector<int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
+	//TODO
 	return vector<int>();
 }
+
+//represents: Parent(1, 2) or Parent*(1, 2)
 bool PKB::isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
 	if (stmtNo1 >= parentList.size() || stmtNo2 >= parentList.size())
@@ -319,46 +358,63 @@ bool PKB::isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 	}
 }
 
+//represents: Parent(1, _), Parent*(1, _)
 bool PKB::hasChild(unsigned int stmtNo1, bool star)
 {
+	//TODO
 	return false;
 }
 
+//represents: Parent(_, 2) or Parent*(_, 2)
 bool PKB::hasParent(unsigned int stmtNo2, bool star)
 {
+	//TODO
 	return false;
 }
 
+//represents: Parent(_, _) or Parent*(_, _)
 bool PKB::hasParentPair(bool star)
 {
+	//TODO
 	return false;
 }
 
+//represents: Parent(a, b) or Parent*(a, b)
 vector<pair<int, int>> PKB::getAllParentPair(string synonym1, string synonym2, bool star)
 {
+	//TODO
 	return vector<pair<int, int>>();
 }
 
+//represents: Parent(a, _) or Parent*(a, _)
 vector<int> PKB::getAllParentStmts(string synonym1, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
+//represents: Parent(a, 1) or Parent*(a, 1)
 vector<int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned int stmtNo2, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
+//represents: Parent(_, a) or Parent*(_, a)
 vector<int> PKB::getAllChildStmts(string synonym2, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
+//represents: Parent(1, a) or Parent*(1, a)
 vector<int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string synonym2, bool star)
 {
+	//TODO
 	return vector<int>();
 }
 
+//represents: Uses(1, "var")
 bool PKB::isUses(unsigned int stmtNo, string varName)
 {
 	if (stmtNo >= usesTable.size())
@@ -366,11 +422,14 @@ bool PKB::isUses(unsigned int stmtNo, string varName)
 	return find(usesTable[stmtNo].begin(), usesTable[stmtNo].end(), varName) != usesTable[stmtNo].end();
 }
 
+//represents: Uses(1, _)
 bool PKB::hasUses(unsigned int stmtNo1)
 {
+	//TODO
 	return false;
 }
 
+//represents: Modifies(1, "var")
 bool PKB::isModifies(unsigned int stmtNo, string varName)
 {
 	if (stmtNo >= modifiesTable.size())
@@ -378,36 +437,45 @@ bool PKB::isModifies(unsigned int stmtNo, string varName)
 	return find(modifiesTable[stmtNo].begin(), modifiesTable[stmtNo].end(), varName) != modifiesTable[stmtNo].end();
 }
 
+//represents: Modifies(1, _)
 bool PKB::hasModifies(unsigned int stmtNo1)
 {
+	//TODO
 	return false;
 }
 
-vector<unsigned int> PKB::getAllStmtsThatUsesVariable(string synonym, string v)
+//represents: Uses(a, "var")
+vector<unsigned int> PKB::getAllStmtsThatUsesVariable(string synonym, string varName)
 {
 	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
 	vector<unsigned int> result;
 	copy_if(stmts.begin(), stmts.end(), back_inserter(result),
-		[=](unsigned int stmtNo) { return PKB::isUses(stmtNo, v); });
+		[=](unsigned int stmtNo) { return PKB::isUses(stmtNo, varName); });
 	return result;
 }
 
+//represents: Uses(a, _)
 vector<unsigned int> PKB::getAllStmtsThatUses(string synonym)
 {
+	//TODO
 	return vector<unsigned int>();
 }
 
+//represents: Uses(p, "var")
 vector<string> PKB::getAllProceduresThatUsesVariable(string varName)
 {
 	//TODO
 	return vector<string>();
 }
 
+//represents: Uses(p, _)
 vector<string> PKB::getAllProceduresThatUses()
 {
+	//TODO
 	return vector<string>();
 }
 
+//represents: Modifies(a, "var")
 vector<unsigned int> PKB::getAllStmtThatModifiesVariable(string synonym, string varName)
 {
 	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
@@ -419,22 +487,28 @@ vector<unsigned int> PKB::getAllStmtThatModifiesVariable(string synonym, string 
 	return result;
 }
 
+//represents: Modifies(a, _)
 vector<unsigned int> PKB::getAllStmtThatModifies(string synonym)
 {
+	//TODO
 	return vector<unsigned int>();
 }
 
+//represents: Modifies(p, "var")
 vector<string> PKB::getAllProceduresThatModifiesVariable(string varName)
 {
 	//TODO
 	return vector<string>();
 }
 
+//represents: Modifies(p, _)
 vector<string> PKB::getAllProceduresThatModifies()
 {
+	//TODO
 	return vector<string>();
 }
 
+//represents: Modifies(a, v)
 vector< pair<unsigned int, string> > PKB::getAllStmtModifiesVariablePairs(string synonym)
 {
 	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym);
@@ -445,11 +519,14 @@ vector< pair<unsigned int, string> > PKB::getAllStmtModifiesVariablePairs(string
 	return result;
 }
 
+//represents: Modifies("proc", "var")
 bool PKB::isProcedureModifies(string procName, string varName)
 {
+	//TODO
 	return false;
 }
 
+//represents: Modifies(p, v)
 vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 {
 	vector< pair<string, string> > result;
@@ -461,6 +538,7 @@ vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 	return result;
 }
 
+//represents: Modifies(1, v)
 vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
 {
 	if ((unsigned int)stmtNo >= modifiesTable.size())
@@ -472,7 +550,7 @@ vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
 bool PKB::hasProcedureModifies(string procName)
 {
 	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [=](pair<string, vector<string> > procM) {
-		if (exactMatch(procM.first, procName))
+		if (exactMatch(procM.first, procName) && procM.second.size() > 0)
 			return true;
 	});
 }
