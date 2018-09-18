@@ -100,4 +100,5 @@ public:
 private:
 	static unsigned int addStatement(unsigned int stmtNo);
 	static bool procedureExists(string procName);
+	static bool exactMatch(string s1, string s2);
 };

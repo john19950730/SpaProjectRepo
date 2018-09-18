@@ -468,9 +468,13 @@ vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
 	return modifiesTable[stmtNo];
 }
 
+//represents: Modifies("proc", _)
 bool PKB::hasProcedureModifies(string procName)
 {
-	return false;
+	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [=](pair<string, vector<string> > procM) {
+		if (exactMatch(procM.first, procName))
+			return true;
+	});
 }
 
 //represents: Modifies("proc", v)
@@ -535,7 +539,7 @@ vector<string> PKB::getProcedureNames()
 vector<unsigned int> PKB::getAllStmtsThatFitSynonym(string synonym)
 {
 	for (unsigned int i = 0; i < STATEMENTS->size(); ++i) {
-		if (synonym.find(STATEMENTS[i], 0) == 0 && synonym.length() == STATEMENTS[i].length())
+		if (exactMatch(synonym, STATEMENTS[i]))
 			return synonymsList[i];
 	}
 	return vector<unsigned int>();
@@ -555,6 +559,10 @@ unsigned int PKB::addStatement(unsigned int stmtNo)
 
 bool PKB::procedureExists(string procName)
 {
-	//TODO
-	return false;
+	return find(procedureList.begin(), procedureList.end(), procName) != procedureList.end();
+}
+
+bool PKB::exactMatch(string s1, string s2)
+{
+	return s1.find(s2) == 0 && s1.length() == s2.length();
 }
