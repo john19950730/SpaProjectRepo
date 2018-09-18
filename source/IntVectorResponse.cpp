@@ -39,11 +39,11 @@ vector<string> IntVectorResponse::apiCallForParent() {
 
 	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
 		cout << "getStmtNoThatIsChildOf first param" << endl;
-		result = PKB::getStmtNoThatIsChildOf(stoi(firstParam), hasTransitiveClosure);
+		//result = PKB::getStmtNoThatIsChildOf(stoi(firstParam), hasTransitiveClosure);
 	}	
 	else if (paramType == make_pair(SYNONYM, STMT_NO) || paramType == make_pair(UNDERSCORE, STMT_NO)) {
 		cout << "getStmtNoThatIsParentOf second param" << endl;
-		result = PKB::getStmtNoThatIsParentOf(stoi(secondParam), hasTransitiveClosure);
+		//result = PKB::getStmtNoThatIsParentOf(stoi(secondParam), hasTransitiveClosure);
 	}
 	else {
 		return vector<string>();

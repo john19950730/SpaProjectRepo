@@ -39,15 +39,7 @@ void GUIWrapper::evaluate(std::string query, std::list<std::string>& results){
 
 	// code to pass query object to query evaluator
 	if (isQueryParseSuccessful) {
-		PATTERN_CLAUSE patternClause = {
-			"a", "v", "_", false, true
-		};
-		vector<PATTERN_CLAUSE> patternClauses;
-		patternClauses.push_back(patternClause);
-
-		QueryObject *object = queryPreprocessor.getQueryObject();
-		object->setPatternClause(patternClauses);
-		QueryEvaluator *queryEvaluator = new QueryEvaluator(object);
+		QueryEvaluator *queryEvaluator = new QueryEvaluator(queryPreprocessor.getQueryObject());
 		vector<string> result = queryEvaluator->evaluateQueryObject();
 		
 		string strResult = "";

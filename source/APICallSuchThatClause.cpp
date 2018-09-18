@@ -69,22 +69,23 @@ map<pair<string, string>, APICallSuchThatClause*> APICallSuchThatClause::buildMo
 
 	modifiesUsesTable[make_pair(STMT_NO, VARIABLE)] = new BooleanResponse();
 	modifiesUsesTable[make_pair(PROC_NAME, VARIABLE)] = new BooleanResponse();
-	
+	modifiesUsesTable[make_pair(STMT_NO, UNDERSCORE)] = new BooleanResponse();
+	modifiesUsesTable[make_pair(PROC_NAME, UNDERSCORE)] = new BooleanResponse();
+
 	modifiesUsesTable[make_pair(STMT_NO, SYNONYM)] = new StringVectorResponse();
-	modifiesUsesTable[make_pair(STMT_NO, UNDERSCORE)] = new StringVectorResponse();
 	modifiesUsesTable[make_pair(PROC_NAME, SYNONYM)] = new StringVectorResponse();
-	modifiesUsesTable[make_pair(PROC_NAME, UNDERSCORE)] = new StringVectorResponse();
+	
 	
 	string synonymType = synonymTable[suchThatClause.firstParameter];
-	if (synonymIsStatementType(synonymType)) {
+	if (synonymIsStatementType(synonymType)) {	// Statements Synonyms
 		modifiesUsesTable[make_pair(SYNONYM, VARIABLE)] = new IntVectorResponse();
 		modifiesUsesTable[make_pair(SYNONYM, SYNONYM)] = new IntStringPairVectorResponse();
-		modifiesUsesTable[make_pair(SYNONYM, UNDERSCORE)] = new IntStringPairVectorResponse();
+		modifiesUsesTable[make_pair(SYNONYM, UNDERSCORE)] = new IntVectorResponse();
 	}
-	else {
+	else {	// Procedure Synonyms
 		modifiesUsesTable[make_pair(SYNONYM, VARIABLE)] = new StringVectorResponse();
 		modifiesUsesTable[make_pair(SYNONYM, SYNONYM)] = new StringStringPairVectorResponse();
-		modifiesUsesTable[make_pair(SYNONYM, UNDERSCORE)] = new StringStringPairVectorResponse();
+		modifiesUsesTable[make_pair(SYNONYM, UNDERSCORE)] = new StringVectorResponse();
 	}
 
 	return modifiesUsesTable;
@@ -94,15 +95,15 @@ map<pair<string, string>, APICallSuchThatClause*> APICallSuchThatClause::buildFo
 	map<pair<string, string>, APICallSuchThatClause*> followsParentTable;
 
 	followsParentTable[make_pair(STMT_NO, STMT_NO)] = new BooleanResponse();
-	
-	followsParentTable[make_pair(SYNONYM, STMT_NO)] = new IntVectorResponse();
-	followsParentTable[make_pair(UNDERSCORE, STMT_NO)] = new IntVectorResponse();
-	followsParentTable[make_pair(STMT_NO, SYNONYM)] = new IntVectorResponse();
-	followsParentTable[make_pair(STMT_NO, UNDERSCORE)] = new IntVectorResponse();
+	followsParentTable[make_pair(STMT_NO, UNDERSCORE)] = new BooleanResponse();
+	followsParentTable[make_pair(UNDERSCORE, STMT_NO)] = new BooleanResponse();
+	followsParentTable[make_pair(UNDERSCORE, UNDERSCORE)] = new BooleanResponse();
 
-	followsParentTable[make_pair(UNDERSCORE, UNDERSCORE)] = new IntIntPairVectorResponse();
-	followsParentTable[make_pair(UNDERSCORE, SYNONYM)] = new IntIntPairVectorResponse();
-	followsParentTable[make_pair(SYNONYM, UNDERSCORE)] = new IntIntPairVectorResponse();
+	followsParentTable[make_pair(SYNONYM, STMT_NO)] = new IntVectorResponse();
+	followsParentTable[make_pair(STMT_NO, SYNONYM)] = new IntVectorResponse();
+	followsParentTable[make_pair(UNDERSCORE, SYNONYM)] = new IntVectorResponse();
+	followsParentTable[make_pair(SYNONYM, UNDERSCORE)] = new IntVectorResponse();
+
 	followsParentTable[make_pair(SYNONYM, SYNONYM)] = new IntIntPairVectorResponse();
 
 	return followsParentTable;
