@@ -549,10 +549,12 @@ vector<string> PKB::getAllVariablesModifiedByStmtNo(unsigned int stmtNo)
 //represents: Modifies("proc", _)
 bool PKB::hasProcedureModifies(string procName)
 {
-	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [=](pair<string, vector<string> > procM) {
+	bool result = false;
+	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [&](pair<string, vector<string> > procM) {
 		if (exactMatch(procM.first, procName) && procM.second.size() > 0)
-			return true;
+			result = true;
 	});
+	return result;
 }
 
 //represents: Modifies("proc", v)
