@@ -37,7 +37,7 @@ static vector<unsigned int> printList;
 static unsigned int printListIndex = 0;
 static vector<unsigned int> callList;
 static unsigned int callListIndex;
-static unordered_map<string, pair<unsigned int, unsigned int> > procedureMap;
+static vector<string> procedureList;
 static unsigned int procedureListIndex = 0;
 static vector<unsigned int> synonymsList[] = { stmtsList, assignList, ifList, whileList, readList, printList, callList };
 
@@ -107,9 +107,9 @@ unsigned int PKB::addCall(unsigned int stmtNo)
 	return callListIndex++;
 }
 
-unsigned int PKB::addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine)
+unsigned int PKB::addProcedure(string procName)
 {
-	procedureMap.insert(make_pair(procName, startEndLine));
+	procedureList.push_back(procName);
 	return procedureListIndex++;
 }
 
@@ -427,18 +427,9 @@ vector<unsigned int> PKB::getCalls()
 	return callList;
 }
 
-unordered_map<string, pair<unsigned int, unsigned int> > PKB::getProcedures()
-{
-	return procedureMap;
-}
-
 vector<string> PKB::getProcedureNames()
 {
-	vector<string> result;
-	for_each(procedureMap.begin(), procedureMap.end(), [&] (pair<string, pair<int, int> > procedurePair) {
-		result.push_back(procedurePair.first);
-	});
-	return result;
+	return procedureList;
 }
 
 vector<unsigned int> PKB::getAllStmtsThatFitSynonym(string synonym)

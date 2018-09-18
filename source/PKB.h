@@ -29,7 +29,7 @@ public:
 	static unsigned int addRead(unsigned int stmtNo);
 	static unsigned int addPrint(unsigned int stmtNo);
 	static unsigned int addCall(unsigned int stmtNo);
-	static unsigned int addProcedure(string procName, pair<unsigned int, unsigned int> startEndLine);
+	static unsigned int addProcedure(string procName);
 
 	// SPA basic relationships query
 	static bool isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star);
@@ -80,7 +80,6 @@ public:
 	static vector<unsigned int> getReads();
 	static vector<unsigned int> getPrints();
 	static vector<unsigned int> getCalls();
-	static unordered_map<string, pair<unsigned int, unsigned int> > getProcedures();
 	static vector<string> getProcedureNames();
 	static vector<unsigned int> getAllStmtsThatFitSynonym(string synonym);
 
