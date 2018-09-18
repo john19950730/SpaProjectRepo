@@ -78,6 +78,42 @@ vector<string> QueryEvaluator::evaluatePatternClause() {
 }
 
 vector<string> QueryEvaluator::evaluateSuchThatAndPatternClause() {
+	/****
+		suchThatClauseResult - pair< map<string, vector<string> >, boolean>
+		patternClause - pair< map<string, vector<string> >, boolean>
+
+		BooleanResponse api call returns boolean and not a vector of results, 
+		hence, manually we need to return an empty vector with the boolean value.
+
+		E.g.	Uses(1, "v") returns true - pair<emptyMap, true> will be returned
+				Modifies(1,"v") returns false - pair(emptyMap, false) will be returned
+
+		1) Check if any of the boolean value is false
+			if(any of the boolean value is false) return noResults()
+
+		2) For clauses without synonyms (e.g. Uses(1,"v"), Follows(1,2))
+			if(both maps() are empty && both boolean value are true)
+				return immediateResults();
+			else if(any of the maps are empty && any of the boolean value is false)
+				return noResults();
+
+		3) Check if the select synonym is found in any of the synonym between the two clauses
+			if(select synonym is not found)
+				return immediateResults()
+
+		4) Check if there are commmon synonyms between the two clauses
+			if(no common synonym)
+			
+			else if(two common synonyms)
+				get intersection between the two maps
+
+			else if(one common synonym)
+		
+		5) map of <string, vector<string>> is built
+
+		6) throw to select function to select the synonym accordingly, and return as vector<string>
+	******/
+
 	vector<string> suchThatClauseResult = evaluateSuchThatClause();
 	vector<string> patternClauseResult = evaluatePatternClause();
 
