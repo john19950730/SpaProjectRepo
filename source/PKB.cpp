@@ -196,9 +196,9 @@ void PKB::addProcedureUses(string procName, string varName)
 {
 	//verify that procName is a registered procedure in PKB
 	//TODO for modifies, abstract
-	if (find(procedureList.begin(), procedureList.end(), procName) == procedureList.end())
+	if (!procedureExists(procName))
 		return;
-	if (find(procedureUsesTable.begin(), procedureUsesTable.end(), procName) == procedureUsesTable.end())
+	if (!hasProcedureUses(procName))
 		procedureUsesTable.insert(make_pair(procName, vector<string>()));
 	if (find(procedureUsesTable[procName].begin(), procedureUsesTable[procName].end(), varName) == procedureUsesTable[procName].end())
 		procedureUsesTable[procName].push_back(varName);
@@ -214,7 +214,9 @@ void PKB::addModifies(unsigned int stmtNo, string varName)
 
 void PKB::addProcedureModifies(string procName, string varName)
 {
-	if (find(procedureModifiesTable.begin(), procedureModifiesTable.end(), procName) == procedureModifiesTable.end())
+	if (!procedureExists(procName))
+		return;
+	if (hasProcedureModifies(procName))
 		procedureModifiesTable.insert(make_pair(procName, vector<string>()));
 	if (find(procedureModifiesTable[procName].begin(), procedureModifiesTable[procName].end(), varName) == procedureModifiesTable[procName].end())
 		procedureModifiesTable[procName].push_back(varName);
@@ -281,7 +283,7 @@ bool PKB::hasFollowedBy(unsigned int stmtNo2, bool star)
 {
 	return false;
 }
-bool PKB::hasMoreThanOneLine(bool star)
+bool PKB::hasFollowsPair(bool star)
 {
 	return false;
 }
@@ -289,19 +291,19 @@ vector<pair<int, int>> PKB::getAllFollowsPair(string synonym1, string synonym2, 
 {
 	return vector<pair<int, int>>();
 }
-vector<int> PKB::getAllStmtsWithFollows(string synonym1, bool star)
+vector<int> PKB::getAllFollowedStmts(string synonym1, bool star)
 {
 	return vector<int>();
 }
-vector<int> PKB::getAllStmtsFollowedByLine(string synonym1, unsigned int stmtNo2, bool star)
+vector<int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
 	return vector<int>();
 }
-vector<int> PKB::getAllStmtsWithFollowedBy(string synonym2, bool star)
+vector<int> PKB::getAllFollowsStmts(string synonym2, bool star)
 {
 	return vector<int>();
 }
-vector<int> PKB::getAllStmtsFollowsLine(unsigned int stmtNo1, string synonym2, bool star)
+vector<int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
 	return vector<int>();
 }
@@ -327,7 +329,7 @@ bool PKB::hasParent(unsigned int stmtNo2, bool star)
 	return false;
 }
 
-bool PKB::hasNesting(bool star)
+bool PKB::hasParentPair(bool star)
 {
 	return false;
 }
@@ -342,7 +344,7 @@ vector<int> PKB::getAllParentStmts(string synonym1, bool star)
 	return vector<int>();
 }
 
-vector<int> PKB::getAllParentStmtsOfLine(string synonym1, unsigned int stmtNo2, bool star)
+vector<int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned int stmtNo2, bool star)
 {
 	return vector<int>();
 }
@@ -352,7 +354,7 @@ vector<int> PKB::getAllChildStmts(string synonym2, bool star)
 	return vector<int>();
 }
 
-vector<int> PKB::getAllChildStmtsOfLine(unsigned int stmtNo1, string synonym2, bool star)
+vector<int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string synonym2, bool star)
 {
 	return vector<int>();
 }
@@ -532,11 +534,10 @@ vector<string> PKB::getProcedureNames()
 
 vector<unsigned int> PKB::getAllStmtsThatFitSynonym(string synonym)
 {
-	//TODO fix string comparison
-	/*string::const_iterator it = find(STATEMENTS->begin(), STATEMENTS->end(), synonym);
-	if (it == STATEMENTS->end())
-		return vector<unsigned int>();
-	return synonymsList[it - STATEMENTS->begin()];*/
+	for (unsigned int i = 0; i < STATEMENTS->size(); ++i) {
+		if (synonym.find(STATEMENTS[i], 0) == 0 && synonym.length() == STATEMENTS[i].length())
+			return synonymsList[i];
+	}
 	return vector<unsigned int>();
 }
 
