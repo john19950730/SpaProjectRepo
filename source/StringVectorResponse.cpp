@@ -11,30 +11,39 @@ StringVectorResponse::StringVectorResponse() : APICallSuchThatClause() {}
 vector<string> StringVectorResponse::apiCallForFollows() {
 	return vector<string>();	// should throw exception error here
 }
+
 vector<string> StringVectorResponse::apiCallForParent() {
 	return vector<string>();	// show throw exception error here
 }
+
 vector<string> StringVectorResponse::apiCallForUses() {
 	cout << "Uses String Vector" << endl;
 	vector<string> result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
+	
+	string forTesting;
+	vector<string> results;
 
-	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
-		result.push_back("getAllVariablesUsedByStmtNo(stoi(firstParam))");
-		//result = PKB::getAllVariablesUsedByStmtNo(stoi(firstParam));
-	} 
-	else if (paramType == make_pair(PROC_NAME, SYNONYM) || paramType == make_pair(PROC_NAME, UNDERSCORE)) {
-		result.push_back("getAllVariablesUsedByProcedures(firstParam)");
-		//result = PKB::getAllVariablesUsedByProcedures(firstParam);
+	if (paramType == make_pair(STMT_NO, SYNONYM)) {
+		//result = PKB::getAllVariablesUsedByStmtNo(unsigned(stoi(firstParam))); // Uses(1, v)
+		forTesting = "getAllVariablesUsedByStmtNo // Uses(1, v)";
+	}
+	else if (paramType == make_pair(PROC_NAME, SYNONYM)) {
+		//result = PKB::getAllVariablesUsedByProcedure(firstParam);	// Uses("proc" , v)
+		forTesting = "getAllVariablesUsedByProcedure // Uses('proc' , v)";
+	}
+	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
+		//result = PKB::getAllProceduresThatUses(); // Uses(p, _)
+		forTesting = "getAllProceduresThatUses // Uses(p, _)";
 	}
 	else if (paramType == make_pair(SYNONYM, VARIABLE)) {
-		if (synonymTable[firstParam] == PROC_VAR) {
-			result.push_back("getAllProcedureThatUses(secondParam)");
-			//result = PKB::getAllProcedureThatUses(secondParam);
-		}
+		// result = PKB::getAllProceduresThatUsesVariable(secondParam);	// Uses(p, "var")
+		forTesting = "getAllProceduresThatUsesVariable // Uses(p, 'var')";
 	}
-	return getResults(result);
+
+	results.push_back(forTesting);
+	return results;
 }
 
 vector<string> StringVectorResponse::apiCallForModifies() {
@@ -43,21 +52,28 @@ vector<string> StringVectorResponse::apiCallForModifies() {
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 
-	if (paramType == make_pair(STMT_NO, SYNONYM) || paramType == make_pair(STMT_NO, UNDERSCORE)) {
-		result.push_back("getAllVariablesModifiedByStmtNo(firstParam)");
-		//result = PKB::getAllVariablesModifiedByStmtNo(stoi(firstParam));
+	string forTesting;
+	vector<string> results;
+
+	if (paramType == make_pair(STMT_NO, SYNONYM)) {
+		//result = PKB::getAllVariablesModifiedByStmtNo(unsigned(stoi(firstParam))); // Modifies(1, v)
+		forTesting = "getAllVariablesModifiedByStmtNo // Modifies(1, v)";
 	}
-	else if (paramType == make_pair(PROC_NAME, SYNONYM) || paramType == make_pair(PROC_NAME, UNDERSCORE)) {
-		result.push_back("getAllVariablesModifiedByProcedures(firstParam)");
-		//result = PKB::getAllVariablesModifiedByProcedures(firstParam);
+	else if (paramType == make_pair(PROC_NAME, SYNONYM)) {
+		//result = PKB::getAllVariablesModifiedByProcedure(firstParam);	// Modifies("proc" , v)
+		forTesting = "getAllVariablesUsedByProcedure // Modifies('proc' , v)";
+	}
+	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
+		//result = PKB::getAllProceduresThatModifies(); // Modifies(p, _)
+		forTesting = "getAllProceduresThatModifies // Modifies(p, _)";
 	}
 	else if (paramType == make_pair(SYNONYM, VARIABLE)) {
-		if (synonymTable[firstParam] == PROC_VAR) {
-			result.push_back("getAllProcedureThatModifies(secondParam)");
-			//result = PKB::getAllProcedureThatModifies(secondParam);
-		}
+		//result = PKB::getAllProceduresThatModifiesVariable(secondParam);	// Modifies(p, "var")
+		forTesting = "getAllProceduresThatModifiesVariable // Modifies(p, 'var')";
 	}
-	return getResults(result);
+
+	results.push_back(forTesting);
+	return results;
 }
 
 string StringVectorResponse::strVectorToString(vector<string> input) {
