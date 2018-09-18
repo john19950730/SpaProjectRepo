@@ -132,6 +132,8 @@ unsigned int PKB::addCall(unsigned int stmtNo)
 unsigned int PKB::addProcedure(string procName)
 {
 	procedureList.push_back(procName);
+	procedureModifiesTable.insert(make_pair(procName, vector<string>()));
+	procedureUsesTable.insert(make_pair(procName, vector<string>()));
 	return procedureListIndex++;
 }
 
@@ -194,14 +196,9 @@ void PKB::addUses(unsigned int stmtNo, string varName)
 
 void PKB::addProcedureUses(string procName, string varName)
 {
-	//verify that procName is a registered procedure in PKB
-	//TODO for modifies, abstract
 	if (!procedureExists(procName))
 		return;
-	if (!hasProcedureUses(procName))
-		procedureUsesTable.insert(make_pair(procName, vector<string>()));
-	if (find(procedureUsesTable[procName].begin(), procedureUsesTable[procName].end(), varName) == procedureUsesTable[procName].end())
-		procedureUsesTable[procName].push_back(varName);
+	procedureUsesTable[procName].push_back(varName);
 }
 
 void PKB::addModifies(unsigned int stmtNo, string varName)
@@ -216,10 +213,7 @@ void PKB::addProcedureModifies(string procName, string varName)
 {
 	if (!procedureExists(procName))
 		return;
-	if (!hasProcedureModifies(procName))
-		procedureModifiesTable.insert(make_pair(procName, vector<string>()));
-	if (find(procedureModifiesTable[procName].begin(), procedureModifiesTable[procName].end(), varName) == procedureModifiesTable[procName].end())
-		procedureModifiesTable[procName].push_back(varName);
+	procedureModifiesTable[procName].push_back(varName);
 }
 
 /****************************************
@@ -541,12 +535,9 @@ bool PKB::isProcedureModifies(string procName, string varName)
 //represents: Modifies("proc", _)
 bool PKB::hasProcedureModifies(string procName)
 {
-	bool result = false;
-	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [&](pair<string, vector<string> > procM) {
-		if (exactMatch(procM.first, procName) && procM.second.size() > 0)
-			result = true;
-	});
-	return result;
+	if (!procedureExists(procName))
+		return false;
+	return procedureModifiesTable[procName].size() > 0;
 }
 
 //represents: Modifies("proc", v)
