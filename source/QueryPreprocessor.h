@@ -24,7 +24,7 @@ const string REL = "Uses|Modifies";																// Relationships (that don't 
 const string REL_T = "Follows|Parent";															// Relationships (that support transitive closure)
 const string REL_PARAM = SYNONYM + '|' + UNDERSCORE + '|' + NUMBER + '|' + STRING;								// Possible relationshp parameter
 const string ASTERISK = "[*]?";																	// Asterisk to indicate transitive closure
-const string PATTERN_PARAM = UNDERSCORE + '|' + UNDERSCORE + STRING + UNDERSCORE + '|' + STRING;
+const string PATTERN_PARAM = UNDERSCORE + '|' + UNDERSCORE + STRING + UNDERSCORE;
 
 const string DECL_REGEX = '(' + DECL_DE + ')' + SPACE + '(' + SYNONYM + "(?:" + COMMA + SYNONYM + ")*)" + SEMICOLON;
 const string RESULT_REGEX = "[Ss]elect" + SPACE + "((?:" + SYNONYM + ")(?:" + COMMA + SYNONYM + ")*)";
