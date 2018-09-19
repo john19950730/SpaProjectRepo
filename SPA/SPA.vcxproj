@@ -11,26 +11,44 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\source\APICall.cpp" />
+    <ClCompile Include="..\source\APICallPatternClause.cpp" />
+    <ClCompile Include="..\source\APICallSuchThatClause.cpp" />
+    <ClCompile Include="..\source\BooleanResponse.cpp" />
     <ClCompile Include="..\source\DesignExtractor.cpp" />
     <ClCompile Include="..\source\CodeParser.cpp" />
+    <ClCompile Include="..\source\IntIntPairVectorResponse.cpp" />
+    <ClCompile Include="..\source\IntStringPairVectorResponse.cpp" />
+    <ClCompile Include="..\source\IntVectorResponse.cpp" />
     <ClCompile Include="..\source\LineOfCodeData.cpp" />
     <ClCompile Include="..\source\PKB.cpp" />
     <ClCompile Include="..\source\QueryEvaluator.cpp" />
     <ClCompile Include="..\source\QueryObject.cpp" />
     <ClCompile Include="..\source\QueryObjStructures.h" />
     <ClCompile Include="..\source\QueryPreprocessor.cpp" />
+    <ClCompile Include="..\source\StringStringPairVectorResponse.cpp" />
+    <ClCompile Include="..\source\StringVectorResponse.cpp" />
     <ClCompile Include="..\source\TNode.cpp" />
     <ClCompile Include="..\source\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\source\APICall.h" />
+    <ClInclude Include="..\source\APICallPatternClause.h" />
+    <ClInclude Include="..\source\APICallSuchThatClause.h" />
+    <ClInclude Include="..\source\BooleanResponse.h" />
     <ClInclude Include="..\source\CodeParser.h" />
     <ClInclude Include="..\source\DesignExtractor.h" />
+    <ClInclude Include="..\source\IntIntPairVectorResponse.h" />
+    <ClInclude Include="..\source\IntStringPairVectorResponse.h" />
+    <ClInclude Include="..\source\IntVectorResponse.h" />
     <ClInclude Include="..\source\Keywords.h" />
     <ClInclude Include="..\source\LineOfCodeData.h" />
     <ClInclude Include="..\source\PKB.h" />
     <ClInclude Include="..\source\QueryEvaluator.h" />
     <ClInclude Include="..\source\QueryObject.h" />
     <ClInclude Include="..\source\QueryPreprocessor.h" />
+    <ClInclude Include="..\source\StringStringPairVectorResponse.h" />
+    <ClInclude Include="..\source\StringVectorResponse.h" />
     <ClInclude Include="..\source\TNode.h" />
     <ClInclude Include="..\source\Utility.h" />
   </ItemGroup>

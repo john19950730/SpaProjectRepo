@@ -8,6 +8,7 @@ QueryObject::QueryObject() {
 	parentClauseIsset = false;
 	selectClauseIsset = false;
 	usesClauseIsset = false;
+	patternClauseIsset = false;
 }
 
 QueryObject::QueryObject(vector<string> selectClause, vector<SUCH_THAT_CLAUSE> followsClause,

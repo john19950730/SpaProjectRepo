@@ -40,11 +40,16 @@ void GUIWrapper::evaluate(std::string query, std::list<std::string>& results){
 	// code to pass query object to query evaluator
 	if (isQueryParseSuccessful) {
 		QueryEvaluator *queryEvaluator = new QueryEvaluator(queryPreprocessor.getQueryObject());
-		string result = queryEvaluator->evaluateQueryObject();
+		vector<string> result = queryEvaluator->evaluateQueryObject();
+		
+		string strResult = "";
+		for (string i : result) {
+			strResult += " " + i;
+		}
 
 		// store the answers to the query in the results list (it is initially empty)
 		// each result must be a string.
-		results.push_back(query + "\nQuery result: " + result);
+		results.push_back(query + "\nQuery result: " + strResult);
 	}
 	else {
 		results.push_back(query + "\nQuery result: Invalid query!");
