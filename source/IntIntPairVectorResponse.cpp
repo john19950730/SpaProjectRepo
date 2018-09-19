@@ -5,16 +5,26 @@ IntIntPairVectorResponse::IntIntPairVectorResponse() : APICallSuchThatClause() {
 
 vector<string> IntIntPairVectorResponse::apiCallForFollows() {
 	vector< pair<int, int> > result;
-	cout << "PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure)" << endl;
-	//result = PKB::getAllFollowsPair(suchThatClause.hasTransitiveClosure);
-	return getResult(result);
+	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
+	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
+	vector<string> results;
+
+	//result = PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)
+	results.push_back("PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)");
+	
+	return results;
 }
 
 vector<string> IntIntPairVectorResponse::apiCallForParent() {
 	vector< pair<int, int> > result;
-	cout << "PKB::getAllParentPair(suchThatClause.hasTransitiveClosure)" << endl;
-	//result = PKB::getAllParentPair(suchThatClause.hasTransitiveClosure);
-	return getResult(result);
+	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
+	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
+	vector<string> results;
+
+	//result = PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)
+	results.push_back("PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)");
+	
+	return results;
 }
 
 vector<string> IntIntPairVectorResponse::apiCallForUses() {
