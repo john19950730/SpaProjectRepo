@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 
 using namespace std;
@@ -53,10 +54,16 @@ static vector<unsigned int> synonymsList[] = { stmtsList, assignList, ifList, wh
 |										|
 ****************************************/
 
-// element at index i means Follows(i, element) holds
-static vector<unsigned int> followsList;
+// element at key i means Follows(i, element) holds
+static map<unsigned int, unsigned int> followsList;
+// element at key i means Follows(element, i) holds
+static map<unsigned int, unsigned int> followedList;
 // element at index i, j means Follows*(i, j) holds
-static vector< vector<bool> > followsStarTable;
+static map<pair<unsigned int, unsigned int>, bool > followsStarTable;
+// Follows*(i, j) holds for each element j in list at index i
+static map<unsigned int, vector<unsigned int> > followsStarList;
+// Follows*(i, j) holds for each element i in list at index j
+static map<unsigned int, vector<unsigned int> > followedStarList;
 
 // element at index i means Parent(element, i) holds
 static vector<unsigned int> parentList;
@@ -139,27 +146,17 @@ unsigned int PKB::addProcedure(string procName)
 
 void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 {
-	while (followsList.size() <= stmtBefore)
-		followsList.push_back(0);
 	followsList[stmtBefore] = stmtAfter;
+	followedList[stmtAfter] = stmtBefore;
 
-	while (followsStarTable.size() <= stmtAfter)
-		followsStarTable.push_back(vector<bool>(stmtAfter));
-	for (unsigned int i = 0; i < followsStarTable.size(); ++i) {
-		while (followsStarTable[i].size() <= stmtAfter)
-			followsStarTable[i].push_back(false);
-	}
-
-	followsStarTable[stmtBefore][stmtAfter] = true;
-	followsStarTable[stmtBefore][stmtBefore] = false;
-	followsStarTable[stmtAfter][stmtAfter] = false;
+	followsStarTable[make_pair(stmtBefore, stmtAfter)] = true;
 	
 	unsigned int i;
 	for (i = 1; i <= (unsigned int) stmtBefore; ++i) {
-		followsStarTable[i][stmtAfter] = followsStarTable[i][stmtBefore];
+		followsStarTable[make_pair(i, stmtAfter)] = followsStarTable[make_pair(i, stmtBefore)];
 	}
-	for (i = stmtAfter + 1; i <= followsStarTable[stmtBefore].size(); ++i) {
-		followsStarTable[stmtBefore][i] = followsStarTable[stmtBefore][i];
+	for (i = stmtAfter + 1; i <= totalLines; ++i) {
+		followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtBefore, i)];
 	}
 }
 
@@ -225,13 +222,11 @@ void PKB::addProcedureModifies(string procName, string varName)
 //represents Follows(1, 2) or Follows*(1, 2)
 bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	if (stmtNo1 >= followsList.size() || stmtNo2 >= followsList.size())
-		return false;
 	if (!star) {
 		return followsList[stmtNo1] == stmtNo2;
 	}
 	else {
-		return followsStarTable[stmtNo1][stmtNo2];
+		return followsStarTable[make_pair(stmtNo1, stmtNo2)];
 	}
 }
 
