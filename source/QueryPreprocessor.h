@@ -34,7 +34,7 @@ const string PATTERN = SPACE + "pattern" + SPACE + '(' + SYNONYM + ')' + BRACKET
 const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT + '|' + PATTERN + ")*)*)" + SEMICOLON_OPT + '$';
 
 const string TRANS_REGEX = "[*]$";					// To check for transitive closure
-const string STRING_CONTENTS = "\"([^\"]*)\"";		// Used to extract text between double quotes
+const string STRING_CONTENTS = "\"([^\"0-9\\W_]*(?:" + SYNONYM + '|' + NUMBER + "))\"";		// Used to extract text between double quotes
 
 struct SUCH_THAT_CLAUSE;
 struct PATTERN_CLAUSE;
