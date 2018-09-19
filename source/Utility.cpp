@@ -13,6 +13,10 @@ bool Utility::isInteger(string s)
 	return !s.empty() && it == s.end();*/
 }
 
+bool Utility::isUnderscore(string s) {
+	return s == "_";
+}
+
 vector<string> Utility::splitByDelimiter(string s, string delimiter)
 {
 	size_t pos = 0;

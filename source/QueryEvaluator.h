@@ -1,10 +1,20 @@
 #pragma once
-#include "QueryTree.h"
+#include "QueryObject.h"
+#include <vector>
 
 using namespace std;
 
 class QueryEvaluator {
 private:
+	QueryObject *queryObject;
 public:
-	static string evaluateQueryTree(QueryTree *queryTree);
+	QueryEvaluator(QueryObject *queryObject);
+
+	vector<string> evaluateQueryObject();
+	vector<string> evaluateSuchThatClause();
+	vector<string> evaluatePatternClause();
+	vector<string> evaluateSuchThatAndPatternClause();
+	
+	pair<string, string> getParamType(SUCH_THAT_CLAUSE clause);
+	pair<string, string> getParamType(PATTERN_CLAUSE clause);
 };
