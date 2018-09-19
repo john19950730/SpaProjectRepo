@@ -25,23 +25,26 @@ vector<string> QueryEvaluator::evaluateQueryObject() {
 
 	// One such that clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && !queryObject->hasPatternClause()) {
-		return evaluateSuchThatClause();
+		// TODO: SELECT RESULT
+		Result* result = evaluateSuchThatClause();
 	}
 
 	// One pattern clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 0 && queryObject->hasPatternClause()) {
-		return evaluatePatternClause();
+		// TODO: SELECT RESULT
+		Result* result = evaluatePatternClause();
 	}
 
 	// One such that clause and one pattern clause
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && queryObject->hasPatternClause()) {
-		return evaluateSuchThatAndPatternClause();
+		// TODO: SELECT RESULT HERE OR INSIDE CLAUSE
+		Result* result = evaluateSuchThatAndPatternClause();
 	}
 
 	return vector<string>();
 }
 
-vector<string> QueryEvaluator::evaluateSuchThatClause() {
+Result* QueryEvaluator::evaluateSuchThatClause() {
 	string selectClause = queryObject->getSelectClause().at(0);
 	map<string, string> synonymTable = queryObject->getSynonymTable();
 
@@ -70,14 +73,18 @@ vector<string> QueryEvaluator::evaluateSuchThatClause() {
 	return apiCallResponse->executeApiCall();
 }
 
-vector<string> QueryEvaluator::evaluatePatternClause() {
+Result* QueryEvaluator::evaluatePatternClause() {
 	PATTERN_CLAUSE patternClause = queryObject->getPatternClause().at(0);
 	APICallPatternClause *apiCallPatternClause = new APICallPatternClause(getParamType(patternClause),
 		patternClause, queryObject->getSelectClause().at(0), queryObject->getSynonymTable());
 	return apiCallPatternClause->executeApiCall();
 }
 
-vector<string> QueryEvaluator::evaluateSuchThatAndPatternClause() {
+Result* QueryEvaluator::evaluateSuchThatAndPatternClause() {
+	// TODO
+	Result* suchThatClauseResult = evaluateSuchThatClause();
+	Result* patternClauseResult = evaluatePatternClause();
+
 	/****
 		suchThatClauseResult - pair< map<string, vector<string> >, boolean>
 		patternClause - pair< map<string, vector<string> >, boolean>
@@ -113,23 +120,7 @@ vector<string> QueryEvaluator::evaluateSuchThatAndPatternClause() {
 
 		6) throw to select function to select the synonym accordingly, and return as vector<string>
 	******/
-
-	vector<string> suchThatClauseResult = evaluateSuchThatClause();
-	vector<string> patternClauseResult = evaluatePatternClause();
-
-	if (suchThatClauseResult.empty() || patternClauseResult.empty()) {
-		return vector<string>();
-	}
-	else {
-		vector<string> intersection;
-		sort(suchThatClauseResult.begin(), suchThatClauseResult.end());
-		sort(patternClauseResult.begin(), patternClauseResult.end());
-
-		set_intersection(suchThatClauseResult.begin(), suchThatClauseResult.end(),
-			patternClauseResult.begin(), patternClauseResult.end(), back_inserter(intersection));
-
-		return intersection;
-	}
+	return NULL;
 }
 
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {

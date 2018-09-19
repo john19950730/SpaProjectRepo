@@ -1,6 +1,7 @@
 #pragma once
 #include "QueryObjStructures.h"
 #include "APICall.h"
+#include "Result.h"
 
 #include <string>
 #include <vector>
@@ -11,13 +12,13 @@ class APICallPatternClause : public APICall {
 public:
 	APICallPatternClause(pair<string, string> paramType, PATTERN_CLAUSE patternClause,
 		string selectSynonym, map<string, string> synonymTable);
-	vector<string> executeApiCall();
+	Result* executeApiCall();
 private:
 	PATTERN_CLAUSE patternClause;
 
-	vector<string> getBooleanResponse();
-	vector<string> getIntVectorResponse();
-	vector<string> getIntStringVectorResponse();
+	BooleanResult* getBooleanResponse();
+	IntVectorResult* getIntVectorResponse();
+	IntStringPairVectorResult* getIntStringVectorResponse();
 
 	vector<string> selectResults(bool hasResults, vector<int> results);
 	string intVectorToString(vector<int> input);

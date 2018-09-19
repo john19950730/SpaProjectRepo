@@ -6,10 +6,10 @@ class StringVectorResponse : public APICallSuchThatClause {
 public:
 	StringVectorResponse();
 private:
-	vector<string> apiCallForFollows();
-	vector<string> apiCallForParent();
-	vector<string> apiCallForUses();
-	vector<string> apiCallForModifies();
+	StringVectorResult* apiCallForFollows();
+	StringVectorResult* apiCallForParent();
+	StringVectorResult* apiCallForUses();
+	StringVectorResult* apiCallForModifies();
 
 	string strVectorToString(vector<string> input);
 	vector<string> getResults(vector<string> result);

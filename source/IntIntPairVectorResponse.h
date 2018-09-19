@@ -1,15 +1,16 @@
 #pragma once
 #include "APICallSuchThatClause.h"
+#include "Result.h"
 #include <vector>
 
 class IntIntPairVectorResponse : public APICallSuchThatClause {
 public:
 	IntIntPairVectorResponse();
 private:
-	vector<string> apiCallForFollows();
-	vector<string> apiCallForParent();
-	vector<string> apiCallForUses();
-	vector<string> apiCallForModifies();
+	IntIntPairVectorResult* apiCallForFollows();
+	IntIntPairVectorResult* apiCallForParent();
+	IntIntPairVectorResult* apiCallForUses();
+	IntIntPairVectorResult* apiCallForModifies();
 
 	vector<string> getResult(vector<pair<int, int>> result);
 

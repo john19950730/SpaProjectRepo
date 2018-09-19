@@ -7,15 +7,15 @@ using namespace keywords::query;
 
 IntStringPairVectorResponse::IntStringPairVectorResponse() : APICallSuchThatClause() {}
 
-vector<string> IntStringPairVectorResponse::apiCallForFollows() {
-	return vector<string>();
+IntStringPairVectorResult* IntStringPairVectorResponse::apiCallForFollows() {
+	return NULL;
 }
 
-vector<string> IntStringPairVectorResponse::apiCallForParent() {
-	return vector<string>();
+IntStringPairVectorResult* IntStringPairVectorResponse::apiCallForParent() {
+	return NULL;
 }
 
-vector<string> IntStringPairVectorResponse::apiCallForUses() {
+IntStringPairVectorResult* IntStringPairVectorResponse::apiCallForUses() {
 	vector< pair<unsigned int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
@@ -23,13 +23,16 @@ vector<string> IntStringPairVectorResponse::apiCallForUses() {
 
 	// First synonym is of statement type - second param is definitely variable synonym type
 		
-	//result = PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)
-	results.push_back("PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)");
+	result = PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)
+	cout << "PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)" << endl;
 
-	return results;
+	IntStringPairVectorResult* intStrPairResult = 
+		new IntStringPairVectorResult(result, make_pair(firstParam, secondParam));
+
+	return intStrPairResult;
 }
 
-vector<string> IntStringPairVectorResponse::apiCallForModifies() {
+IntStringPairVectorResult* IntStringPairVectorResponse::apiCallForModifies() {
 	vector< pair<unsigned int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
@@ -37,10 +40,13 @@ vector<string> IntStringPairVectorResponse::apiCallForModifies() {
 	
 	// First synonym is of statement type - second param is definitely variable synonym type
 	
-	//result = PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)
-	results.push_back("PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)");
+	result = PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)
+	cout << "PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)" << endl;
 
-	return results;
+	IntStringPairVectorResult* intStrPairResult =
+		new IntStringPairVectorResult(result, make_pair(firstParam, secondParam));
+
+	return intStrPairResult;
 }
 
 vector<string> IntStringPairVectorResponse::getResult(vector<pair<int, string>> result) {

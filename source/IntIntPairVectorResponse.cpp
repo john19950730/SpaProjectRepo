@@ -3,36 +3,42 @@
 
 IntIntPairVectorResponse::IntIntPairVectorResponse() : APICallSuchThatClause() {}
 
-vector<string> IntIntPairVectorResponse::apiCallForFollows() {
+IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForFollows() {
 	vector< pair<unsigned int, unsigned int> > result;
 	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
 	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
 	vector<string> results;
 
-	//result = PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)
-	results.push_back("PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)");
+	result = PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)
+	cout << "PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)" << endl;
+
+	IntIntPairVectorResult* intIntPairVectorResult 
+		= new IntIntPairVectorResult(result, make_pair(suchThatClause.firstParameter, suchThatClause.secondParameter));
 	
-	return results;
+	return intIntPairVectorResult;
 }
 
-vector<string> IntIntPairVectorResponse::apiCallForParent() {
+IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForParent() {
 	vector< pair<unsigned int, unsigned int> > result;
 	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
 	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
 	vector<string> results;
 
-	//result = PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)
-	results.push_back("PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)");
+	result = PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)
+	cout << "PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)" << endl;
 	
-	return results;
+	IntIntPairVectorResult* intIntPairVectorResult
+		= new IntIntPairVectorResult(result, make_pair(suchThatClause.firstParameter, suchThatClause.secondParameter));
+
+	return intIntPairVectorResult;
 }
 
-vector<string> IntIntPairVectorResponse::apiCallForUses() {
-	return vector<string>();
+IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForUses() {
+	return NULL;
 }
 
-vector<string> IntIntPairVectorResponse::apiCallForModifies() {
-	return vector<string>();
+IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForModifies() {
+	return NULL;
 }
 
 vector<string> IntIntPairVectorResponse::getResult(vector<pair<int, int>> result) {

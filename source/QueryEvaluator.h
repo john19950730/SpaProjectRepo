@@ -1,4 +1,5 @@
 #pragma once
+#include "Result.h"
 #include "QueryObject.h"
 #include <vector>
 
@@ -11,9 +12,9 @@ public:
 	QueryEvaluator(QueryObject *queryObject);
 
 	vector<string> evaluateQueryObject();
-	vector<string> evaluateSuchThatClause();
-	vector<string> evaluatePatternClause();
-	vector<string> evaluateSuchThatAndPatternClause();
+	Result* evaluateSuchThatClause();
+	Result* evaluatePatternClause();
+	Result* evaluateSuchThatAndPatternClause();
 	
 	pair<string, string> getParamType(SUCH_THAT_CLAUSE clause);
 	pair<string, string> getParamType(PATTERN_CLAUSE clause);
