@@ -15,6 +15,10 @@ public:
 private:
 	PATTERN_CLAUSE patternClause;
 
+	vector<string> getBooleanResponse();
+	vector<string> getIntVectorResponse();
+	vector<string> getIntStringVectorResponse();
+
 	vector<string> selectResults(bool hasResults, vector<int> results);
 	string intVectorToString(vector<int> input);
 	vector<string> convertVectorIntToVectorStr(vector<int> input);

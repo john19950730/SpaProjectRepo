@@ -151,7 +151,7 @@ pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
 }
 
 pair<string, string> QueryEvaluator::getParamType(PATTERN_CLAUSE clause) {
-	pair<string, string> paramType(SYNONYM, EXPRESSION);
+	pair<string, string> paramType(SYNONYM, VARIABLE);
 	
 	if (!clause.firstParamIsSynonym) {
 		paramType.first = VARIABLE;
@@ -159,6 +159,8 @@ pair<string, string> QueryEvaluator::getParamType(PATTERN_CLAUSE clause) {
 
 	if (Utility::isUnderscore(clause.firstParam)) paramType.first = UNDERSCORE;
 	if (Utility::isUnderscore(clause.secondParam)) paramType.second = UNDERSCORE;
+
+	if (Utility::isInteger(clause.secondParam)) paramType.second = CONSTANT;
 
 	return paramType;
 }

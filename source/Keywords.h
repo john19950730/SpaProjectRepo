@@ -32,5 +32,6 @@ namespace keywords {
 		const std::string VARIABLE = "variable";
 		const std::string UNDERSCORE = "underscore";
 		const std::string EXPRESSION = "expression";
+		const std::string CONSTANT = "constant";
 	}
 };
