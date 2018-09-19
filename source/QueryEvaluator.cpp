@@ -25,14 +25,16 @@ vector<string> QueryEvaluator::evaluateQueryObject() {
 
 	// One such that clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && !queryObject->hasPatternClause()) {
-		// TODO: SELECT RESULT
 		Result* result = evaluateSuchThatClause();
+		map < string, vector<string> > selectMap = result->toComparableFormat().first;
+		return selectFrom(selectMap);
 	}
 
 	// One pattern clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 0 && queryObject->hasPatternClause()) {
-		// TODO: SELECT RESULT
 		Result* result = evaluatePatternClause();
+		map < string, vector<string> > selectMap = result->toComparableFormat().first;
+		return selectFrom(selectMap);
 	}
 
 	// One such that clause and one pattern clause
@@ -122,6 +124,12 @@ Result* QueryEvaluator::evaluateSuchThatAndPatternClause() {
 	******/
 	return NULL;
 }
+
+vector<string> QueryEvaluator::selectFrom(map < string, vector<string> > selectMap) {
+	string selectClause = queryObject->getSelectClause().at(0);
+	return selectMap[selectClause];
+}
+
 
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
 	pair<string, string> paramType(SYNONYM, SYNONYM);
