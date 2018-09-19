@@ -1,5 +1,6 @@
 #include "StringStringPairVectorResponse.h"
 #include "PKB.h"
+#include "Keywords.h"
 
 StringStringPairVectorResponse::StringStringPairVectorResponse() : APICallSuchThatClause() {}
 
@@ -13,16 +14,22 @@ vector<string> StringStringPairVectorResponse::apiCallForParent() {
 
 vector<string> StringStringPairVectorResponse::apiCallForUses() {
 	vector< pair<string, string> > result;
-	cout << "PKB::getAllProcedureUsesVariablePairs()" << endl;
-	//result = PKB::getAllProcedureUsesVariablePairs();
-	return getResult(result);
+	vector<string> results;
+
+	//result = PKB::getAllProcedureUsesVariablePairs(); // Uses(p, v)
+	results.push_back("PKB::getAllProcedureUsesVariablePairs(); // Uses(p, v)");
+
+	return results;
 }
 
 vector<string> StringStringPairVectorResponse::apiCallForModifies() {
 	vector< pair<string, string> > result;
-	cout << "PKB::getAllProcedureModifiesVariablePairs()" << endl;
-	//result = PKB::getAllProcedureModifiesVariablePairs();
-	return getResult(result);
+	vector<string> results;
+
+	//result = PKB::getAllProcedureModifiesVariablePairs(); // Modifies(p, v)
+	results.push_back("PKB::getAllProcedureModifiesVariablePairs(); // Modifies(p, v)");
+
+	return results;
 }
 
 vector<string> StringStringPairVectorResponse::getResult(vector<pair<string, string>> result) {
