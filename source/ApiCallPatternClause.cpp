@@ -31,35 +31,61 @@ vector<string> APICallPatternClause::executeApiCall() {
 vector<string> APICallPatternClause::getIntVectorResponse() {
 	vector<unsigned int> result;
 	vector<string> results;
+	string firstParam = patternClause.firstParam;
+	string secondParam = patternClause.secondParam;
 
 	if (paramType == make_pair(VARIABLE, UNDERSCORE)) { // a("v", _)
 		// Becomes Modifies(a, "v") 
 		//result = PKB::getAllStmtThatModifiesVariable(ASSIGNMENT_VAR, patternClause.firstParam);
-		results.push_back("PKB::getAllStmtThatModifiesVariable(ASSIGNMENT_VAR, patternClause.firstParam) // Modifies(a, 'v') ");
+		results.push_back("PKB::getAllStmtThatModifiesVariable(ASSIGNMENT_VAR, patternClause.firstParam) // a('v', _) ");
 	}
 	else if (paramType == make_pair(UNDERSCORE, CONSTANT)) { // a(_, _"5"_)
 		// Uses(a, "5")
+		//result = PKB::getAllAssignsWithConstant(secondParam);
+		results.push_back("PKB::getAllAssignsWithConstant(secondParam) // a(_, _'5'_)");
 	}
 	else if (paramType == make_pair(UNDERSCORE, VARIABLE)) { // a(_,_"var"_)
 		// Uses(a, "var")
 		//result = PKB::getAllStmtsThatUsesVariable(ASSIGNMENT_VAR, patternClause.secondParam);
-		results.push_back("PKB::getAllStmtsThatUsesVariable(ASSIGNMENT_VAR, patternClause.secondParam) // Uses(a, 'var')");
+		results.push_back("PKB::getAllStmtsThatUsesVariable(ASSIGNMENT_VAR, patternClause.secondParam)  // a(_,_'var'_)");
 	}
 	else if (paramType == make_pair(VARIABLE, CONSTANT)) { // a('v', _'5'_)
 		// Modifies(a,"v") - Get all assignments that modifies "v"
+		vector<unsigned int> all = PKB::getAllStmtThatModifiesVariable(ASSIGNMENT_VAR, firstParam);
+
 		// Uses(a, "5") - Loop through all assignments and get the assignment that uses constant 5
+		for (unsigned int i : all) {
+			if (PKB::isAssignmentUsesConstant(i, secondParam)) {
+				result.push_back(i);
+			}
+		}
+
+		results.push_back("// a('v', _'5'_)");
 	}
 	else if (paramType == make_pair(VARIABLE, VARIABLE)) { // a('v', _'h'_)
 		// Modifies(a,"v") - Get all assignments that modifies "v"
+		vector<unsigned int> all = PKB::getAllStmtThatModifiesVariable(ASSIGNMENT_VAR, firstParam);
+
 		// Uses(a, "h") - Loop through all assignments and get the assignment that uses variable h
+		for (unsigned int i : all) {
+			if (PKB::isUses(i, secondParam)) {
+				result.push_back(i);
+			}
+		}
+
+		results.push_back("// a('v', _'h'_)");
 	}
 	return results;
 }
 
 vector<string> APICallPatternClause::getBooleanResponse() {
-	// a(_,_)
-	return vector<string>();
+	vector<string> results;
 
+	// a(_,_)
+	//PKB::hasAssignmentStmt();
+	results.push_back("// a(_,_)");
+
+	return results;
 }
 
 vector<string> APICallPatternClause::getIntStringVectorResponse() {
