@@ -213,22 +213,24 @@ PATTERN_CLAUSE QueryPreprocessor::createPatternClause(string patternSynonym, str
 	// check if param1 is synonym
 	bool paramIsSynonym1 = existsInSynonymTable(param1);
 
-	if (param2 != "_") {
-		// convert param2 into postfix
-		regex exprSyntax(STRING_CONTENTS);
-		smatch exprMatches;
-		regex_search(param2, exprMatches, exprSyntax);
-		string param2 = exprMatches[1].str();
-		//string postfix = Utility::convertInfixToPostfix(paramExpr);
-		//param2 = postfix;
-		//cout << "postfix: " << postfix << endl;
-	}
-
 	// check if param2 is a partial expression
 	bool paramIsPartialExpression = false;
 	if (param2 != "_" && param2.front() == '_') {
 		paramIsPartialExpression = true;
 	}
+
+	if (param2 != "_") {
+		regex exprSyntax(STRING_CONTENTS);
+		smatch exprMatches;
+		regex_search(param2, exprMatches, exprSyntax);
+		param2 = exprMatches[1].str();
+		// convert param2 into postfix
+		//string postfix = Utility::convertInfixToPostfix(paramExpr);
+		//param2 = postfix;
+		//cout << "postfix: " << postfix << endl;
+	}
+
+	cout << param2 << endl;
 
 	clause = { patternSynonym, stripDoubleQuotes(param1), param2, paramIsPartialExpression, paramIsSynonym1 };
 	return clause;
