@@ -4,7 +4,7 @@
 IntIntPairVectorResponse::IntIntPairVectorResponse() : APICallSuchThatClause() {}
 
 vector<string> IntIntPairVectorResponse::apiCallForFollows() {
-	vector< pair<int, int> > result;
+	vector< pair<unsigned int, unsigned int> > result;
 	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
 	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
 	vector<string> results;
@@ -16,7 +16,7 @@ vector<string> IntIntPairVectorResponse::apiCallForFollows() {
 }
 
 vector<string> IntIntPairVectorResponse::apiCallForParent() {
-	vector< pair<int, int> > result;
+	vector< pair<unsigned int, unsigned int> > result;
 	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
 	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
 	vector<string> results;
