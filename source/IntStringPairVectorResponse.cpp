@@ -2,6 +2,7 @@
 #include "PKB.h"
 #include "Keywords.h"
 
+using namespace keywords::clauseParamType;
 using namespace keywords::query;
 
 IntStringPairVectorResponse::IntStringPairVectorResponse() : APICallSuchThatClause() {}
@@ -15,35 +16,31 @@ vector<string> IntStringPairVectorResponse::apiCallForParent() {
 }
 
 vector<string> IntStringPairVectorResponse::apiCallForUses() {
-	vector< pair<int, string> > result;
+	vector< pair<unsigned int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
+	vector<string> results;
 
-	if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
-		cout << "PKB::getAllAssignmentUsesVariablePairs()" << endl;
-		//result = PKB::getAllAssignmentUsesVariablePairs();
+	if (paramType == make_pair(SYNONYM, SYNONYM)) {	// First synonym is of statement type - second param is definitely variable synonym type
+		//result = PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)
+		results.push_back("PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)");
 	}
-	else if (synonymTable[firstParam] == STMT_VAR) {
-		cout << "PKB::getAllStmtUsesVariablePairs()" << endl;
-		//result = PKB::getAllStmtUsesVariablePairs();
-	}
-	return getResult(result);
+
+	return results;
 }
 
 vector<string> IntStringPairVectorResponse::apiCallForModifies() {
-	vector< pair<int, string> > result;
+	vector< pair<unsigned int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
+	vector<string> results;
+	
+	if (paramType == make_pair(SYNONYM, SYNONYM)) {	// First synonym is of statement type - second param is definitely variable synonym type
+		result = PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)
+		results.push_back("PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)");
+	}
 
-	if (synonymTable[firstParam] == ASSIGNMENT_VAR) {
-		cout << "PKB::getAllAssignmentModifiesVariablePairs()" << endl;
-		//result = PKB::getAllAssignmentModifiesVariablePairs();
-	}
-	else if (synonymTable[firstParam] == STMT_VAR) {
-		cout << "PKB::getAllStmtModifiesVariablePairs()" << endl;
-		//result = PKB::getAllStmtModifiesVariablePairs();
-	}
-	return getResult(result);
+	return results;
 }
 
 vector<string> IntStringPairVectorResponse::getResult(vector<pair<int, string>> result) {
