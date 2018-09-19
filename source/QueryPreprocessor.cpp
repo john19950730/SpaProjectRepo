@@ -299,7 +299,6 @@ bool QueryPreprocessor::arePatternParamsValid(string param1, string param2) {
 		smatch matches;
 		if (regex_search(param2, matches, exprSyntax)) {
 			string expr = matches[1].str();
-			cout << expr << endl;
 		}
 		else paramValid2 = false;
 		/*if (!Utility::validateInfixExpression(expr)) {
