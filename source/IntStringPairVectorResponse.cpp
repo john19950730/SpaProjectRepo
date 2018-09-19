@@ -21,10 +21,10 @@ vector<string> IntStringPairVectorResponse::apiCallForUses() {
 	string secondParam = suchThatClause.secondParameter;
 	vector<string> results;
 
-	if (paramType == make_pair(SYNONYM, SYNONYM)) {	// First synonym is of statement type - second param is definitely variable synonym type
-		//result = PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)
-		results.push_back("PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)");
-	}
+	// First synonym is of statement type - second param is definitely variable synonym type
+		
+	//result = PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)
+	results.push_back("PKB::getAllStmtUsesVariablePairs(synonymTable[firstParam]); // Uses(a, v)");
 
 	return results;
 }
@@ -35,10 +35,10 @@ vector<string> IntStringPairVectorResponse::apiCallForModifies() {
 	string secondParam = suchThatClause.secondParameter;
 	vector<string> results;
 	
-	if (paramType == make_pair(SYNONYM, SYNONYM)) {	// First synonym is of statement type - second param is definitely variable synonym type
-		result = PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)
-		results.push_back("PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)");
-	}
+	// First synonym is of statement type - second param is definitely variable synonym type
+	
+	//result = PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)
+	results.push_back("PKB::getAllStmtModifiesVariablePairs(synonymTable[firstParam]); // Modifies(a, v)");
 
 	return results;
 }
