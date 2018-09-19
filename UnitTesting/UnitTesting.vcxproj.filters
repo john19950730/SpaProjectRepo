@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\SPATesting">
+      <UniqueIdentifier>{b7cfccee-2d0b-4776-ac7c-e27575f3fbec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -28,6 +31,9 @@
     </ClCompile>
     <ClCompile Include="TestAST.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CodeParserTest.cpp">
+      <Filter>Source Files\SPATesting</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
