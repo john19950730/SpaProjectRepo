@@ -25,7 +25,6 @@ vector<string> QueryEvaluator::evaluateQueryObject() {
 
 	// One such that clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && !queryObject->hasPatternClause()) {
-		cout << "Such that clause only" << endl;
 		return evaluateSuchThatClause();
 	}
 
