@@ -54,12 +54,12 @@ static vector<unsigned int> synonymsList[] = { stmtsList, assignList, ifList, wh
 ****************************************/
 
 // element at index i means Follows(i, element) holds
-static vector<int> followsList;
+static vector<unsigned int> followsList;
 // element at index i, j means Follows*(i, j) holds
 static vector< vector<bool> > followsStarTable;
 
 // element at index i means Parent(element, i) holds
-static vector<int> parentList;
+static vector<unsigned int> parentList;
 // element at index i, j means Parent*(i, j) holds
 static vector< vector<bool> > parentStarTable;
 
@@ -263,38 +263,38 @@ bool PKB::hasFollowsPair(bool star)
 }
 
 //represents Follows(a, b) or Follows*(a, b)
-vector<pair<int, int>> PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
+vector<pair<unsigned int, unsigned int>> PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
 {
 	//TODO
-	return vector<pair<int, int>>();
+	return vector<pair<unsigned int, unsigned int>>();
 }
 
 //represents Follows(a, _) or Follows*(a, _)
-vector<int> PKB::getAllFollowedStmts(string synonym1, bool star)
+vector<unsigned int> PKB::getAllFollowedStmts(string synonym1, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 //represents Follows(a, 2) or Follows*(a, 2)
-vector<int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
+vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 //represents: Follows(_, b) or Follows*(_, b)
-vector<int> PKB::getAllFollowsStmts(string synonym2, bool star)
+vector<unsigned int> PKB::getAllFollowsStmts(string synonym2, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 //represents: Follows(1, b) or Follows*(1, b)
-vector<int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
+vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 /****************************************
@@ -338,38 +338,38 @@ bool PKB::hasParentPair(bool star)
 }
 
 //represents: Parent(a, b) or Parent*(a, b)
-vector<pair<int, int>> PKB::getAllParentPair(string synonym1, string synonym2, bool star)
+vector<pair<unsigned int, unsigned int>> PKB::getAllParentPair(string synonym1, string synonym2, bool star)
 {
 	//TODO
-	return vector<pair<int, int>>();
+	return vector<pair<unsigned int, unsigned int>>();
 }
 
 //represents: Parent(a, _) or Parent*(a, _)
-vector<int> PKB::getAllParentStmts(string synonym1, bool star)
+vector<unsigned int> PKB::getAllParentStmts(string synonym1, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 //represents: Parent(a, 2) or Parent*(a, 2)
-vector<int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned int stmtNo2, bool star)
+vector<unsigned int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned int stmtNo2, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 //represents: Parent(_, b) or Parent*(_, b)
-vector<int> PKB::getAllChildStmts(string synonym2, bool star)
+vector<unsigned int> PKB::getAllChildStmts(string synonym2, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 //represents: Parent(1, b) or Parent*(1, b)
-vector<int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string synonym2, bool star)
+vector<unsigned int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string synonym2, bool star)
 {
 	//TODO
-	return vector<int>();
+	return vector<unsigned int>();
 }
 
 /****************************************
@@ -581,6 +581,21 @@ vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 		});
 	});
 	return result;
+}
+
+vector<unsigned int> PKB::getAllAssignsWithConstant(string constant)
+{
+	return vector<unsigned int>();
+}
+
+bool PKB::hasAssignmentStmt()
+{
+	return false;
+}
+
+bool PKB::isAssignmentUsesConstant(unsigned int stmtNo, string constant)
+{
+	return false;
 }
 
 /****************************************
