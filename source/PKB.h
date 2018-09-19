@@ -85,6 +85,11 @@ public:
 	static vector<string> getAllProceduresThatModifies(); // Modifies(p, _)
 	static vector< pair<string, string> > getAllProcedureModifiesVariablePairs(); // Modifies(p, v)
 
+	// PKB pattern query
+	static vector<unsigned int> getAllAssignsWithConstant(string constant);
+	static bool hasAssignmentStmt(); // a(_, _)
+	static bool isAssignmentUsesConstant(unsigned int stmtNo, string constant);
+
 	// PKB synonyms query
 	static vector<string> getVariables();
 	static vector<unsigned int> getAllStmts();

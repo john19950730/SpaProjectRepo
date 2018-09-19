@@ -583,6 +583,21 @@ vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 	return result;
 }
 
+vector<unsigned int> PKB::getAllAssignsWithConstant(string constant)
+{
+	return vector<unsigned int>();
+}
+
+bool PKB::hasAssignmentStmt()
+{
+	return false;
+}
+
+bool PKB::isAssignmentUsesConstant(unsigned int stmtNo, string constant)
+{
+	return false;
+}
+
 /****************************************
 |										|
 |			PKB Synonyms Query			|
