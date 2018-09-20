@@ -36,14 +36,18 @@ pair < map<string, vector<string>>, bool > BooleanResult::toComparableFormat() {
 	return convertedResult;
 }
 
+bool BooleanResult::isSelectSynonymFound(string selectSynonym) {
+	return false;	// shouldn't reach here 
+}
+
 /*** IntVectorResult ***/
 
 IntVectorResult::IntVectorResult(vector<unsigned int> result, string synonym)
 {
 	//this->result = result;
-	//this->synonym = synonym;
+	this->synonym = synonym;
 	this->result = { 1, 2, 4, 4, 5, 7 };
-	this->synonym = "a";
+	//this->synonym = "a";
 }
 
 vector<unsigned int> IntVectorResult::getResult()
@@ -71,14 +75,18 @@ pair < map<string, vector<string>>, bool > IntVectorResult::toComparableFormat()
 	return convertedResult;
 }
 
+bool IntVectorResult::isSelectSynonymFound(string selectSynonym) {
+	return selectSynonym == this->synonym;
+}
+
 /*** StringVectorResult ***/
 
 StringVectorResult::StringVectorResult(vector<string> result, string synonym)
 {
 	//this->result = result;
-	//this->synonym = synonym;
+	this->synonym = synonym;
 	this->result = { "p", "q", "r", "s", "s", "t", "w" };
-	this->synonym = "v";
+	//this->synonym = "v";
 }
 
 vector<string> StringVectorResult::getResult()
@@ -106,14 +114,18 @@ pair < map<string, vector<string>>, bool > StringVectorResult::toComparableForma
 	return convertedResult;
 }
 
+bool StringVectorResult::isSelectSynonymFound(string selectSynonym) {
+	return selectSynonym == this->synonym;
+}
+
 /*** IntIntPairVectorResult ***/
 
 IntIntPairVectorResult::IntIntPairVectorResult(vector<pair<unsigned int, unsigned int>> result, pair<string, string> synonym)
 {
 	//this->result = result;
-	//this->synonym = synonym;
+	this->synonym = synonym;
 	this->result = { make_pair(1, 2), make_pair(3, 4), make_pair(6, 7), make_pair(7, 8) };
-	this->synonym = make_pair("s1", "s2");
+	//this->synonym = make_pair("s1", "s2");
 }
 
 vector<pair<unsigned int, unsigned int>> IntIntPairVectorResult::getResult()
@@ -144,14 +156,18 @@ pair < map<string, vector<string>>, bool > IntIntPairVectorResult::toComparableF
 	return convertedResult;
 }
 
+bool IntIntPairVectorResult::isSelectSynonymFound(string selectSynonym) {
+	return (selectSynonym == this->synonym.first || selectSynonym == this->synonym.second);
+}
+
 /*** IntStringPairVectorResult ***/
 
 IntStringPairVectorResult::IntStringPairVectorResult(vector<pair<unsigned int, string>> result, pair<string, string> synonym)
 {
 	//this->result = result;
-	//this->synonym = synonym;
+	this->synonym = synonym;
 	this->result = { make_pair(3, "q"), make_pair(5, "r"), make_pair(5, "t"), make_pair(9, "q") };
-	this->synonym = make_pair("a", "v");
+	//this->synonym = make_pair("a", "v");
 }
 
 vector<pair<unsigned int, string>> IntStringPairVectorResult::getResult()
@@ -182,14 +198,18 @@ pair < map<string, vector<string>>, bool > IntStringPairVectorResult::toComparab
 	return convertedResult;
 }
 
+bool IntStringPairVectorResult::isSelectSynonymFound(string selectSynonym) {
+	return (selectSynonym == this->synonym.first || selectSynonym == this->synonym.second);
+}
+
 /*** StringStringPairVectorResult ***/
 
 StringStringPairVectorResult::StringStringPairVectorResult(vector<pair<string, string>> result, pair<string, string> synonym)
 {
 	//this->result = result;
-	//this->synonym = synonym;
+	this->synonym = synonym;
 	this->result = { make_pair("proc1", "w"), make_pair("proc1", "p"), make_pair("proc3", "p") };
-	this->synonym = make_pair("p", "v");
+	//this->synonym = make_pair("p", "v");
 }
 
 vector<pair<string, string>> StringStringPairVectorResult::getResult()
@@ -220,6 +240,9 @@ pair < map<string, vector<string>>, bool > StringStringPairVectorResult::toCompa
 	return convertedResult;
 }
 
+bool StringStringPairVectorResult::isSelectSynonymFound(string selectSynonym) {
+	return (selectSynonym == this->synonym.first || selectSynonym == this->synonym.second);
+}
 
 /*** MapBooleanPairResult ***/
 
@@ -239,4 +262,8 @@ MapBooleanPairResult::MapBooleanPairResult(pair<map<string, vector<string>>, boo
 
 pair < map<string, vector<string>>, bool > MapBooleanPairResult::toComparableFormat() {
 	return this->comparableFormat;
+}
+
+bool MapBooleanPairResult::isSelectSynonymFound(string selectSynonym) {
+	return false;	// shouldn't reach here 
 }
