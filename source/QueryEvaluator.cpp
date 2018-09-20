@@ -35,8 +35,7 @@ vector<string> QueryEvaluator::evaluateQueryObject() {
 
 	// One such that clause and one pattern clause
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && queryObject->hasPatternClause()) {
-		// TODO: SELECT RESULT HERE OR INSIDE CLAUSE
-		Result* result = evaluateSuchThatAndPatternClause();
+		return getResults(evaluateSuchThatClause(), evaluatePatternClause());
 	}
 
 	return vector<string>();
@@ -78,69 +77,43 @@ Result* QueryEvaluator::evaluatePatternClause() {
 	return apiCallPatternClause->executeApiCall();
 }
 
-Result* QueryEvaluator::evaluateSuchThatAndPatternClause() {
-	// TODO
-	Result* suchThatClauseResult = evaluateSuchThatClause();
-	Result* patternClauseResult = evaluatePatternClause();
+vector<string> QueryEvaluator::getResults(Result* firstResult, Result* secondResult) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	string synonymType = queryObject->getSynonymTable()[selectSynonym];
 
-	suchThatClauseResult->printMap();
-	patternClauseResult->printMap();
+	map<string, vector<string>> firstResultTable = firstResult->toComparableFormat().first;
+	map<string, vector<string>> secondResultTable = secondResult->toComparableFormat().first;
 
-	 map<string, vector<string>> suchThatTable = suchThatClauseResult->toComparableFormat().first;
-	 map<string, vector<string>> patternTable = patternClauseResult->toComparableFormat().first;
-	 bool isSuchThatClauseValid = suchThatClauseResult->toComparableFormat().second;
-	 bool isPatternClauseValid = patternClauseResult->toComparableFormat().second;
+	bool isFirstClauseValid = firstResult->toComparableFormat().second;
+	bool isSecondClauseValid = secondResult->toComparableFormat().second;
 
-	 // For clauses that only return true/false
-	 if (!isSuchThatClauseValid || !isPatternClauseValid) {
-		 // empty result, bool = false - no results
-		 MapBooleanPairResult *result = new MapBooleanPairResult(false);
-		 return result;
-	 }
+	// For clauses that returns false or clauses that returns no results
+	if (!isFirstClauseValid || !isSecondClauseValid) {
+		return APICall::apiCallForNoResults();
+	}
 
-	 // Not a true/false clause but returns no results
-	 if (isSuchThatClauseValid && isPatternClauseValid && suchThatTable.empty() && patternTable.empty()) {
-		 // empty result, bool = true - might still have results after selecting
-		 MapBooleanPairResult *result = new MapBooleanPairResult(true);
-		 return result;
-	 }
+	// Both clauses are boolean response which returns true
+	if (firstResultTable.empty() && secondResultTable.empty()) {
+		return APICall::apiCallForImmediateResults(synonymType);
+	}
 
-	/****
-		suchThatClauseResult - pair< map<string, vector<string> >, boolean>
-		patternClause - pair< map<string, vector<string> >, boolean>
+	// Both clauses have results but select synonym is not found in any of the clause
+	if (!firstResult->isSelectSynonymFound(selectSynonym) && !secondResult->isSelectSynonymFound(selectSynonym)) {
+		return APICall::apiCallForImmediateResults(synonymType);
+	}
 
-		BooleanResponse api call returns boolean and not a vector of results, 
-		hence, manually we need to return an empty vector with the boolean value.
+	/*** TODO: MERGING AND INTERSECTION HERE ***/
+	
+	map < string, vector<string> >::iterator it;
+	// No common synonym
+	for (it = firstResultTable.begin(); it != firstResultTable.end(); it++) {
+		string key = it->first;
+		if (secondResultTable.count(key) > 0) return true;	// One common key is found
+	}
 
-		E.g.	Uses(1, "v") returns true - pair<emptyMap, true> will be returned
-				Modifies(1,"v") returns false - pair(emptyMap, false) will be returned
 
-		1) Check if any of the boolean value is false
-			if(any of the boolean value is false) return noResults()
-
-		2) For clauses without synonyms (e.g. Uses(1,"v"), Follows(1,2))
-			if(both maps() are empty && both boolean value are true)
-				return immediateResults();
-			else if(any of the maps are empty && any of the boolean value is false)
-				return noResults();
-
-		3) Check if the select synonym is found in any of the synonym between the two clauses
-			if(select synonym is not found)
-				return immediateResults()
-
-		4) Check if there are commmon synonyms between the two clauses
-			if(no common synonym)
-			
-			else if(two common synonyms)
-				get intersection between the two maps
-
-			else if(one common synonym)
-		
-		5) map of <string, vector<string>> is built
-
-		6) throw to select function to select the synonym accordingly, and return as vector<string>
-	******/
-	return NULL;
+	// One common synonym
+	// Two common synonyms
 }
 
 vector<string> QueryEvaluator::getResults(Result* result) {
@@ -151,29 +124,26 @@ vector<string> QueryEvaluator::getResults(Result* result) {
 
 	result->printMap();
 
-	// Case 1: Clause is not valid - No results returned from clause
+	// Case 1: Clause returns false or Clause has no results
 	if (!isClauseValid) {
-		cout << "Case 1 - Clause is not valid" << endl;
+		cout << "Case 1: Clause returns false or Clause has no results" << endl;
 		return APICall::apiCallForNoResults();
 	}
 
-	// Case 2: Clause is valid but map is empty - Clause is a true/false clause
-	// select a such that Modifies(1,"v");
-	if (isClauseValid && selectMap.empty()) {
-		cout << "Case 2 - Result is Boolean Type" << endl;
+	// Case 2: Clause is Boolean Response that returns true
+	if (selectMap.empty()) {
+		cout << " Case 2: Clause is Boolean Response that returns true" << endl;
 		return APICall::apiCallForImmediateResults(synonymType);
 	}
 
-	// Case 3: Clause is valid and map is not empty and select synonym is not found in the clause
-	// select a such that Modifies(a1,"v");
-	if (isClauseValid && !selectMap.empty() && !result->isSelectSynonymFound(selectSynonym)) {
-		cout << "Case 3 - Synonym not in clause" << endl;
+	// Case 3: Clause has results but select synonym is not found in the clause
+	if (!result->isSelectSynonymFound(selectSynonym)) {
+		cout << "Case 3: Clause has results but select synonym is not found in the clause" << endl;
 		return APICall::apiCallForImmediateResults(synonymType);
 	}
 	
-	// Case 3: Clause is valid and map is not empty - Select the synonym from the results map
-	// select a such that Modifies(a,"v");
-	cout << "Case 4 - Select From Map" << endl;
+	// Case 4: Clause has results and select synonym is found in the clause
+	cout << "Case 4: Clause has results and select synonym is found in the clause" << endl;
 	return selectFrom(selectMap);
 }
 

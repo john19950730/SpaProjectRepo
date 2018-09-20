@@ -17,6 +17,7 @@ public:
 	Result* evaluateSuchThatAndPatternClause();
 	
 	vector<string> getResults(Result* result);
+	vector<string> getResults(Result* firstResult, Result* secondResult);
 
 	pair<string, string> getParamType(SUCH_THAT_CLAUSE clause);
 	pair<string, string> getParamType(PATTERN_CLAUSE clause);
