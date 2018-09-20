@@ -15,7 +15,10 @@ public:
 	Result* evaluateSuchThatClause();
 	Result* evaluatePatternClause();
 	
+	vector<string> combineResults(Result* firstResult, Result* secondResult);
 	vector<string> noCommonSynonym(Result* firstResult, Result* secondResult);
+	vector<string> oneCommonSynonym(Result* firstResult, Result* secondResult, vector<string> commonKeys);
+	vector<string> twoCommonSynonyms(Result* firstResult, Result* secondResult, vector<string> commonKeys);
 
 	vector<string> getResults(Result* result);
 	vector<string> getResults(Result* firstResult, Result* secondResult);
