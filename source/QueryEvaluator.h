@@ -14,8 +14,9 @@ public:
 	vector<string> evaluateQueryObject();
 	Result* evaluateSuchThatClause();
 	Result* evaluatePatternClause();
-	Result* evaluateSuchThatAndPatternClause();
 	
+	vector<string> noCommonSynonym(Result* firstResult, Result* secondResult);
+
 	vector<string> getResults(Result* result);
 	vector<string> getResults(Result* firstResult, Result* secondResult);
 

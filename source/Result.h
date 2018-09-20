@@ -12,6 +12,7 @@ class Result {
 public:
 	virtual pair < map<string, vector<string>>, bool > toComparableFormat() = 0;
 	virtual bool isSelectSynonymFound(string selectSynonym) = 0;
+	virtual vector<string> getSynonyms() = 0;
 	void printMap();
 };
 
@@ -21,6 +22,7 @@ public:
 	bool getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 	bool isSelectSynonymFound(string selectSynonym);
+	vector<string> getSynonyms();
 private:
 	bool result;
 };
@@ -31,6 +33,7 @@ public:
 	vector<unsigned int> getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 	bool isSelectSynonymFound(string selectSynonym);
+	vector<string> getSynonyms();
 private:
 	vector<unsigned int> result;
 	string synonym;
@@ -42,6 +45,7 @@ public:
 	vector<string> getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 	bool isSelectSynonymFound(string selectSynonym);
+	vector<string> getSynonyms();
 private:
 	vector<string> result;
 	string synonym;
@@ -53,6 +57,7 @@ public:
 	vector<pair<unsigned int, unsigned int>> getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 	bool isSelectSynonymFound(string selectSynonym);
+	vector<string> getSynonyms();
 private:
 	vector<pair<unsigned int, unsigned int>> result;
 	pair<string, string> synonym;
@@ -64,6 +69,7 @@ public:
 	vector<pair<unsigned int, string>> getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 	bool isSelectSynonymFound(string selectSynonym);
+	vector<string> getSynonyms();
 private:
 	vector<pair<unsigned int, string>> result;
 	pair<string, string> synonym;
@@ -75,6 +81,7 @@ public:
 	vector<pair<string, string>> getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 	bool isSelectSynonymFound(string selectSynonym);
+	vector<string> getSynonyms();
 private:
 	vector<pair<string, string>> result;
 	pair<string, string> synonym;
@@ -87,6 +94,7 @@ public:
 	MapBooleanPairResult(pair<map<string, vector<string>>, bool> comparableFormat);
 	pair<map<string, vector<string>>, bool> toComparableFormat();
 	bool isSelectSynonymFound(string selectSynonym);
+	vector<string> getSynonyms();
 private:
 	pair<map<string, vector<string>>, bool> comparableFormat;
 };

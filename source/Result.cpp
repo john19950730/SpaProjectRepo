@@ -40,6 +40,10 @@ bool BooleanResult::isSelectSynonymFound(string selectSynonym) {
 	return false;	// shouldn't reach here 
 }
 
+vector<string> BooleanResult::getSynonyms() {
+	return vector<string>();
+}
+
 /*** IntVectorResult ***/
 
 IntVectorResult::IntVectorResult(vector<unsigned int> result, string synonym)
@@ -79,6 +83,13 @@ bool IntVectorResult::isSelectSynonymFound(string selectSynonym) {
 	return selectSynonym == this->synonym;
 }
 
+vector<string> IntVectorResult::getSynonyms() {
+	vector<string> s;
+	s.push_back(this->synonym);
+
+	return s;
+}
+
 /*** StringVectorResult ***/
 
 StringVectorResult::StringVectorResult(vector<string> result, string synonym)
@@ -116,6 +127,12 @@ pair < map<string, vector<string>>, bool > StringVectorResult::toComparableForma
 
 bool StringVectorResult::isSelectSynonymFound(string selectSynonym) {
 	return selectSynonym == this->synonym;
+}
+
+vector<string> StringVectorResult::getSynonyms() {
+	vector<string> s;
+	s.push_back(this->synonym);
+	return s;
 }
 
 /*** IntIntPairVectorResult ***/
@@ -160,6 +177,14 @@ bool IntIntPairVectorResult::isSelectSynonymFound(string selectSynonym) {
 	return (selectSynonym == this->synonym.first || selectSynonym == this->synonym.second);
 }
 
+vector<string> IntIntPairVectorResult::getSynonyms() {
+	vector<string> s;
+	s.push_back(this->synonym.first);
+	s.push_back(this->synonym.second);
+
+	return s;
+}
+
 /*** IntStringPairVectorResult ***/
 
 IntStringPairVectorResult::IntStringPairVectorResult(vector<pair<unsigned int, string>> result, pair<string, string> synonym)
@@ -200,6 +225,14 @@ pair < map<string, vector<string>>, bool > IntStringPairVectorResult::toComparab
 
 bool IntStringPairVectorResult::isSelectSynonymFound(string selectSynonym) {
 	return (selectSynonym == this->synonym.first || selectSynonym == this->synonym.second);
+}
+
+vector<string> IntStringPairVectorResult::getSynonyms() {
+	vector<string> s;
+	s.push_back(this->synonym.first);
+	s.push_back(this->synonym.second);
+	
+	return s;
 }
 
 /*** StringStringPairVectorResult ***/
@@ -244,6 +277,14 @@ bool StringStringPairVectorResult::isSelectSynonymFound(string selectSynonym) {
 	return (selectSynonym == this->synonym.first || selectSynonym == this->synonym.second);
 }
 
+vector<string> StringStringPairVectorResult::getSynonyms() {
+	vector<string> s;
+	s.push_back(this->synonym.first);
+	s.push_back(this->synonym.second);
+
+	return s;
+}
+
 /*** MapBooleanPairResult ***/
 
 MapBooleanPairResult::MapBooleanPairResult(bool isValid) {
@@ -266,4 +307,8 @@ pair < map<string, vector<string>>, bool > MapBooleanPairResult::toComparableFor
 
 bool MapBooleanPairResult::isSelectSynonymFound(string selectSynonym) {
 	return false;	// shouldn't reach here 
+}
+
+vector<string> MapBooleanPairResult::getSynonyms() {
+	return vector<string>();
 }

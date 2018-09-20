@@ -103,10 +103,171 @@ vector<string> QueryEvaluator::getResults(Result* firstResult, Result* secondRes
 	}
 
 	/*** TODO: MERGING AND INTERSECTION HERE ***/
+	vector<string> firstResultKeys = firstResult->getSynonyms();
+	vector<string> secondResultKeys = secondResult->getSynonyms();
 	
-	// No common synonym
-	// One common synonym
-	// Two common synonyms
+	vector<string> commonKeys;
+	sort(firstResultKeys.begin(), firstResultKeys.end());
+	sort(secondResultKeys.begin(), secondResultKeys.end());
+
+	set_intersection(firstResultKeys.begin(), firstResultKeys.end(),
+		secondResultKeys.begin(), secondResultKeys.end(), back_inserter(commonKeys));
+	
+	map<string, vector<string>> finalResultsTable;
+
+	if (commonKeys.empty()) { // No common synonym
+		cout << "No common synonyms" << endl;
+		if (firstResult->isSelectSynonymFound(selectSynonym)) {	// Select synonym found in first table - Select from first table
+			return selectFrom(firstResultTable);
+		}
+		else if (secondResult->isSelectSynonymFound(selectSynonym)) { // Select synonym found in second table - Select from second table
+			return selectFrom(secondResultTable);
+		}
+	}
+	else if (commonKeys.size() == 1) { // One common synonym
+		string commonKey = commonKeys.at(0);
+		int totalSynonyms = firstResultKeys.size() + secondResultKeys.size();
+		vector<string> firstTableValue = firstResultTable[commonKey];
+		vector<string> secondTableValue = secondResultTable[commonKey];
+		
+		if (totalSynonyms == 2) {
+			cout << "One common synonym - Total Syn = 2" << endl;
+			vector<string> commonValues;
+			sort(firstTableValue.begin(), firstTableValue.end());
+			sort(secondTableValue.begin(), secondTableValue.end());
+
+			set_intersection(firstTableValue.begin(), firstTableValue.end(),
+				secondTableValue.begin(), secondTableValue.end(), back_inserter(commonValues));
+			
+			if (commonValues.empty()) {
+				return APICall::apiCallForNoResults();
+			}
+
+			finalResultsTable[commonKey] = commonValues;
+			return selectFrom(finalResultsTable);
+		} 
+		else if (totalSynonyms == 3) {
+			cout << "One common synonym - Total Syn = 3" << endl;
+			map<string, vector<string>> tableWithTwoSynonyms = firstResultKeys.size() == 2 
+				? firstResultTable : secondResultTable;
+			
+			map<string, vector<string>> tableWithOneSynonym = firstResultKeys.size() == 1
+				? firstResultTable : secondResultTable;
+
+			vector<string> tableWithTwoSynonymValue = tableWithTwoSynonyms[commonKey];
+			vector<string> tableWithOneSynonymValue = tableWithOneSynonym[commonKey];
+
+			string tableWithTwoSynonymSecondKey;
+
+			if (firstResultKeys.size() == 2) {
+				tableWithTwoSynonymSecondKey = firstResultKeys.at(0) != commonKey
+					? firstResultKeys.at(0) : firstResultKeys.at(1);
+			}
+			else {
+				tableWithTwoSynonymSecondKey = secondResultKeys.at(0) != commonKey
+					? secondResultKeys.at(0) : secondResultKeys.at(1);
+			}
+			vector<string> tableWithTwoSynonymSecondValue = tableWithTwoSynonyms[tableWithTwoSynonymSecondKey];
+
+			bool isTableEmpty = true;
+			vector<string> finalResultCommon;
+			vector<string> finalResultSecondValue;
+
+			int pos = 0;
+			for (string s : tableWithTwoSynonymValue) {
+				vector<string>::iterator it = find(secondTableValue.begin(), secondTableValue.end(), s);
+				// String found
+				if (it != secondTableValue.end()) {
+					finalResultCommon.push_back(s);
+					finalResultSecondValue.push_back(tableWithTwoSynonymSecondValue.at(pos));
+					isTableEmpty = false;
+				}
+			}
+			if (isTableEmpty) {
+				return APICall::apiCallForNoResults();
+			}
+
+			finalResultsTable[commonKey] = finalResultCommon;
+			finalResultsTable[tableWithTwoSynonymSecondKey] = finalResultSecondValue;
+			return selectFrom(finalResultsTable);
+		}
+		else if (totalSynonyms == 4) {
+			cout << "One common synonym - Total Syn = 4" << endl;
+			string firstResultSecondKey = firstResultKeys.at(0) != commonKey ? firstResultKeys.at(0) : firstResultKeys.at(1);
+			vector<string> firstTableSecondValue = firstResultTable[firstResultSecondKey];
+			
+			string secondResultSecondKey = secondResultKeys.at(0) != commonKey ? secondResultKeys.at(0) : secondResultKeys.at(1);
+			vector<string> secondTableSecondValue = secondResultTable[secondResultSecondKey];
+
+			bool isTableEmpty = true;
+			vector<string> finalResultCommon;
+			vector<string> finalResultFirstTableSecondValue;
+			vector<string> finalResultSecondTableSecondValue;
+
+			int pos = 0;
+			for (string s : firstTableValue) {
+				vector<string>::iterator it = find(secondTableValue.begin(), secondTableValue.end(), s);
+				// String found
+				if (it != secondTableValue.end()) {
+					int index = distance(secondTableValue.begin(), it);
+					finalResultCommon.push_back(s);
+					finalResultFirstTableSecondValue.push_back(firstTableSecondValue.at(pos));
+					finalResultSecondTableSecondValue.push_back(secondTableSecondValue.at(index));
+					isTableEmpty = false;
+				}
+				pos++;
+			}
+
+			if (isTableEmpty) {
+				return APICall::apiCallForNoResults();
+			}
+
+			finalResultsTable[commonKey] = finalResultCommon;
+			finalResultsTable[firstResultSecondKey] = finalResultFirstTableSecondValue;
+			finalResultsTable[secondResultSecondKey] = finalResultSecondTableSecondValue;
+			return selectFrom(finalResultsTable);
+		}
+	}
+	else if (commonKeys.size() == 2) { // Two common synonyms
+		cout << "2 common synonyms" << endl;
+		string commonKey1 = commonKeys.at(0);
+		string commonKey2 = commonKeys.at(1);
+
+		vector<string> firstTableValue1 = firstResultTable[commonKey1];
+		vector<string> firstTableValue2 = firstResultTable[commonKey2];
+		vector<string> secondTableValue1 = secondResultTable[commonKey1];
+		vector<string> secondTableValue2 = secondResultTable[commonKey2];
+
+		bool isTableEmpty = true;
+		vector<string> finalResult1;
+		vector<string> finalResult2;
+
+		// Find the same pairs
+		int pos = 0;
+		for (string s : firstTableValue1) {
+			vector<string>::iterator it = find(secondTableValue1.begin(), secondTableValue1.end(), s);
+			// Pair Found
+			if (it != secondTableValue1.end()) {
+				int index = distance(secondTableValue1.begin(), it);
+				if (secondTableValue2.at(index) == firstTableValue2.at(pos)) {
+					finalResult1.push_back(s);
+					finalResult2.push_back(firstTableValue2.at(pos));
+					isTableEmpty = false;
+				}
+			}
+			pos++;
+		}
+		
+		// After intersection, if table is empty means no result
+		if (isTableEmpty) {
+			return APICall::apiCallForNoResults();
+		}
+
+		finalResultsTable[commonKey1] = finalResult1;
+		finalResultsTable[commonKey2] = finalResult2;
+		return selectFrom(finalResultsTable);
+	}
+	
 }
 
 vector<string> QueryEvaluator::getResults(Result* result) {
@@ -143,6 +304,10 @@ vector<string> QueryEvaluator::getResults(Result* result) {
 vector<string> QueryEvaluator::selectFrom(map < string, vector<string> > selectMap) {
 	string selectSynonym = queryObject->getSelectClause().at(0);
 	return selectMap[selectSynonym];
+}
+
+vector<string> QueryEvaluator::noCommonSynonym(Result* firstResult, Result* secondResult) {
+
 }
 
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
