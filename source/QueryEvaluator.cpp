@@ -20,21 +20,17 @@ vector<string> QueryEvaluator::evaluateQueryObject() {
 	// No clauses
 	if (!queryObject->hasClauses()) {
 		string synonymType = queryObject->getSynonymTable()[queryObject->getSelectClause().at(0)];
-		return APICall::apiCallForNoClause(synonymType);
+		return APICall::apiCallForImmediateResults(synonymType);
 	}
 
 	// One such that clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && !queryObject->hasPatternClause()) {
-		Result* result = evaluateSuchThatClause();
-		map < string, vector<string> > selectMap = result->toComparableFormat().first;
-		return selectFrom(selectMap);
+		return getResults(evaluateSuchThatClause());
 	}
 
 	// One pattern clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 0 && queryObject->hasPatternClause()) {
-		Result* result = evaluatePatternClause();
-		map < string, vector<string> > selectMap = result->toComparableFormat().first;
-		return selectFrom(selectMap);
+		return getResults(evaluatePatternClause());
 	}
 
 	// One such that clause and one pattern clause
@@ -147,11 +143,44 @@ Result* QueryEvaluator::evaluateSuchThatAndPatternClause() {
 	return NULL;
 }
 
-vector<string> QueryEvaluator::selectFrom(map < string, vector<string> > selectMap) {
-	string selectClause = queryObject->getSelectClause().at(0);
-	return selectMap[selectClause];
+vector<string> QueryEvaluator::getResults(Result* result) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	string synonymType = queryObject->getSynonymTable()[selectSynonym];
+	map < string, vector<string> > selectMap = result->toComparableFormat().first;
+	bool isClauseValid = result->toComparableFormat().second;
+
+	result->printMap();
+
+	// Case 1: Clause is not valid - No results returned from clause
+	if (!isClauseValid) {
+		cout << "Case 1 - Clause is not valid" << endl;
+		return APICall::apiCallForNoResults();
+	}
+
+	// Case 2: Clause is valid but map is empty - Clause is a true/false clause
+	// select a such that Modifies(1,"v");
+	if (isClauseValid && selectMap.empty()) {
+		cout << "Case 2 - Result is Boolean Type" << endl;
+		return APICall::apiCallForImmediateResults(synonymType);
+	}
+
+	// Case 3: Clause is valid and map is not empty and select synonym is not found in the clause
+	// select a such that Modifies(a1,"v");
+	if (isClauseValid && !selectMap.empty() && !result->isSelectSynonymFound(selectSynonym)) {
+		cout << "Case 3 - Synonym not in clause" << endl;
+		return APICall::apiCallForImmediateResults(synonymType);
+	}
+	
+	// Case 3: Clause is valid and map is not empty - Select the synonym from the results map
+	// select a such that Modifies(a,"v");
+	cout << "Case 4 - Select From Map" << endl;
+	return selectFrom(selectMap);
 }
 
+vector<string> QueryEvaluator::selectFrom(map < string, vector<string> > selectMap) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	return selectMap[selectSynonym];
+}
 
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {
 	pair<string, string> paramType(SYNONYM, SYNONYM);
