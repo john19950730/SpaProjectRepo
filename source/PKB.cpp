@@ -150,13 +150,21 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 	followedList[stmtAfter] = stmtBefore;
 
 	followsStarTable[make_pair(stmtBefore, stmtAfter)] = true;
+	followsStarList[stmtBefore].push_back(stmtAfter);
+	followedStarList[stmtAfter].push_back(stmtBefore);
 	
 	unsigned int i;
 	for (i = 1; i <= (unsigned int) stmtBefore; ++i) {
-		followsStarTable[make_pair(i, stmtAfter)] = followsStarTable[make_pair(i, stmtBefore)];
+		if (followsStarTable[make_pair(i, stmtAfter)]) {
+			followsStarTable[make_pair(i, stmtAfter)] = followsStarTable[make_pair(i, stmtBefore)];
+			followsStarList[i].push_back(stmtAfter);
+		}
 	}
 	for (i = stmtAfter + 1; i <= totalLines; ++i) {
-		followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtBefore, i)];
+		if (followsStarTable[make_pair(stmtBefore, i)]) {
+			followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtBefore, i)];
+			followedStarList[i].push_back(stmtBefore);
+		}
 	}
 }
 
