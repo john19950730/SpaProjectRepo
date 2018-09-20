@@ -104,14 +104,7 @@ vector<string> QueryEvaluator::getResults(Result* firstResult, Result* secondRes
 
 	/*** TODO: MERGING AND INTERSECTION HERE ***/
 	
-	map < string, vector<string> >::iterator it;
 	// No common synonym
-	for (it = firstResultTable.begin(); it != firstResultTable.end(); it++) {
-		string key = it->first;
-		if (secondResultTable.count(key) > 0) return true;	// One common key is found
-	}
-
-
 	// One common synonym
 	// Two common synonyms
 }
