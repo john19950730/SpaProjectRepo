@@ -3,8 +3,12 @@
 
 using namespace keywords::query;
 
-vector<string> APICall::apiCallForNoClause(string synonymType) {
+vector<string> APICall::apiCallForImmediateResults(string synonymType) {
 	return immediateResults(synonymType);
+}
+
+vector<string> APICall::apiCallForNoResults() {
+	return vector<string>();
 }
 
 vector<string> APICall::getImmediateResults() {

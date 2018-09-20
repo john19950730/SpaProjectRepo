@@ -7,7 +7,8 @@ using namespace std;
 
 class APICall {
 public:
-	static vector<string> apiCallForNoClause(string synonymType);
+	static vector<string> apiCallForImmediateResults(string synonymType);
+	static vector<string> apiCallForNoResults();
 protected:
 	string selectSynonym;
 	map<string, string> synonymTable;
