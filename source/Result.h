@@ -11,6 +11,7 @@ using namespace std;
 class Result {
 public:
 	virtual pair < map<string, vector<string>>, bool > toComparableFormat() = 0;
+	void printMap();
 };
 
 class BooleanResult : public Result {
@@ -58,7 +59,7 @@ private:
 
 class IntStringPairVectorResult : public Result {
 public:
-	IntStringPairVectorResult(vector<pair<unsigned int, string>> results, pair<string, string> synonym);
+	IntStringPairVectorResult(vector<pair<unsigned int, string>> result, pair<string, string> synonym);
 	vector<pair<unsigned int, string>> getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 
@@ -69,11 +70,22 @@ private:
 
 class StringStringPairVectorResult : public Result {
 public:
-	StringStringPairVectorResult(vector<pair<string, string>> results, pair<string, string> synonym);
+	StringStringPairVectorResult(vector<pair<string, string>> result, pair<string, string> synonym);
 	vector<pair<string, string>> getResult();
 	pair < map<string, vector<string>>, bool > toComparableFormat();
 
 private:
 	vector<pair<string, string>> result;
 	pair<string, string> synonym;
+};
+
+class MapBooleanPairResult : public Result {
+public:
+	MapBooleanPairResult(bool isValid);
+	MapBooleanPairResult(map<string, vector<string>> resultMap, bool isValid);
+	MapBooleanPairResult(pair<map<string, vector<string>>, bool> comparableFormat);
+	pair<map<string, vector<string>>, bool> toComparableFormat();
+
+private:
+	pair<map<string, vector<string>>, bool> comparableFormat;
 };

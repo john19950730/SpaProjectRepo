@@ -87,6 +87,28 @@ Result* QueryEvaluator::evaluateSuchThatAndPatternClause() {
 	Result* suchThatClauseResult = evaluateSuchThatClause();
 	Result* patternClauseResult = evaluatePatternClause();
 
+	suchThatClauseResult->printMap();
+	patternClauseResult->printMap();
+
+	 map<string, vector<string>> suchThatTable = suchThatClauseResult->toComparableFormat().first;
+	 map<string, vector<string>> patternTable = patternClauseResult->toComparableFormat().first;
+	 bool isSuchThatClauseValid = suchThatClauseResult->toComparableFormat().second;
+	 bool isPatternClauseValid = patternClauseResult->toComparableFormat().second;
+
+	 // For clauses that only return true/false
+	 if (!isSuchThatClauseValid || !isPatternClauseValid) {
+		 // empty result, bool = false - no results
+		 MapBooleanPairResult *result = new MapBooleanPairResult(false);
+		 return result;
+	 }
+
+	 // Not a true/false clause but returns no results
+	 if (isSuchThatClauseValid && isPatternClauseValid && suchThatTable.empty() && patternTable.empty()) {
+		 // empty result, bool = true - might still have results after selecting
+		 MapBooleanPairResult *result = new MapBooleanPairResult(true);
+		 return result;
+	 }
+
 	/****
 		suchThatClauseResult - pair< map<string, vector<string> >, boolean>
 		patternClause - pair< map<string, vector<string> >, boolean>

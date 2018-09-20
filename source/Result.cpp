@@ -2,9 +2,26 @@
 
 /*** BooleanResult ***/
 
+void Result::printMap()
+{
+	auto map = this->toComparableFormat().first;
+	for (auto i = map.cbegin(); i != map.cend(); ++i)
+	{
+		cout << " " << i->first << " | ";
+		auto vctr = i->second;
+		for (auto j = vctr.rbegin(); j != vctr.rend(); ++j)
+		{
+			cout << *j << " ";
+		}
+		cout << endl;
+	}
+	cout << endl;
+}
+
 BooleanResult::BooleanResult(bool result)
 {
-	this->result = result;
+	//this->result = result;
+	this->result = true;
 }
 
 bool BooleanResult::getResult()
@@ -23,8 +40,10 @@ pair < map<string, vector<string>>, bool > BooleanResult::toComparableFormat() {
 
 IntVectorResult::IntVectorResult(vector<unsigned int> result, string synonym)
 {
-	this->result = result;
-	this->synonym = synonym;
+	//this->result = result;
+	//this->synonym = synonym;
+	this->result = { 1, 2, 4, 4, 5, 7 };
+	this->synonym = "a";
 }
 
 vector<unsigned int> IntVectorResult::getResult()
@@ -56,8 +75,10 @@ pair < map<string, vector<string>>, bool > IntVectorResult::toComparableFormat()
 
 StringVectorResult::StringVectorResult(vector<string> result, string synonym)
 {
-	this->result = result;
-	this->synonym = synonym;
+	//this->result = result;
+	//this->synonym = synonym;
+	this->result = { "p", "q", "r", "s", "s", "t", "w" };
+	this->synonym = "v";
 }
 
 vector<string> StringVectorResult::getResult()
@@ -89,8 +110,10 @@ pair < map<string, vector<string>>, bool > StringVectorResult::toComparableForma
 
 IntIntPairVectorResult::IntIntPairVectorResult(vector<pair<unsigned int, unsigned int>> result, pair<string, string> synonym)
 {
-	this->result = result;
-	this->synonym = synonym;
+	//this->result = result;
+	//this->synonym = synonym;
+	this->result = { make_pair(1, 2), make_pair(3, 4), make_pair(6, 7), make_pair(7, 8) };
+	this->synonym = make_pair("s1", "s2");
 }
 
 vector<pair<unsigned int, unsigned int>> IntIntPairVectorResult::getResult()
@@ -125,8 +148,10 @@ pair < map<string, vector<string>>, bool > IntIntPairVectorResult::toComparableF
 
 IntStringPairVectorResult::IntStringPairVectorResult(vector<pair<unsigned int, string>> result, pair<string, string> synonym)
 {
-	this->result = result;
-	this->synonym = synonym;
+	//this->result = result;
+	//this->synonym = synonym;
+	this->result = { make_pair(3, "q"), make_pair(5, "r"), make_pair(5, "t"), make_pair(9, "q") };
+	this->synonym = make_pair("a", "v");
 }
 
 vector<pair<unsigned int, string>> IntStringPairVectorResult::getResult()
@@ -161,8 +186,10 @@ pair < map<string, vector<string>>, bool > IntStringPairVectorResult::toComparab
 
 StringStringPairVectorResult::StringStringPairVectorResult(vector<pair<string, string>> result, pair<string, string> synonym)
 {
-	this->result = result;
-	this->synonym = synonym;
+	//this->result = result;
+	//this->synonym = synonym;
+	this->result = { make_pair("proc1", "w"), make_pair("proc1", "p"), make_pair("proc3", "p") };
+	this->synonym = make_pair("p", "v");
 }
 
 vector<pair<string, string>> StringStringPairVectorResult::getResult()
@@ -191,4 +218,25 @@ pair < map<string, vector<string>>, bool > StringStringPairVectorResult::toCompa
 	convertedResult.second = true;
 
 	return convertedResult;
+}
+
+
+/*** MapBooleanPairResult ***/
+
+MapBooleanPairResult::MapBooleanPairResult(bool isValid) {
+	map<string, vector<string>> resultMap;
+	pair<map<string, vector<string>>, bool> comparableFormat = make_pair(resultMap, isValid);
+}
+
+MapBooleanPairResult::MapBooleanPairResult(map<string, vector<string>> resultMap, bool isValid) {
+	pair<map<string, vector<string>>, bool> comparableFormat = make_pair(resultMap, isValid);
+}
+
+MapBooleanPairResult::MapBooleanPairResult(pair<map<string, vector<string>>, bool> comparableFormat)
+{
+	this->comparableFormat = comparableFormat;
+}
+
+pair < map<string, vector<string>>, bool > MapBooleanPairResult::toComparableFormat() {
+	return this->comparableFormat;
 }
