@@ -139,7 +139,12 @@ vector<string> QueryEvaluator::getResults(Result* result) {
 
 vector<string> QueryEvaluator::selectFrom(map < string, vector<string> > selectMap) {
 	string selectSynonym = queryObject->getSelectClause().at(0);
-	return selectMap[selectSynonym];
+	vector<string> selected = selectMap[selectSynonym];
+
+	// Remove duplicates
+	sort(selected.begin(), selected.end());
+	selected.erase(unique(selected.begin(), selected.end()), selected.end());
+	return selected;
 }
 
 vector<string> QueryEvaluator::combineResults(Result* firstResult, Result* secondResult) {
