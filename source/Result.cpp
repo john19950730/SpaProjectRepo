@@ -48,9 +48,9 @@ vector<string> BooleanResult::getSynonyms() {
 
 IntVectorResult::IntVectorResult(vector<unsigned int> result, string synonym)
 {
-	//this->result = result;
+	this->result = result;
 	this->synonym = synonym;
-	this->result = { 1, 2, 4, 4, 5, 7 };
+	//this->result = { 1, 2, 4, 4, 5, 7 };
 	//this->synonym = "a";
 }
 
@@ -94,9 +94,9 @@ vector<string> IntVectorResult::getSynonyms() {
 
 StringVectorResult::StringVectorResult(vector<string> result, string synonym)
 {
-	//this->result = result;
+	this->result = result;
 	this->synonym = synonym;
-	this->result = { "p", "q", "r", "s", "s", "t", "w" };
+	//this->result = { "p", "q", "r", "s", "s", "t", "w" };
 	//this->synonym = "v";
 }
 
@@ -189,9 +189,9 @@ vector<string> IntIntPairVectorResult::getSynonyms() {
 
 IntStringPairVectorResult::IntStringPairVectorResult(vector<pair<unsigned int, string>> result, pair<string, string> synonym)
 {
-	//this->result = result;
+	this->result = result;
 	this->synonym = synonym;
-	this->result = { make_pair(3, "q"), make_pair(5, "r"), make_pair(5, "t"), make_pair(9, "q") };
+	//this->result = { make_pair(3, "q"), make_pair(5, "r"), make_pair(5, "t"), make_pair(9, "q") };
 	//this->synonym = make_pair("a", "v");
 }
 

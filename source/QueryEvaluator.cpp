@@ -153,6 +153,9 @@ vector<string> QueryEvaluator::combineResults(Result* firstResult, Result* secon
 	set_intersection(firstResultKeys.begin(), firstResultKeys.end(),
 		secondResultKeys.begin(), secondResultKeys.end(), back_inserter(commonKeys));
 
+	firstResult->printMap();
+	secondResult->printMap();
+
 	if (commonKeys.empty()) { // No common synonym
 		return noCommonSynonym(firstResult, secondResult);
 	}
@@ -236,13 +239,14 @@ vector<string> QueryEvaluator::oneCommonSynonym(Result* firstResult, Result* sec
 
 		int pos = 0;
 		for (string s : tableWithTwoSynonymValue) {
-			vector<string>::iterator it = find(secondTableValue.begin(), secondTableValue.end(), s);
+			vector<string>::iterator it = find(tableWithOneSynonymValue.begin(), tableWithOneSynonymValue.end(), s);
 			// String found
-			if (it != secondTableValue.end()) {
+			if (it != tableWithOneSynonymValue.end()) {
 				finalResultCommon.push_back(s);
 				finalResultSecondValue.push_back(tableWithTwoSynonymSecondValue.at(pos));
 				isTableEmpty = false;
 			}
+			pos++;
 		}
 		if (isTableEmpty) {
 			return APICall::apiCallForNoResults();
@@ -267,14 +271,17 @@ vector<string> QueryEvaluator::oneCommonSynonym(Result* firstResult, Result* sec
 
 		int pos = 0;
 		for (string s : firstTableValue) {
-			vector<string>::iterator it = find(secondTableValue.begin(), secondTableValue.end(), s);
+			//vector<string>::iterator it = find(secondTableValue.begin(), secondTableValue.end(), s);
+			vector<string>::iterator it = secondTableValue.begin();
 			// String found
-			if (it != secondTableValue.end()) {
+			while ((it = find(it, secondTableValue.end(), s)) != secondTableValue.end()) {
 				int index = distance(secondTableValue.begin(), it);
 				finalResultCommon.push_back(s);
 				finalResultFirstTableSecondValue.push_back(firstTableSecondValue.at(pos));
 				finalResultSecondTableSecondValue.push_back(secondTableSecondValue.at(index));
 				isTableEmpty = false;
+
+				it++;
 			}
 			pos++;
 		}
@@ -310,15 +317,16 @@ vector<string> QueryEvaluator::twoCommonSynonyms(Result* firstResult, Result* se
 	// Find the same pairs
 	int pos = 0;
 	for (string s : firstTableValue1) {
-		vector<string>::iterator it = find(secondTableValue1.begin(), secondTableValue1.end(), s);
-		// Pair Found
-		if (it != secondTableValue1.end()) {
+		vector<string>::iterator it = secondTableValue1.begin();
+		while ((it = find(it, secondTableValue1.end(), s)) != secondTableValue1.end()) {
 			int index = distance(secondTableValue1.begin(), it);
+			// Pair Found
 			if (secondTableValue2.at(index) == firstTableValue2.at(pos)) {
 				finalResult1.push_back(s);
 				finalResult2.push_back(firstTableValue2.at(pos));
 				isTableEmpty = false;
 			}
+			it++;
 		}
 		pos++;
 	}
