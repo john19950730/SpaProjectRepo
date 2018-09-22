@@ -40,7 +40,7 @@ static vector<unsigned int> callList;
 static unsigned int callListIndex;
 static vector<string> procedureList;
 static unsigned int procedureListIndex = 0;
-static vector<unsigned int> synonymsList[] = { stmtsList, assignList, ifList, whileList, readList, printList, callList };
+static vector<unsigned int> * synonymsList[] = { &stmtsList, &assignList, &ifList, &whileList, &readList, &printList, &callList };
 
 /****************************************
 |										|
@@ -157,7 +157,7 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 
 	unsigned int i;
 	for (i = 1; i <= (unsigned int) stmtBefore; ++i) {
-		if (followsStarTable[make_pair(i, stmtAfter)]) {
+		if (followsStarTable[make_pair(i, stmtBefore)]) {
 			followsStarTable[make_pair(i, stmtAfter)] = followsStarTable[make_pair(i, stmtBefore)];
 			followsStarList[STMT_VAR][i].push_back(stmtAfter);
 			followsStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtAfter);
@@ -165,8 +165,8 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 		}
 	}
 	for (i = stmtAfter + 1; i <= totalLines; ++i) {
-		if (followsStarTable[make_pair(stmtBefore, i)]) {
-			followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtBefore, i)];
+		if (followsStarTable[make_pair(stmtAfter, i)]) {
+			followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtAfter, i)];
 			followedStarList[STMT_VAR][i].push_back(stmtBefore);
 			followedStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtBefore);
 			addFollowsPair(stmtBefore, i, true);
@@ -675,7 +675,7 @@ vector<unsigned int> PKB::getAllStmtsThatFitSynonym(string synonym)
 {
 	for (unsigned int i = 0; i < STATEMENTS.size(); ++i) {
 		if (exactMatch(synonym, STATEMENTS[i]))
-			return synonymsList[i];
+			return * synonymsList[i];
 	}
 	return vector<unsigned int>();
 }
@@ -702,11 +702,12 @@ bool PKB::exactMatch(string s1, string s2)
 	return s1.find(s2) == 0 && s1.length() == s2.length();
 }
 
-string PKB::getSynonymTypeOfStmt(unsigned int stmtNo)
+const string PKB::getSynonymTypeOfStmt(unsigned int stmtNo)
 {
-	for (int index = 0; index < STATEMENTS.size(); ++index)
-		if (find(synonymsList[index].begin(), synonymsList[index].end(), stmtNo) != synonymsList[index].end())
+	for (int index = 1; index < STATEMENTS.size(); ++index)
+		if (find(synonymsList[index]->begin(), synonymsList[index]->end(), stmtNo) != synonymsList[index]->end())
 			return STATEMENTS[index];
+	return STMT_VAR;
 }
 
 void PKB::addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star)
