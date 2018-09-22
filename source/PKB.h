@@ -102,12 +102,10 @@ public:
 	static vector<string> getProcedureNames();
 	static vector<unsigned int> getAllStmtsThatFitSynonym(string synonym);
 
-	static const string getSynonymTypeOfStmt(unsigned int stmtNo);
-
 private:
 	static unsigned int addStatement(unsigned int stmtNo);
 	static bool procedureExists(string procName);
 	static bool exactMatch(string s1, string s2);
-	
+	static const string getSynonymTypeOfStmt(unsigned int stmtNo);
 	static void addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star);
 };

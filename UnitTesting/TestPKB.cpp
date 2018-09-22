@@ -25,16 +25,13 @@ namespace UnitTesting
 		7		y = 0;
 			} */
 			// Populating PKB with relevant data
-			PKB::addRead(1);
+			/*PKB::addRead(1);
 			PKB::addWhile(2);
 			PKB::addAssign(3);
 			PKB::addIf(4);
 			PKB::addPrint(5);
 			PKB::addCall(6);
-			PKB::addAssign(7);
-			vector<unsigned int> reads = PKB::getReads();
-			Assert::IsFalse(find(reads.begin(), reads.end(), (unsigned int) 1) == reads.end());
-			Assert::AreEqual(PKB::getSynonymTypeOfStmt(1), string("read"));
+			PKB::addAssign(7);*/
 		}
 		TEST_METHOD(Follows)
 		{
@@ -68,11 +65,37 @@ namespace UnitTesting
 			
 			// Tests
 			Assert::IsTrue(PKB::isFollows(1, 2, false)); //Follows(1, 2) is true
-			Assert::IsFalse(PKB::isFollows(2, 4, false)); //Follows(2, 4) is false
+			Assert::IsTrue(PKB::isFollows(1, 2, true));
+			Assert::IsTrue(PKB::isFollows(2, 3, true));
+			Assert::IsFalse(PKB::isFollows(1, 3, false)); //Follows(1, 3) is false but...
+			Assert::IsTrue(PKB::isFollows(1, 3, true)); //Follows*(1, 3) is true
+			Assert::IsFalse(PKB::isFollows(2, 4, true)); //Follows*(2, 4) is false
 			Assert::IsTrue(PKB::hasFollows(4, false)); //Follows(4, _) is true
 			Assert::IsFalse(PKB::hasFollows(5, false)); //Follows(5, _) is false
 			Assert::IsTrue(PKB::hasFollowedBy(8, false)); //Follows(_, 8) is true
 			Assert::IsFalse(PKB::hasFollowedBy(7, false)); //Follows(_, 7) is false
+			Assert::IsTrue(PKB::hasFollowsPair); //Follows(_, _) is true
+
+			vector<pair<unsigned int, unsigned int> > pairs = PKB::getAllFollowsPair("assign", "stmt", false);
+			Assert::AreEqual(pairs.size(), (size_t)2); //Follows(a, s) should have 2 pairs
+			Assert::IsTrue(pairs[0] == make_pair((unsigned int)2, (unsigned int)3)); //<2, 3>, and
+			Assert::IsTrue(pairs[1] == make_pair((unsigned int)4, (unsigned int)5)); //<4, 5>
+
+			vector<unsigned int> listA_ = PKB::getAllFollowedStmts("while", false);
+			Assert::AreEqual(listA_.size(), (size_t)1); //Follows(w, _) should have 1 entry
+			Assert::AreEqual(listA_[0], (unsigned int)3); // w = 3
+
+			vector<unsigned int> list_B = PKB::getAllFollowsStmts("assign", false);
+			Assert::AreEqual(list_B.size(), (size_t)2); //Follows(_, a) should have 2 entries
+			Assert::AreEqual(list_B[0], (unsigned int)2); // a = 2 and
+			Assert::AreEqual(list_B[1], (unsigned int)8); // a = 8
+
+			vector<unsigned int> list1s = PKB::getAllStmtsThatFollows(1, "stmt", true);
+			Assert::AreEqual(list1s.size(), (size_t)3); //Follows*(1, s) should have 3 entries
+			Assert::IsTrue(list1s[0] == 2 && list1s[1] == 3 && list1s[2] == 8); // s = 2, 3, 8
+
+			vector<unsigned int> lists2 = PKB::getAllStmtsFollowedBy("assign", 8, false);
+			Assert::AreEqual(lists2.size(), (size_t)0); //Follows(a, 8) should have no entries
 		}
 
 	};
