@@ -12,15 +12,9 @@ using namespace std;
 
 #include "PKB.h"
 #include "TNode.h"
+#include "Keywords.h"
 
-static const string STMT_VAR = "stmt";
-static const string ASSIGNMENT_VAR = "assign";
-static const string IF_VAR = "if";
-static const string WHILE_VAR = "while";
-static const string READ_VAR = "read";
-static const string PRINT_VAR = "print";
-static const string CALL_VAR = "call";
-static const string STATEMENTS[] = { STMT_VAR, ASSIGNMENT_VAR, IF_VAR, WHILE_VAR, READ_VAR, PRINT_VAR, CALL_VAR };
+using namespace keywords::query;
 
 /****************************************
 |										|
@@ -61,9 +55,12 @@ static map<unsigned int, unsigned int> followedList;
 // element at index i, j means Follows*(i, j) holds
 static map<pair<unsigned int, unsigned int>, bool > followsStarTable;
 // Follows*(i, j) holds for each element j in list at index i
-static map<unsigned int, vector<unsigned int> > followsStarList;
+static map<string, map<unsigned int, vector<unsigned int> > > followsStarList;
 // Follows*(i, j) holds for each element i in list at index j
-static map<unsigned int, vector<unsigned int> > followedStarList;
+static map<string, map<unsigned int, vector<unsigned int> > > followedStarList;
+// Follows pair storage, maps synonym pairs to appropriate follows pair
+static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsPairs;
+static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsStarPairs;
 
 // element at index i means Parent(element, i) holds
 static vector<unsigned int> parentList;
@@ -150,20 +147,29 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 	followedList[stmtAfter] = stmtBefore;
 
 	followsStarTable[make_pair(stmtBefore, stmtAfter)] = true;
-	followsStarList[stmtBefore].push_back(stmtAfter);
-	followedStarList[stmtAfter].push_back(stmtBefore);
-	
+	followsStarList[STMT_VAR][stmtBefore].push_back(stmtAfter);
+	followsStarList[getSynonymTypeOfStmt(stmtBefore)][stmtBefore].push_back(stmtAfter);
+	followedStarList[STMT_VAR][stmtAfter].push_back(stmtBefore);
+	followedStarList[getSynonymTypeOfStmt(stmtAfter)][stmtAfter].push_back(stmtBefore);
+
+	addFollowsPair(stmtBefore, stmtAfter, false);
+	addFollowsPair(stmtBefore, stmtAfter, true);
+
 	unsigned int i;
 	for (i = 1; i <= (unsigned int) stmtBefore; ++i) {
 		if (followsStarTable[make_pair(i, stmtAfter)]) {
 			followsStarTable[make_pair(i, stmtAfter)] = followsStarTable[make_pair(i, stmtBefore)];
-			followsStarList[i].push_back(stmtAfter);
+			followsStarList[STMT_VAR][i].push_back(stmtAfter);
+			followsStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtAfter);
+			addFollowsPair(i, stmtAfter, true);
 		}
 	}
 	for (i = stmtAfter + 1; i <= totalLines; ++i) {
 		if (followsStarTable[make_pair(stmtBefore, i)]) {
 			followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtBefore, i)];
-			followedStarList[i].push_back(stmtBefore);
+			followedStarList[STMT_VAR][i].push_back(stmtBefore);
+			followedStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtBefore);
+			addFollowsPair(stmtBefore, i, true);
 		}
 	}
 }
@@ -238,14 +244,14 @@ bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 bool PKB::hasFollows(unsigned int stmtNo1, bool star)
 {
 	return (!star && followsList[stmtNo1] != 0) ||
-		(star && followsStarList[stmtNo1].size() != 0);
+		(star && followsStarList[STMT_VAR][stmtNo1].size() != 0);
 }
 
 //represents Follows(_, 2) or Follows*(_, 2)
 bool PKB::hasFollowedBy(unsigned int stmtNo2, bool star)
 {
 	return (!star && followedList[stmtNo2] != 0) ||
-		(star && followedStarList[stmtNo2].size() != 0);
+		(star && followedStarList[STMT_VAR][stmtNo2].size() != 0);
 }
 
 //represents Follows(_, _) or Follows*(_, _)
@@ -257,41 +263,63 @@ bool PKB::hasFollowsPair(bool star)
 //represents Follows(a, b) or Follows*(a, b)
 vector<pair<unsigned int, unsigned int> > PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
 {
-	//TODO
-	vector<unsigned int> stmts1 = getAllStmtsThatFitSynonym(synonym1);
-	vector<unsigned int> stmts2 = getAllStmtsThatFitSynonym(synonym2);
-	vector<pair<unsigned int, unsigned int> > result;
-	for_each(stmts1.begin(), stmts1.end(), [&](unsigned int stmtNo1) {
-	});
-	return result;
+	if (!star)
+		return followsPairs[make_pair(synonym1, synonym2)];
+	return followsStarPairs[make_pair(synonym1, synonym2)];
 }
 
 //represents Follows(a, _) or Follows*(a, _)
 vector<unsigned int> PKB::getAllFollowedStmts(string synonym1, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
+	vector<unsigned int> result;
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+		return (!star && followsList[stmtNo] != 0) || (star && followsStarList[STMT_VAR][stmtNo].size() > 0);
+	});
+	return result;
 }
 
 //represents Follows(a, 2) or Follows*(a, 2)
 vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> result;
+	if (!star) {
+		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
+		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+			return (followsList[stmtNo] == stmtNo2);
+		});
+	}
+	else {
+		result = followedStarList[synonym1][stmtNo2];
+	}
+	return result;
 }
 
 //represents: Follows(_, b) or Follows*(_, b)
 vector<unsigned int> PKB::getAllFollowsStmts(string synonym2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
+	vector<unsigned int> result;
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+		return (!star && followedList[stmtNo] != 0) || (star && followedStarList[STMT_VAR][stmtNo].size() > 0);
+	});
+	return result;
 }
 
 //represents: Follows(1, b) or Follows*(1, b)
 vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> result;
+	if (!star) {
+		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
+		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+			return (followedList[stmtNo] == stmtNo1);
+		});
+	}
+	else {
+		result = followsStarList[synonym2][stmtNo1];
+	}
+	return result;
 }
 
 /****************************************
@@ -645,7 +673,7 @@ vector<string> PKB::getProcedureNames()
 
 vector<unsigned int> PKB::getAllStmtsThatFitSynonym(string synonym)
 {
-	for (unsigned int i = 0; i < STATEMENTS->size(); ++i) {
+	for (unsigned int i = 0; i < STATEMENTS.size(); ++i) {
 		if (exactMatch(synonym, STATEMENTS[i]))
 			return synonymsList[i];
 	}
@@ -672,4 +700,27 @@ bool PKB::procedureExists(string procName)
 bool PKB::exactMatch(string s1, string s2)
 {
 	return s1.find(s2) == 0 && s1.length() == s2.length();
+}
+
+string PKB::getSynonymTypeOfStmt(unsigned int stmtNo)
+{
+	for (int index = 0; index < STATEMENTS.size(); ++index)
+		if (find(synonymsList[index].begin(), synonymsList[index].end(), stmtNo) != synonymsList[index].end())
+			return STATEMENTS[index];
+}
+
+void PKB::addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star)
+{
+	if (star) {
+		followsStarPairs[make_pair(STMT_VAR, STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsStarPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsStarPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+		followsStarPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+	}
+	else {
+		followsPairs[make_pair(STMT_VAR, STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+		followsPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+	}
 }
