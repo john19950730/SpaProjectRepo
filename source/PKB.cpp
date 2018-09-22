@@ -230,40 +230,40 @@ void PKB::addProcedureModifies(string procName, string varName)
 //represents Follows(1, 2) or Follows*(1, 2)
 bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	if (!star) {
-		return followsList[stmtNo1] == stmtNo2;
-	}
-	else {
-		return followsStarTable[make_pair(stmtNo1, stmtNo2)];
-	}
+	return (!star && followsList[stmtNo1] == stmtNo2) ||
+		(star && followsStarTable[make_pair(stmtNo1, stmtNo2)]);
 }
 
 //represents Follows(1, _) or Follows*(1, _)
 bool PKB::hasFollows(unsigned int stmtNo1, bool star)
 {
-	//TODO
-	return false;
+	return (!star && followsList[stmtNo1] != 0) ||
+		(star && followsStarList[stmtNo1].size() != 0);
 }
 
 //represents Follows(_, 2) or Follows*(_, 2)
 bool PKB::hasFollowedBy(unsigned int stmtNo2, bool star)
 {
-	//TODO
-	return false;
+	return (!star && followedList[stmtNo2] != 0) ||
+		(star && followedStarList[stmtNo2].size() != 0);
 }
 
 //represents Follows(_, _) or Follows*(_, _)
 bool PKB::hasFollowsPair(bool star)
 {
-	//TODO
-	return false;
+	return followsList[1] != 0;
 }
 
 //represents Follows(a, b) or Follows*(a, b)
-vector<pair<unsigned int, unsigned int>> PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
+vector<pair<unsigned int, unsigned int> > PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
 {
 	//TODO
-	return vector<pair<unsigned int, unsigned int>>();
+	vector<unsigned int> stmts1 = getAllStmtsThatFitSynonym(synonym1);
+	vector<unsigned int> stmts2 = getAllStmtsThatFitSynonym(synonym2);
+	vector<pair<unsigned int, unsigned int> > result;
+	for_each(stmts1.begin(), stmts1.end(), [&](unsigned int stmtNo1) {
+	});
+	return result;
 }
 
 //represents Follows(a, _) or Follows*(a, _)
