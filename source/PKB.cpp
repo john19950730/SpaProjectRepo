@@ -274,7 +274,7 @@ vector<unsigned int> PKB::getAllFollowedStmts(string synonym1, bool star)
 	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
 	vector<unsigned int> result;
 	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
-		return (!star && followsList[stmtNo] != 0) || (star && followsStarList[STMT_VAR][stmtNo].size() > 0);
+		return hasFollows(stmtNo, star);
 	});
 	return result;
 }
@@ -285,8 +285,8 @@ vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int st
 	vector<unsigned int> result;
 	if (!star) {
 		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
-		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
-			return (followsList[stmtNo] == stmtNo2);
+		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo1) {
+			return isFollows(stmtNo1, stmtNo2, false);
 		});
 	}
 	else {
@@ -301,7 +301,7 @@ vector<unsigned int> PKB::getAllFollowsStmts(string synonym2, bool star)
 	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
 	vector<unsigned int> result;
 	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
-		return (!star && followedList[stmtNo] != 0) || (star && followedStarList[STMT_VAR][stmtNo].size() > 0);
+		return hasFollowedBy(stmtNo, star);
 	});
 	return result;
 }
@@ -312,8 +312,8 @@ vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string sy
 	vector<unsigned int> result;
 	if (!star) {
 		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
-		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
-			return (followedList[stmtNo] == stmtNo1);
+		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo2) {
+			return isFollows(stmtNo1, stmtNo2, false);
 		});
 	}
 	else {
