@@ -37,7 +37,7 @@ static unsigned int readListIndex = 0;
 static vector<unsigned int> printList;
 static unsigned int printListIndex = 0;
 static vector<unsigned int> callList;
-static unsigned int callListIndex;
+static unsigned int callListIndex = 0;
 static vector<string> procedureList;
 static unsigned int procedureListIndex = 0;
 static vector<unsigned int> * synonymsList[] = { &stmtsList, &assignList, &ifList, &whileList, &readList, &printList, &callList };
@@ -67,7 +67,7 @@ static map<unsigned int, unsigned int> parentList;
 // elements at key i means Parent(i, element) holds
 static map<unsigned int, vector<unsigned int> > childList;
 // element at index i, j means Parent*(i, j) holds
-static vector< vector<bool> > parentStarTable;
+static map<pair<unsigned int, unsigned int>, bool> parentStarTable;
 // Parent*(i, j) holds for each element j in list at index i, filtered by synonym type
 static map<string, map<unsigned int, vector<unsigned int> > > parentStarList;
 // Parent*(i, j) holds for each element i in list at index j, filtered by synonym type
@@ -85,6 +85,52 @@ static unordered_map<string, vector<string> > procedureUsesTable;
 static vector< vector<string> > modifiesTable;
 // maps procedure name to list of variables modified in the procedure
 static unordered_map<string, vector<string> > procedureModifiesTable;
+
+/****************************************
+|										|
+|			PKB De-population			|
+|										|
+****************************************/
+void PKB::clearPKB()
+{
+	stmtsList = vector<unsigned int>();
+	totalLines = 0;
+	varList = vector<string>();
+	varListIndex = 0;
+	assignList = vector<unsigned int>();
+	assignListIndex = 0;
+	ifList = vector<unsigned int>();
+	ifListIndex = 0;
+	whileList = vector<unsigned int>();
+	whileListIndex = 0;
+	readList = vector<unsigned int>();
+	readListIndex = 0;
+	printList = vector<unsigned int>();
+	printListIndex = 0;
+	callList = vector<unsigned int>();
+	callListIndex = 0;
+	procedureList = vector<string>();
+	procedureListIndex = 0;
+
+	followsList = map<unsigned int, unsigned int>();
+	followedList = map<unsigned int, unsigned int>();
+	followsStarTable = map<pair<unsigned int, unsigned int>, bool >();
+	followsStarList = map<string, map<unsigned int, vector<unsigned int> > >();
+	followedStarList = map<string, map<unsigned int, vector<unsigned int> > >();
+	followsPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
+	followsStarPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
+
+	parentList = map<unsigned int, unsigned int>();
+	childList = map<unsigned int, vector<unsigned int> >();
+	parentStarTable = map<pair<unsigned int, unsigned int>, bool >();
+	parentStarList = map<string, map<unsigned int, vector<unsigned int> > >();
+	childStarList = map<string, map<unsigned int, vector<unsigned int> > >();
+	parentPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
+	parentStarPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
+
+	//TODO: add more resets after Uses and Modifies tables are revamped
+
+}
 
 /****************************************
 |										|
@@ -186,21 +232,13 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 void PKB::addParent(unsigned int stmtParent, unsigned int stmtChild)
 {
 	parentList[stmtChild] = stmtParent;
+	childList[stmtParent].push_back(stmtChild);
 
-	while (parentStarTable.size() <= stmtChild)
-		parentStarTable.push_back(vector<bool>(stmtChild));
-	for (unsigned int i = 0; i < parentStarTable.size(); ++i) {
-		while (parentStarTable[i].size() <= stmtChild)
-			parentStarTable[i].push_back(false);
-	}
-
-	parentStarTable[stmtParent][stmtChild] = true;
-	parentStarTable[stmtParent][stmtParent] = false;
-	parentStarTable[stmtChild][stmtChild] = false;
+	parentStarTable[make_pair(stmtParent, stmtChild)] = true;
 
 	int parent = stmtParent;
 	while (parentList[parent]) {
-		parentStarTable[parent][stmtChild] = true;
+		parentStarTable[make_pair(parent, stmtChild)] = true;
 	}
 }
 
@@ -344,7 +382,7 @@ bool PKB::isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 		return parentList[stmtNo2] == stmtNo1;
 	}
 	else {
-		return parentStarTable[stmtNo1][stmtNo2];
+		return parentStarTable[make_pair(stmtNo1, stmtNo2)];
 	}
 }
 
