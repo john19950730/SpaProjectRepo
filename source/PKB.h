@@ -108,4 +108,5 @@ private:
 	static bool exactMatch(string s1, string s2);
 	static string getSynonymTypeOfStmt(unsigned int stmtNo);
 	static void addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star);
+	static void addParentPair(unsigned int stmtParent, unsigned int stmtChild, bool star);
 };

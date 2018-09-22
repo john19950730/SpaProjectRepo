@@ -54,18 +54,27 @@ static map<unsigned int, unsigned int> followsList;
 static map<unsigned int, unsigned int> followedList;
 // element at index i, j means Follows*(i, j) holds
 static map<pair<unsigned int, unsigned int>, bool > followsStarTable;
-// Follows*(i, j) holds for each element j in list at index i
+// Follows*(i, j) holds for each element j in list at index i, filtered by synonym type
 static map<string, map<unsigned int, vector<unsigned int> > > followsStarList;
-// Follows*(i, j) holds for each element i in list at index j
+// Follows*(i, j) holds for each element i in list at index j, filtered by synonym type
 static map<string, map<unsigned int, vector<unsigned int> > > followedStarList;
 // Follows pair storage, maps synonym pairs to appropriate follows pair
 static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsPairs;
 static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsStarPairs;
 
-// element at index i means Parent(element, i) holds
-static vector<unsigned int> parentList;
+// element at key i means Parent(element, i) holds
+static map<unsigned int, unsigned int> parentList;
+// elements at key i means Parent(i, element) holds
+static map<unsigned int, vector<unsigned int> > childList;
 // element at index i, j means Parent*(i, j) holds
 static vector< vector<bool> > parentStarTable;
+// Parent*(i, j) holds for each element j in list at index i, filtered by synonym type
+static map<string, map<unsigned int, vector<unsigned int> > > parentStarList;
+// Parent*(i, j) holds for each element i in list at index j, filtered by synonym type
+static map<string, map<unsigned int, vector<unsigned int> > > childStarList;
+// Parent pair storage, maps synonym pairs to appropriate parent pair
+static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > parentPairs;
+static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > parentStarPairs;
 
 // array at index i of usesTable[i] contains list of variables v where Uses(i, v) holds
 static vector< vector<string> > usesTable;
@@ -176,8 +185,6 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 
 void PKB::addParent(unsigned int stmtParent, unsigned int stmtChild)
 {
-	while (parentList.size() <= stmtChild)
-		parentList.push_back(0);
 	parentList[stmtChild] = stmtParent;
 
 	while (parentStarTable.size() <= stmtChild)
@@ -722,5 +729,21 @@ void PKB::addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool s
 		followsPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
 		followsPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
 		followsPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+	}
+}
+
+void PKB::addParentPair(unsigned int stmtParent, unsigned int stmtChild, bool star)
+{
+	if (star) {
+		parentStarPairs[make_pair(STMT_VAR, STMT_VAR)].push_back(make_pair(stmtParent, stmtChild));
+		parentStarPairs[make_pair(getSynonymTypeOfStmt(stmtParent), STMT_VAR)].push_back(make_pair(stmtParent, stmtChild));
+		parentStarPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtChild))].push_back(make_pair(stmtParent, stmtChild));
+		parentStarPairs[make_pair(getSynonymTypeOfStmt(stmtParent), getSynonymTypeOfStmt(stmtChild))].push_back(make_pair(stmtParent, stmtChild));
+	}
+	else {
+		parentPairs[make_pair(STMT_VAR, STMT_VAR)].push_back(make_pair(stmtParent, stmtChild));
+		parentPairs[make_pair(getSynonymTypeOfStmt(stmtParent), STMT_VAR)].push_back(make_pair(stmtParent, stmtChild));
+		parentPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtChild))].push_back(make_pair(stmtParent, stmtChild));
+		parentPairs[make_pair(getSynonymTypeOfStmt(stmtParent), getSynonymTypeOfStmt(stmtChild))].push_back(make_pair(stmtParent, stmtChild));
 	}
 }
