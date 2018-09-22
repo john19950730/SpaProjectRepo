@@ -5,21 +5,16 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <map>
 #include <unordered_map>
 
 using namespace std;
 
 #include "PKB.h"
 #include "TNode.h"
+#include "Keywords.h"
 
-static const string STMT_VAR = "stmt";
-static const string ASSIGNMENT_VAR = "assign";
-static const string IF_VAR = "if";
-static const string WHILE_VAR = "while";
-static const string READ_VAR = "read";
-static const string PRINT_VAR = "print";
-static const string CALL_VAR = "call";
-static const string STATEMENTS[] = { STMT_VAR, ASSIGNMENT_VAR, IF_VAR, WHILE_VAR, READ_VAR, PRINT_VAR, CALL_VAR };
+using namespace keywords::query;
 
 /****************************************
 |										|
@@ -53,10 +48,19 @@ static vector<unsigned int> synonymsList[] = { stmtsList, assignList, ifList, wh
 |										|
 ****************************************/
 
-// element at index i means Follows(i, element) holds
-static vector<unsigned int> followsList;
+// element at key i means Follows(i, element) holds
+static map<unsigned int, unsigned int> followsList;
+// element at key i means Follows(element, i) holds
+static map<unsigned int, unsigned int> followedList;
 // element at index i, j means Follows*(i, j) holds
-static vector< vector<bool> > followsStarTable;
+static map<pair<unsigned int, unsigned int>, bool > followsStarTable;
+// Follows*(i, j) holds for each element j in list at index i
+static map<string, map<unsigned int, vector<unsigned int> > > followsStarList;
+// Follows*(i, j) holds for each element i in list at index j
+static map<string, map<unsigned int, vector<unsigned int> > > followedStarList;
+// Follows pair storage, maps synonym pairs to appropriate follows pair
+static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsPairs;
+static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsStarPairs;
 
 // element at index i means Parent(element, i) holds
 static vector<unsigned int> parentList;
@@ -132,32 +136,41 @@ unsigned int PKB::addCall(unsigned int stmtNo)
 unsigned int PKB::addProcedure(string procName)
 {
 	procedureList.push_back(procName);
+	procedureModifiesTable.insert(make_pair(procName, vector<string>()));
+	procedureUsesTable.insert(make_pair(procName, vector<string>()));
 	return procedureListIndex++;
 }
 
 void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 {
-	while (followsList.size() <= stmtBefore)
-		followsList.push_back(0);
 	followsList[stmtBefore] = stmtAfter;
+	followedList[stmtAfter] = stmtBefore;
 
-	while (followsStarTable.size() <= stmtAfter)
-		followsStarTable.push_back(vector<bool>(stmtAfter));
-	for (unsigned int i = 0; i < followsStarTable.size(); ++i) {
-		while (followsStarTable[i].size() <= stmtAfter)
-			followsStarTable[i].push_back(false);
-	}
+	followsStarTable[make_pair(stmtBefore, stmtAfter)] = true;
+	followsStarList[STMT_VAR][stmtBefore].push_back(stmtAfter);
+	followsStarList[getSynonymTypeOfStmt(stmtBefore)][stmtBefore].push_back(stmtAfter);
+	followedStarList[STMT_VAR][stmtAfter].push_back(stmtBefore);
+	followedStarList[getSynonymTypeOfStmt(stmtAfter)][stmtAfter].push_back(stmtBefore);
 
-	followsStarTable[stmtBefore][stmtAfter] = true;
-	followsStarTable[stmtBefore][stmtBefore] = false;
-	followsStarTable[stmtAfter][stmtAfter] = false;
-	
+	addFollowsPair(stmtBefore, stmtAfter, false);
+	addFollowsPair(stmtBefore, stmtAfter, true);
+
 	unsigned int i;
 	for (i = 1; i <= (unsigned int) stmtBefore; ++i) {
-		followsStarTable[i][stmtAfter] = followsStarTable[i][stmtBefore];
+		if (followsStarTable[make_pair(i, stmtAfter)]) {
+			followsStarTable[make_pair(i, stmtAfter)] = followsStarTable[make_pair(i, stmtBefore)];
+			followsStarList[STMT_VAR][i].push_back(stmtAfter);
+			followsStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtAfter);
+			addFollowsPair(i, stmtAfter, true);
+		}
 	}
-	for (i = stmtAfter + 1; i <= followsStarTable[stmtBefore].size(); ++i) {
-		followsStarTable[stmtBefore][i] = followsStarTable[stmtBefore][i];
+	for (i = stmtAfter + 1; i <= totalLines; ++i) {
+		if (followsStarTable[make_pair(stmtBefore, i)]) {
+			followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtBefore, i)];
+			followedStarList[STMT_VAR][i].push_back(stmtBefore);
+			followedStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtBefore);
+			addFollowsPair(stmtBefore, i, true);
+		}
 	}
 }
 
@@ -194,14 +207,9 @@ void PKB::addUses(unsigned int stmtNo, string varName)
 
 void PKB::addProcedureUses(string procName, string varName)
 {
-	//verify that procName is a registered procedure in PKB
-	//TODO for modifies, abstract
 	if (!procedureExists(procName))
 		return;
-	if (!hasProcedureUses(procName))
-		procedureUsesTable.insert(make_pair(procName, vector<string>()));
-	if (find(procedureUsesTable[procName].begin(), procedureUsesTable[procName].end(), varName) == procedureUsesTable[procName].end())
-		procedureUsesTable[procName].push_back(varName);
+	procedureUsesTable[procName].push_back(varName);
 }
 
 void PKB::addModifies(unsigned int stmtNo, string varName)
@@ -216,10 +224,7 @@ void PKB::addProcedureModifies(string procName, string varName)
 {
 	if (!procedureExists(procName))
 		return;
-	if (!hasProcedureModifies(procName))
-		procedureModifiesTable.insert(make_pair(procName, vector<string>()));
-	if (find(procedureModifiesTable[procName].begin(), procedureModifiesTable[procName].end(), varName) == procedureModifiesTable[procName].end())
-		procedureModifiesTable[procName].push_back(varName);
+	procedureModifiesTable[procName].push_back(varName);
 }
 
 /****************************************
@@ -231,70 +236,90 @@ void PKB::addProcedureModifies(string procName, string varName)
 //represents Follows(1, 2) or Follows*(1, 2)
 bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	if (stmtNo1 >= followsList.size() || stmtNo2 >= followsList.size())
-		return false;
-	if (!star) {
-		return followsList[stmtNo1] == stmtNo2;
-	}
-	else {
-		return followsStarTable[stmtNo1][stmtNo2];
-	}
+	return (!star && followsList[stmtNo1] == stmtNo2) ||
+		(star && followsStarTable[make_pair(stmtNo1, stmtNo2)]);
 }
 
 //represents Follows(1, _) or Follows*(1, _)
 bool PKB::hasFollows(unsigned int stmtNo1, bool star)
 {
-	//TODO
-	return false;
+	return (!star && followsList[stmtNo1] != 0) ||
+		(star && followsStarList[STMT_VAR][stmtNo1].size() != 0);
 }
 
 //represents Follows(_, 2) or Follows*(_, 2)
 bool PKB::hasFollowedBy(unsigned int stmtNo2, bool star)
 {
-	//TODO
-	return false;
+	return (!star && followedList[stmtNo2] != 0) ||
+		(star && followedStarList[STMT_VAR][stmtNo2].size() != 0);
 }
 
 //represents Follows(_, _) or Follows*(_, _)
 bool PKB::hasFollowsPair(bool star)
 {
-	//TODO
-	return false;
+	return followsList[1] != 0;
 }
 
 //represents Follows(a, b) or Follows*(a, b)
-vector<pair<unsigned int, unsigned int>> PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
+vector<pair<unsigned int, unsigned int> > PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
 {
-	//TODO
-	return vector<pair<unsigned int, unsigned int>>();
+	if (!star)
+		return followsPairs[make_pair(synonym1, synonym2)];
+	return followsStarPairs[make_pair(synonym1, synonym2)];
 }
 
 //represents Follows(a, _) or Follows*(a, _)
 vector<unsigned int> PKB::getAllFollowedStmts(string synonym1, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
+	vector<unsigned int> result;
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+		return hasFollows(stmtNo, star);
+	});
+	return result;
 }
 
 //represents Follows(a, 2) or Follows*(a, 2)
 vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> result;
+	if (!star) {
+		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
+		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo1) {
+			return isFollows(stmtNo1, stmtNo2, false);
+		});
+	}
+	else {
+		result = followedStarList[synonym1][stmtNo2];
+	}
+	return result;
 }
 
 //represents: Follows(_, b) or Follows*(_, b)
 vector<unsigned int> PKB::getAllFollowsStmts(string synonym2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
+	vector<unsigned int> result;
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+		return hasFollowedBy(stmtNo, star);
+	});
+	return result;
 }
 
 //represents: Follows(1, b) or Follows*(1, b)
 vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> result;
+	if (!star) {
+		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
+		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo2) {
+			return isFollows(stmtNo1, stmtNo2, false);
+		});
+	}
+	else {
+		result = followsStarList[synonym2][stmtNo1];
+	}
+	return result;
 }
 
 /****************************************
@@ -541,12 +566,9 @@ bool PKB::isProcedureModifies(string procName, string varName)
 //represents: Modifies("proc", _)
 bool PKB::hasProcedureModifies(string procName)
 {
-	bool result = false;
-	for_each(procedureModifiesTable.begin(), procedureModifiesTable.end(), [&](pair<string, vector<string> > procM) {
-		if (exactMatch(procM.first, procName) && procM.second.size() > 0)
-			result = true;
-	});
-	return result;
+	if (!procedureExists(procName))
+		return false;
+	return procedureModifiesTable[procName].size() > 0;
 }
 
 //represents: Modifies("proc", v)
@@ -651,7 +673,7 @@ vector<string> PKB::getProcedureNames()
 
 vector<unsigned int> PKB::getAllStmtsThatFitSynonym(string synonym)
 {
-	for (unsigned int i = 0; i < STATEMENTS->size(); ++i) {
+	for (unsigned int i = 0; i < STATEMENTS.size(); ++i) {
 		if (exactMatch(synonym, STATEMENTS[i]))
 			return synonymsList[i];
 	}
@@ -678,4 +700,27 @@ bool PKB::procedureExists(string procName)
 bool PKB::exactMatch(string s1, string s2)
 {
 	return s1.find(s2) == 0 && s1.length() == s2.length();
+}
+
+string PKB::getSynonymTypeOfStmt(unsigned int stmtNo)
+{
+	for (int index = 0; index < STATEMENTS.size(); ++index)
+		if (find(synonymsList[index].begin(), synonymsList[index].end(), stmtNo) != synonymsList[index].end())
+			return STATEMENTS[index];
+}
+
+void PKB::addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star)
+{
+	if (star) {
+		followsStarPairs[make_pair(STMT_VAR, STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsStarPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsStarPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+		followsStarPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+	}
+	else {
+		followsPairs[make_pair(STMT_VAR, STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), STMT_VAR)].push_back(make_pair(stmtBefore, stmtAfter));
+		followsPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+		followsPairs[make_pair(getSynonymTypeOfStmt(stmtBefore), getSynonymTypeOfStmt(stmtAfter))].push_back(make_pair(stmtBefore, stmtAfter));
+	}
 }
