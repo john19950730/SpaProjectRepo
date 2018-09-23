@@ -21,7 +21,6 @@ void Result::printMap()
 BooleanResult::BooleanResult(bool result)
 {
 	this->result = result;
-	//this->result = true;
 }
 
 bool BooleanResult::getResult()
@@ -50,8 +49,6 @@ IntVectorResult::IntVectorResult(vector<unsigned int> result, string synonym)
 {
 	this->result = result;
 	this->synonym = synonym;
-	//this->result = { 1, 2, 4, 4, 5, 7 };
-	//this->synonym = "a";
 }
 
 vector<unsigned int> IntVectorResult::getResult()
@@ -96,8 +93,6 @@ StringVectorResult::StringVectorResult(vector<string> result, string synonym)
 {
 	this->result = result;
 	this->synonym = synonym;
-	//this->result = { "p", "q", "r", "s", "s", "t", "w" };
-	//this->synonym = "v";
 }
 
 vector<string> StringVectorResult::getResult()
@@ -141,8 +136,6 @@ IntIntPairVectorResult::IntIntPairVectorResult(vector<pair<unsigned int, unsigne
 {
 	this->result = result;
 	this->synonym = synonym;
-	//this->result = { make_pair(1, 2), make_pair(3, 4), make_pair(6, 7), make_pair(7, 8) };
-	//this->synonym = make_pair("s1", "s2");
 }
 
 vector<pair<unsigned int, unsigned int>> IntIntPairVectorResult::getResult()
@@ -191,8 +184,6 @@ IntStringPairVectorResult::IntStringPairVectorResult(vector<pair<unsigned int, s
 {
 	this->result = result;
 	this->synonym = synonym;
-	//this->result = { make_pair(3, "q"), make_pair(5, "r"), make_pair(5, "t"), make_pair(9, "q") };
-	//this->synonym = make_pair("a", "v");
 }
 
 vector<pair<unsigned int, string>> IntStringPairVectorResult::getResult()
@@ -241,8 +232,6 @@ StringStringPairVectorResult::StringStringPairVectorResult(vector<pair<string, s
 {
 	this->result = result;
 	this->synonym = synonym;
-	//this->result = { make_pair("proc1", "w"), make_pair("proc1", "p"), make_pair("proc3", "p") };
-	//this->synonym = make_pair("p", "v");
 }
 
 vector<pair<string, string>> StringStringPairVectorResult::getResult()
