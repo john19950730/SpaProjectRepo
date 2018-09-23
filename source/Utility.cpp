@@ -222,3 +222,11 @@ string Utility::trim_copy(string s) {
 	rtrim(s);
 	return s;
 }
+
+vector<string> Utility::intVectorToStrVector(vector<unsigned int> intVector) {
+	vector<string> strVector;
+	for (unsigned int i : intVector) {
+		strVector.push_back(to_string(i));
+	}
+	return strVector;
+}
