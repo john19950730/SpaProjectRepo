@@ -312,6 +312,8 @@ vector<string> QueryEvaluator::oneCommonSynonym(Result* firstResult, Result* sec
 		finalResultsTable[secondResultSecondKey] = finalResultSecondTableSecondValue;
 		return selectFrom(finalResultsTable);
 	}
+
+	return vector<string>();
 }
 
 vector<string> QueryEvaluator::twoCommonSynonyms(Result* firstResult, Result* secondResult, vector<string> commonKeys) {
