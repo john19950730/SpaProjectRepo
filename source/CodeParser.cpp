@@ -71,7 +71,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 
 	if (foundProcedure == 1) {
 		CodeParser::nesting_level.push(make_pair(lineNumber,"procedure"));//TODO proc always 0 linnenum, parse into PKB add proc
-		PKB::addProcedure("main", make_pair(1, 13)); //hardcoded name, start/endline for now!!
+		PKB::addProcedure("main"); //hardcoded name, start/endline for now!!
 	}
 	if (foundWhile == 1) {
 		LineOfCodeData lcd;
