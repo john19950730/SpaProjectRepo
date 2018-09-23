@@ -6,7 +6,7 @@
 QueryPreprocessor::QueryPreprocessor()
 {
 	synonymTable = {};
-	relParamTypes = {};
+	clauseParamTypeTable = {};
 	queryObject = new QueryObject();
 
 	vector<SUCH_THAT_CLAUSE> usesClauses;
@@ -23,21 +23,19 @@ QueryPreprocessor::QueryPreprocessor()
 	vector<string> patternParam1 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_QUOTED" };
 	vector<string> patternParam2 = { "_UNDERSCORE", "_SUBEXPRESSION", "_QUOTED" };
 
-	relParamTypes["Uses"] = make_pair(usesModParam1, usesModParam2);
-	relParamTypes["Modifies"] = make_pair(usesModParam1, usesModParam2);
-	relParamTypes["Follows"] = make_pair(followsParentParam1, followsParentParam2);
-	relParamTypes["Parent"] = make_pair(followsParentParam1, followsParentParam2);
+	clauseParamTypeTable["Uses"] = make_pair(usesModParam1, usesModParam2);
+	clauseParamTypeTable["Modifies"] = make_pair(usesModParam1, usesModParam2);
+	clauseParamTypeTable["Follows"] = make_pair(followsParentParam1, followsParentParam2);
+	clauseParamTypeTable["Parent"] = make_pair(followsParentParam1, followsParentParam2);
 
-	relParamTypes["pattern"] = make_pair(patternParam1, patternParam2);
+	clauseParamTypeTable["pattern"] = make_pair(patternParam1, patternParam2);
 }
 
 bool QueryPreprocessor::parseQuery(string query)
 {
 	if (!isQuerySyntaxValid(query)) {
 		cout << endl << endl << "##### Query syntax is invalid!" << endl;
-		cout << endl << "### Example usage:  variable v; procedure v; select v such that Uses(1, v)" << endl;
-		cout << "#### keywords are case-sensitive i.e. relationships must begin with an upper-case letter, but 'select' and 'Select' are both accepted" << endl;
-		cout << "#### semicolon at the end of `select` clause is optional" << endl << endl;
+		cout << endl << "### Example usage:  variable v; procedure v; Select v such that Uses(1, v)" << endl;
 		return false;
 	}
 	
@@ -71,7 +69,7 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 
 bool QueryPreprocessor::setResultsClauseInQueryObject(string query) {
 	if (!isResultsClauseValid(query)) {
-		cout << endl << endl << "### Check that you have declared all used synonyms";
+		cout << endl << endl << "### Check that you have declared the synonym you wish to select";
 		return false;
 	}
 	vector<string> resultsClause = createResultsClause(query);
@@ -82,9 +80,9 @@ bool QueryPreprocessor::setResultsClauseInQueryObject(string query) {
 }
 
 bool QueryPreprocessor::setRelationhipClausesInQueryObject(string query) {
-	regex relSyntax(REL_REGEX);
+	regex relRegex(REL_REGEX);
 	smatch matches;
-	while (regex_search(query, matches, relSyntax)) {
+	while (regex_search(query, matches, relRegex)) {
 		string relationship = matches[1];
 		string param1 = matches[2];
 		string param2 = matches[3];
@@ -121,10 +119,10 @@ bool QueryPreprocessor::setRelationhipClausesInQueryObject(string query) {
 }
 
 bool QueryPreprocessor::setPatternClausesInQueryObject(string query) {
-	regex patternSyntax(PATTERN);
+	regex patternRegex(PATTERN_REGEX);
 	smatch matches;
 	PATTERN_CLAUSE clause;
-	while (regex_search(query, matches, patternSyntax)) {
+	while (regex_search(query, matches, patternRegex)) {
 		string patternSynonym = matches[1];
 		string param1 = matches[2];
 		string param2 = matches[3];
@@ -144,15 +142,15 @@ bool QueryPreprocessor::setPatternClausesInQueryObject(string query) {
 
 // Checks if query syntax is valid
 bool QueryPreprocessor::isQuerySyntaxValid(string query) {	
-	regex querySyntax(QUERY_SYNTAX_REGEX);
-	return regex_match(query, querySyntax);
+	regex querySyntaxRegex(QUERY_SYNTAX_REGEX);
+	return regex_match(query, querySyntaxRegex);
 }
 
 bool QueryPreprocessor::extractSynonymsFromDeclaration(string query) {
-	regex declarationSyntax(DECL_REGEX);
+	regex declarationRegex(DECL_REGEX);
 	smatch matches;
 
-	while (regex_search(query, matches, declarationSyntax)) {
+	while (regex_search(query, matches, declarationRegex)) {
 		string designEntity = matches[1];
 		string synonymStr = matches[2];
 		vector<string> synonymVctr = Utility::splitByDelimiter(synonymStr, ",");
@@ -169,22 +167,18 @@ bool QueryPreprocessor::extractSynonymsFromDeclaration(string query) {
 }
 
 bool QueryPreprocessor::isResultsClauseValid(string query) {
-	regex resultSyntax(RESULT_REGEX);
+	regex resultRegex(RESULT_REGEX);
 	smatch matches;
-	if (regex_search(query, matches, resultSyntax)) {
-		// Search hashmap to check if synonym exists
-		if (synonymTable.count(matches[1].str()) != 1) {
-			return false; // not found
-		}
-	}
+	if (regex_search(query, matches, resultRegex))
+		if (!existsInSynonymTable(matches[1].str())) return false;
 	return true;
 }
 
 vector<string> QueryPreprocessor::createResultsClause(string query) {
 	vector<string> clause;
-	regex resultSyntax(RESULT_REGEX);
+	regex resultRegex(RESULT_REGEX);
 	smatch matches;
-	regex_search(query, matches, resultSyntax);
+	regex_search(query, matches, resultRegex);
 	string synonymType = synonymTable[matches[1].str()];
 	string synonymName = matches[1].str();
 	clause.push_back(synonymName);
@@ -193,10 +187,10 @@ vector<string> QueryPreprocessor::createResultsClause(string query) {
 
 SUCH_THAT_CLAUSE QueryPreprocessor::createSuchThatClause(string relationship, string param1, string param2) {
 	SUCH_THAT_CLAUSE clause;
-	regex transSyntax(TRANS_REGEX);
+	regex isTransRegex(IS_TRANS_REGEX);
 	smatch matches;
 	bool hasTransitiveClosure = false;
-	if (regex_search(relationship, matches, transSyntax)) {
+	if (regex_search(relationship, matches, isTransRegex)) {
 		hasTransitiveClosure = true;
 	}
 	bool paramIsSynonym1 = existsInSynonymTable(param1);
@@ -220,9 +214,9 @@ PATTERN_CLAUSE QueryPreprocessor::createPatternClause(string patternSynonym, str
 	}
 
 	if (param2 != "_") {
-		regex exprSyntax(STRING_CONTENTS);
+		regex exprRegex(GET_STRING_CONTENTS);
 		smatch exprMatches;
-		regex_search(param2, exprMatches, exprSyntax);
+		regex_search(param2, exprMatches, exprRegex);
 		param2 = exprMatches[1].str();
 		// convert param2 into postfix
 		//string postfix = Utility::convertInfixToPostfix(paramExpr);
@@ -242,13 +236,13 @@ bool QueryPreprocessor::areRelationshipParamsValid(string relationship, string p
 	cout << ">> " + relationship + '(' + param1 + ':' + paramType1 + ", " + param2 + ':' + paramType2 + ')' << endl;
 	if (paramType1 == "" || paramType2 == "") return false;
 
-	regex rel("([a-zA-Z]+)[*]?");
+	regex relTypeRegex(GET_REL_TYPE_REGEX);
 	smatch matches;
-	if (regex_match(relationship, matches, rel)) {
+	if (regex_match(relationship, matches, relTypeRegex)) {
 		relationship = matches[1].str();
 	}
-	vector<string> expectedParam1 = relParamTypes[relationship].first;
-	vector<string> expectedParam2 = relParamTypes[relationship].second;
+	vector<string> expectedParam1 = clauseParamTypeTable[relationship].first;
+	vector<string> expectedParam2 = clauseParamTypeTable[relationship].second;
 
 	bool paramValid1 = false;
 	bool paramValid2 = false;
@@ -280,8 +274,8 @@ bool QueryPreprocessor::arePatternParamsValid(string param1, string param2) {
 
 	bool paramValid1 = false;
 	bool paramValid2 = false;
-	vector<string> expectedParam1 = relParamTypes["pattern"].first;
-	vector<string> expectedParam2 = relParamTypes["pattern"].second;
+	vector<string> expectedParam1 = clauseParamTypeTable["pattern"].first;
+	vector<string> expectedParam2 = clauseParamTypeTable["pattern"].second;
 	for (size_t i = 0; i < expectedParam1.size(); i++) {
 		if (paramType1 == expectedParam1[i]) {
 			paramValid1 = true;
@@ -297,7 +291,7 @@ bool QueryPreprocessor::arePatternParamsValid(string param1, string param2) {
 	}
 
 	if (paramType2 != "_UNDERSCORE") {
-		regex exprSyntax(STRING_CONTENTS);
+		regex exprSyntax(GET_STRING_CONTENTS);
 		smatch matches;
 		if (regex_search(param2, matches, exprSyntax)) {
 			string expr = matches[1].str();

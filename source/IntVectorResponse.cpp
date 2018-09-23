@@ -7,131 +7,118 @@ using namespace keywords::query;
 
 IntVectorResponse::IntVectorResponse() : APICallSuchThatClause() {}
 
-vector<string> IntVectorResponse::apiCallForFollows() {
+IntVectorResult* IntVectorResponse::apiCallForFollows() {
 	cout << "Inside intvector follows" << endl;
 	vector<unsigned int> result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
-	string forTesting;
-	vector<string> results;
+	string synonym;
 
 	if (paramType == make_pair(SYNONYM, STMT_NO)) {
-		//result = PKB::getAllStmtsFollowedBy(synonymTable[firstParam], unsigned(stoi(secondParam)), hasTransitiveClosure); 
-		forTesting = "getAllStmtsFollowedBy // Follows(a, 2)";
+		result = PKB::getAllStmtsFollowedBy(synonymTable[firstParam], unsigned(stoi(secondParam)), hasTransitiveClosure); 
+		synonym = firstParam;
+		cout << "getAllStmtsFollowedBy // Follows(a, 2)" << endl;
 	}
 	else if (paramType == make_pair(STMT_NO, SYNONYM)) {
-		//result = PKB::getAllStmtsThatFollows(unsigned(stoi(firstParam)), synonymTable[secondParam], hasTransitiveClosure); 
-		forTesting = "getAllStmtsThatFollows // Follows(1, b)";
+		result = PKB::getAllStmtsThatFollows(unsigned(stoi(firstParam)), synonymTable[secondParam], hasTransitiveClosure); 
+		synonym = secondParam;
+		cout << "getAllStmtsThatFollows // Follows(1, b)" << endl;
 	}
 	else if (paramType == make_pair(UNDERSCORE, SYNONYM)) {
-		//result = PKB::getAllFollowsStmts(synonymTable[secondParam], hasTransitiveClosure); // Follows(_, b)
-		forTesting = "getAllFollowsStmts // Follows(_, b)";
+		result = PKB::getAllFollowsStmts(synonymTable[secondParam], hasTransitiveClosure); // Follows(_, b)
+		synonym = secondParam;
+		cout << "getAllFollowsStmts // Follows(_, b)" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
-		//result = PKB::getAllFollowedStmts(synonymTable[firstParam], hasTransitiveClosure); // Follows(a, _)
-		forTesting = "getAllFollowedStmts // Follows(a, _)";
+		result = PKB::getAllFollowedStmts(synonymTable[firstParam], hasTransitiveClosure); // Follows(a, _)
+		synonym = firstParam;
+		cout << "getAllFollowedStmts // Follows(a, _)" << endl;
 	}
 
-	results.push_back(forTesting);
-	return results;
+	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
+	return intVectorResult;
 }
 
-vector<string> IntVectorResponse::apiCallForParent() {
+IntVectorResult* IntVectorResponse::apiCallForParent() {
 	cout << "Inside intvector parent" << endl;
 	vector<unsigned int> result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
-	string forTesting;
-	vector<string> results;
+	string synonym;
 	
 	if (paramType == make_pair(SYNONYM, STMT_NO)) {
-		//result = PKB::getAllStmtsThatIsParentOf(synonymTable[firstParam], unsigned(stoi(secondParam)), hasTransitiveClosure); 
-		forTesting = "getAllStmtsThatIsParentOf // Parent(a, 2)";
+		result = PKB::getAllStmtsThatIsParentOf(synonymTable[firstParam], unsigned(stoi(secondParam)), hasTransitiveClosure); 
+		synonym = firstParam;
+		cout << "getAllStmtsThatIsParentOf // Parent(a, 2)" << endl;
 	}
 	else if (paramType == make_pair(STMT_NO, SYNONYM)) {
-		//result = PKB::getAllStmtsThatIsChildOf(unsigned(stoi(firstParam)), synonymTable[secondParam], hasTransitiveClosure); 
-		forTesting = "getAllStmtsThatIsChildOf // Parent(1, b)";
+		result = PKB::getAllStmtsThatIsChildOf(unsigned(stoi(firstParam)), synonymTable[secondParam], hasTransitiveClosure); 
+		synonym = secondParam;
+		cout << "getAllStmtsThatIsChildOf // Parent(1, b)" << endl;
 	}
 	else if (paramType == make_pair(UNDERSCORE, SYNONYM)) {
-		//result = PKB::getAllChildStmts(synonymTable[secondParam], hasTransitiveClosure); 
-		forTesting = "getAllChildStmts // Parent(_, b)";
+		result = PKB::getAllChildStmts(synonymTable[secondParam], hasTransitiveClosure); 
+		synonym = secondParam;
+		cout << "getAllChildStmts // Parent(_, b)" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
-		//result = PKB::getAllParentStmts(synonymTable[firstParam], hasTransitiveClosure); // Parent(a, _)
-		forTesting = "getAllParentStmts // Parent(a, _)";
+		result = PKB::getAllParentStmts(synonymTable[firstParam], hasTransitiveClosure); // Parent(a, _)
+		synonym = firstParam;
+		cout << "getAllParentStmts // Parent(a, _)" << endl;
 	}
 
-	results.push_back(forTesting);
-	return results;
+	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
+	return intVectorResult;
 }
 
-vector<string> IntVectorResponse::apiCallForUses() {
+IntVectorResult* IntVectorResponse::apiCallForUses() {
 	cout << "Inside apiCallForUses" << endl;
 	vector<unsigned int> result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	string synonymType = synonymTable[firstParam];
-	string forTesting;
-	vector<string> results;
+	string synonym;
 
 	if (paramType == make_pair(SYNONYM, VARIABLE)) {
-		//result = PKB::getAllStmtsThatUsesVariable(synonymType, secondParam);
-		forTesting = " PKB::getAllStmtsThatUsesVariable(synonymType, secondParam); // Uses(a, 'var')";
+		result = PKB::getAllStmtsThatUsesVariable(synonymType, secondParam);
+		synonym = firstParam;
+	
+		cout << " PKB::getAllStmtsThatUsesVariable(synonymType, secondParam); // Uses(a, 'var')" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
-		//result = PKB::getAllStmtsThatUses(synonymType);
-		forTesting = "PKB::getAllStmtsThatUses(synonymType);	//Uses(a, _)";
+		result = PKB::getAllStmtsThatUses(synonymType);
+		synonym = firstParam;
+
+		cout << "PKB::getAllStmtsThatUses(synonymType);	//Uses(a, _)" << endl;
 	}
 
-	results.push_back(forTesting);
-	return results;
+	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
+	return intVectorResult;
 }
 
-vector<string> IntVectorResponse::apiCallForModifies() {
+IntVectorResult* IntVectorResponse::apiCallForModifies() {
 	cout << "Inside apiCallForModifies" << endl;
 	vector<unsigned int> result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	string synonymType = synonymTable[firstParam];
-	string forTesting; 
-	vector<string> results;
+	string synonym;
 
 	if (paramType == make_pair(SYNONYM, VARIABLE)) {
-		//result = PKB::getAllStmtThatModifiesVariable(synonymType, secondParam);
-		forTesting = "PKB::getAllStmtThatModifiesVariable(synonymType, secondParam); // Modifies(a, 'var')";
+		result = PKB::getAllStmtThatModifiesVariable(synonymType, secondParam);
+		synonym = firstParam;
+		
+		cout << "PKB::getAllStmtThatModifiesVariable(synonymType, secondParam); // Modifies(a, 'var')" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
-		//result = PKB::getAllStmtThatModifies(synonymType);
-		forTesting = "PKB::getAllStmtThatModifies(synonymType);	// Modifies(a, _)";
+		result = PKB::getAllStmtThatModifies(synonymType);
+		synonym = firstParam;
+
+		cout << "PKB::getAllStmtThatModifies(synonymType);	// Modifies(a, _)" << endl;
 	}
 
-	results.push_back(forTesting);
-	return results;
-}
-
-string IntVectorResponse::intVectorToString(vector<int> input) {
-	string s = "";
-	for (int i : input) {
-		s += " " + to_string(i);
-	}
-	return s;
-}
-
-vector<string> IntVectorResponse::getResults(vector<int> result) {
-	if (!result.empty()) {
-		if (!selectSynonymIsFoundInParam()) return getImmediateResults();
-		//else return intVectorToString(result);
-		else return convertVectorIntToVectorStr(result);
-	}
-	else return getNoResults();
-}
-
-vector<string> IntVectorResponse::convertVectorIntToVectorStr(vector<int> input) {
-	vector<string> strVector;
-	for (int i : input) {
-		strVector.push_back(to_string(i));
-	}
-	return strVector;
+	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
+	return intVectorResult;
 }

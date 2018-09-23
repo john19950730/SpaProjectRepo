@@ -32,4 +32,6 @@ public:
 	static void ltrim(string &s);
 	static void rtrim(std::string &s);
 	static string trim_copy(string s);
+
+	static vector<string> intVectorToStrVector(vector<unsigned int> intVector);
 };

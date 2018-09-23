@@ -22,7 +22,7 @@ void APICallSuchThatClause::setSuchThatClause(SUCH_THAT_CLAUSE suchThatClause) {
 	this->suchThatClause = suchThatClause;
 }
 
-vector<string> APICallSuchThatClause::executeApiCall() {
+Result* APICallSuchThatClause::executeApiCall() {
 	if (typeOfRs == USES_RS)
 		return apiCallForUses();
 	else if (typeOfRs == MODIFIES_RS)
@@ -32,7 +32,7 @@ vector<string> APICallSuchThatClause::executeApiCall() {
 	else if (typeOfRs == PARENT_RS)
 		return apiCallForParent();
 	else
-		return vector<string>();
+		return NULL;
 }
 
 APICallSuchThatClause* APICallSuchThatClause::getApiCallResponse(string typeOfRs, pair<string, string> paramType, 
