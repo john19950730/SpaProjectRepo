@@ -230,6 +230,7 @@ bool CodeParser::compare_nesting(std::stack <std::pair<int, string>> prevNesting
 			}
 			else {
 				isChanged = true;
+				return isChanged;
 			}
 		}
 	}
