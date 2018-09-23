@@ -137,26 +137,38 @@ vector<string> QueryEvaluator::getResults(Result* result) {
 	return selectFrom(selectMap);
 }
 
+vector<string> QueryEvaluator::removeDuplicates(vector<string> result) {
+	// Remove duplicates
+	vector<string> resultVector = result;
+	sort(resultVector.begin(), resultVector.end());
+	resultVector.erase(unique(resultVector.begin(), resultVector.end()), resultVector.end());
+
+	return resultVector;
+}
+
 vector<string> QueryEvaluator::selectFrom(map < string, vector<string> > selectMap) {
 	string selectSynonym = queryObject->getSelectClause().at(0);
 	vector<string> selected = selectMap[selectSynonym];
-
-	// Remove duplicates
-	sort(selected.begin(), selected.end());
-	selected.erase(unique(selected.begin(), selected.end()), selected.end());
-	return selected;
+	
+	return removeDuplicates(selected);
 }
 
-vector<string> QueryEvaluator::combineResults(Result* firstResult, Result* secondResult) {
-	vector<string> firstResultKeys = firstResult->getSynonyms();
-	vector<string> secondResultKeys = secondResult->getSynonyms();
-
+vector<string> QueryEvaluator::getCommonKeys(vector<string> firstResultKeys, vector<string> secondResultKeys) {
 	vector<string> commonKeys;
 	sort(firstResultKeys.begin(), firstResultKeys.end());
 	sort(secondResultKeys.begin(), secondResultKeys.end());
 
 	set_intersection(firstResultKeys.begin(), firstResultKeys.end(),
 		secondResultKeys.begin(), secondResultKeys.end(), back_inserter(commonKeys));
+
+	return commonKeys;
+}
+
+vector<string> QueryEvaluator::combineResults(Result* firstResult, Result* secondResult) {
+	vector<string> firstResultKeys = firstResult->getSynonyms();
+	vector<string> secondResultKeys = secondResult->getSynonyms();
+
+	vector<string> commonKeys = getCommonKeys(firstResultKeys, secondResultKeys);
 
 	firstResult->printMap();
 	secondResult->printMap();
