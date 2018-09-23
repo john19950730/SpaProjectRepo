@@ -1,6 +1,14 @@
 # include "Utility.h"
 #include "Keywords.h"
 
+string Utility::fileToString(string filename)
+{
+	std::ifstream t(filename);
+	std::stringstream buffer;
+	buffer << t.rdbuf();
+	return buffer.str();
+}
+
 bool Utility::isValidVariableName(string s) {
 	return regex_match(s, regex("^[a-zA-Z][a-zA-Z0-9]*?$"));
 }

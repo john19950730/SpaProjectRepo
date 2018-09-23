@@ -16,6 +16,8 @@ class TNode;
 class PKB {
 public:
 	// FOR FRONT-END
+	static void clearPKB(); //the Kill Switch
+
 	/* SPA relationships table */
 	static void addFollows(unsigned int stmtBefore, unsigned int stmtAfter);
 	static void addParent(unsigned int stmtParent, unsigned int stmtChild);
@@ -108,4 +110,5 @@ private:
 	static bool exactMatch(string s1, string s2);
 	static const string getSynonymTypeOfStmt(unsigned int stmtNo);
 	static void addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star);
+	static void addParentPair(unsigned int stmtParent, unsigned int stmtChild, bool star);
 };
