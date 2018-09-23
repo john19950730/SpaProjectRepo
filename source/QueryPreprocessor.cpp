@@ -35,9 +35,7 @@ bool QueryPreprocessor::parseQuery(string query)
 {
 	if (!isQuerySyntaxValid(query)) {
 		cout << endl << endl << "##### Query syntax is invalid!" << endl;
-		cout << endl << "### Example usage:  variable v; procedure v; select v such that Uses(1, v)" << endl;
-		cout << "#### keywords are case-sensitive i.e. relationships must begin with an upper-case letter, but 'select' and 'Select' are both accepted" << endl;
-		cout << "#### semicolon at the end of `select` clause is optional" << endl << endl;
+		cout << endl << "### Example usage:  variable v; procedure v; Select v such that Uses(1, v)" << endl;
 		return false;
 	}
 	
