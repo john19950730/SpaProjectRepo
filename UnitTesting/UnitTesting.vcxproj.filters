@@ -55,6 +55,9 @@
     </ClCompile>
     <ClCompile Include="CombineResultsTest.cpp">
       <Filter>Source Files\PQLUnitTesting\QueryEvaluator</Filter>
+	</ClCompile>
+    <ClCompile Include="TestPKB.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
