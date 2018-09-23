@@ -18,13 +18,58 @@
     <ClCompile Include="..\source\DesignExtractor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\Parser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\PKB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\source\TNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\QueryPreprocessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\CodeParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\QueryEvaluator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\QueryObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\QueryObjStructures.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\LineOfCodeData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\Utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\BooleanResponse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\IntVectorResponse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\StringVectorResponse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\IntIntPairVectorResponse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\IntStringPairVectorResponse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\StringStringPairVectorResponse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\APICall.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\APICallSuchThatClause.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\APICallPatternClause.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -33,6 +78,57 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\source\TNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\QueryPreprocessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\CodeParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Keywords.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\QueryEvaluator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\QueryObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\LineOfCodeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\DesignExtractor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\BooleanResponse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\IntVectorResponse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\StringVectorResponse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\IntStringPairVectorResponse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\StringStringPairVectorResponse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\IntIntPairVectorResponse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\APICall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\APICallSuchThatClause.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\APICallPatternClause.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
