@@ -163,6 +163,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodeParserTest.cpp" />
+    <ClCompile Include="CombineResultsNoCommonSynonymsTest.cpp" />
+    <ClCompile Include="CombineResultsOneCommonSynonymTest.cpp" />
+    <ClCompile Include="CombineResultsTwoCommonSynonymsTest.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

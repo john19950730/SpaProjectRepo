@@ -20,8 +20,8 @@ void Result::printMap()
 
 BooleanResult::BooleanResult(bool result)
 {
-	//this->result = result;
-	this->result = true;
+	this->result = result;
+	//this->result = true;
 }
 
 bool BooleanResult::getResult()
@@ -139,9 +139,9 @@ vector<string> StringVectorResult::getSynonyms() {
 
 IntIntPairVectorResult::IntIntPairVectorResult(vector<pair<unsigned int, unsigned int>> result, pair<string, string> synonym)
 {
-	//this->result = result;
+	this->result = result;
 	this->synonym = synonym;
-	this->result = { make_pair(1, 2), make_pair(3, 4), make_pair(6, 7), make_pair(7, 8) };
+	//this->result = { make_pair(1, 2), make_pair(3, 4), make_pair(6, 7), make_pair(7, 8) };
 	//this->synonym = make_pair("s1", "s2");
 }
 
@@ -239,9 +239,9 @@ vector<string> IntStringPairVectorResult::getSynonyms() {
 
 StringStringPairVectorResult::StringStringPairVectorResult(vector<pair<string, string>> result, pair<string, string> synonym)
 {
-	//this->result = result;
+	this->result = result;
 	this->synonym = synonym;
-	this->result = { make_pair("proc1", "w"), make_pair("proc1", "p"), make_pair("proc3", "p") };
+	//this->result = { make_pair("proc1", "w"), make_pair("proc1", "p"), make_pair("proc3", "p") };
 	//this->synonym = make_pair("p", "v");
 }
 

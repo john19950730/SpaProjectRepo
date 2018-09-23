@@ -16,6 +16,12 @@
     <Filter Include="Source Files\SPATesting">
       <UniqueIdentifier>{b7cfccee-2d0b-4776-ac7c-e27575f3fbec}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\PQLUnitTesting">
+      <UniqueIdentifier>{157f0352-3564-4fd6-8c37-fdad028d136c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\PQLUnitTesting\QueryEvaluator">
+      <UniqueIdentifier>{47007e4d-1475-4f7b-953e-897753876d81}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -34,6 +40,15 @@
     </ClCompile>
     <ClCompile Include="CodeParserTest.cpp">
       <Filter>Source Files\SPATesting</Filter>
+    </ClCompile>
+    <ClCompile Include="CombineResultsTwoCommonSynonymsTest.cpp">
+      <Filter>Source Files\PQLUnitTesting\QueryEvaluator</Filter>
+    </ClCompile>
+    <ClCompile Include="CombineResultsNoCommonSynonymsTest.cpp">
+      <Filter>Source Files\PQLUnitTesting\QueryEvaluator</Filter>
+    </ClCompile>
+    <ClCompile Include="CombineResultsOneCommonSynonymTest.cpp">
+      <Filter>Source Files\PQLUnitTesting\QueryEvaluator</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
