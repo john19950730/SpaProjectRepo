@@ -50,5 +50,11 @@
     <ClCompile Include="CombineResultsOneCommonSynonymTest.cpp">
       <Filter>Source Files\PQLUnitTesting\QueryEvaluator</Filter>
     </ClCompile>
+    <ClCompile Include="GetCommonKeysTest.cpp">
+      <Filter>Source Files\PQLUnitTesting\QueryEvaluator</Filter>
+    </ClCompile>
+    <ClCompile Include="CombineResultsTest.cpp">
+      <Filter>Source Files\PQLUnitTesting\QueryEvaluator</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
