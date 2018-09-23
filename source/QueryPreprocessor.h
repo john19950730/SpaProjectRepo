@@ -29,12 +29,14 @@ const string PATTERN_PARAM = UNDERSCORE + '|' + UNDERSCORE + STRING + UNDERSCORE
 const string DECL_REGEX = '(' + DECL_DE + ')' + SPACE + '(' + SYNONYM + "(?:" + COMMA + SYNONYM + ")*)" + SEMICOLON;
 const string RESULT_REGEX = "Select" + SPACE + "((?:" + SYNONYM + ")(?:" + COMMA + SYNONYM + ")*)";
 const string REL_REGEX = '(' + REL + "|(?:" + REL_T + ")" + ASTERISK + ')' + BRACKET_O + "(?:(" + REL_PARAM + ')' + COMMA + '(' + REL_PARAM + "))" + BRACKET_C;
-const string SUCH_THAT = SPACE + "such" + SPACE + "that" + SPACE + "(?:" + REL_REGEX + ")";
-const string PATTERN = SPACE + "pattern" + SPACE + '(' + SYNONYM + ')' + BRACKET_O + '(' + REL_PARAM + ')' + COMMA + '(' + PATTERN_PARAM + ')' + BRACKET_C;
-const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT + '|' + PATTERN + ")*)*)$";
+const string SUCH_THAT_REGEX = SPACE + "such" + SPACE + "that" + SPACE + "(?:" + REL_REGEX + ")";
+const string PATTERN_REGEX = SPACE + "pattern" + SPACE + '(' + SYNONYM + ')' + BRACKET_O + '(' + REL_PARAM + ')' + COMMA + '(' + PATTERN_PARAM + ')' + BRACKET_C;
+const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT_REGEX + '|' + PATTERN_REGEX + ")*)*)$";
 
-const string TRANS_REGEX = "[*]$";					// To check for transitive closure
-const string STRING_CONTENTS = "\"([^\"0-9\\W_]*(?:" + SYNONYM + '|' + NUMBER + "))\"";		// Used to extract text between double quotes
+/* Helper regex definitions */
+const string IS_TRANS_REGEX = "[*]$";															// To check for transitive closure
+const string GET_REL_TYPE_REGEX = "([a-zA-Z]+)[*]?";											// To extract the relationship type without any '*' e.g. "Follows" from "Follows*"
+const string GET_STRING_CONTENTS = "\"([^\"0-9\\W_]*(?:" + SYNONYM + '|' + NUMBER + "))\"";		// To extract text between double quotes
 
 struct SUCH_THAT_CLAUSE;
 struct PATTERN_CLAUSE;
