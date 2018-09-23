@@ -284,31 +284,3 @@ vector<string> StringStringPairVectorResult::getSynonyms() {
 
 	return s;
 }
-
-/*** MapBooleanPairResult ***/
-
-MapBooleanPairResult::MapBooleanPairResult(bool isValid) {
-	map<string, vector<string>> resultMap;
-	pair<map<string, vector<string>>, bool> comparableFormat = make_pair(resultMap, isValid);
-}
-
-MapBooleanPairResult::MapBooleanPairResult(map<string, vector<string>> resultMap, bool isValid) {
-	pair<map<string, vector<string>>, bool> comparableFormat = make_pair(resultMap, isValid);
-}
-
-MapBooleanPairResult::MapBooleanPairResult(pair<map<string, vector<string>>, bool> comparableFormat)
-{
-	this->comparableFormat = comparableFormat;
-}
-
-pair < map<string, vector<string>>, bool > MapBooleanPairResult::toComparableFormat() {
-	return this->comparableFormat;
-}
-
-bool MapBooleanPairResult::isSelectSynonymFound(string selectSynonym) {
-	return false;	// shouldn't reach here 
-}
-
-vector<string> MapBooleanPairResult::getSynonyms() {
-	return vector<string>();
-}

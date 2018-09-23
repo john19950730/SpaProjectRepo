@@ -86,15 +86,3 @@ private:
 	vector<pair<string, string>> result;
 	pair<string, string> synonym;
 };
-
-class MapBooleanPairResult : public Result {
-public:
-	MapBooleanPairResult(bool isValid);
-	MapBooleanPairResult(map<string, vector<string>> resultMap, bool isValid);
-	MapBooleanPairResult(pair<map<string, vector<string>>, bool> comparableFormat);
-	pair<map<string, vector<string>>, bool> toComparableFormat();
-	bool isSelectSynonymFound(string selectSynonym);
-	vector<string> getSynonyms();
-private:
-	pair<map<string, vector<string>>, bool> comparableFormat;
-};
