@@ -69,7 +69,7 @@ bool QueryPreprocessor::buildQueryObject(string query) {
 
 bool QueryPreprocessor::setResultsClauseInQueryObject(string query) {
 	if (!isResultsClauseValid(query)) {
-		cout << endl << endl << "### Check that you have declared all used synonyms";
+		cout << endl << endl << "### Check that you have declared the synonym you wish to select";
 		return false;
 	}
 	vector<string> resultsClause = createResultsClause(query);
@@ -169,12 +169,8 @@ bool QueryPreprocessor::extractSynonymsFromDeclaration(string query) {
 bool QueryPreprocessor::isResultsClauseValid(string query) {
 	regex resultRegex(RESULT_REGEX);
 	smatch matches;
-	if (regex_search(query, matches, resultRegex)) {
-		// Search hashmap to check if synonym exists
-		if (synonymTable.count(matches[1].str()) != 1) {
-			return false; // not found
-		}
-	}
+	if (regex_search(query, matches, resultRegex))
+		if (!existsInSynonymTable) return false;
 	return true;
 }
 
