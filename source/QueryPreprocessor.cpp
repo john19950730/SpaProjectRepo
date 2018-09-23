@@ -170,7 +170,7 @@ bool QueryPreprocessor::isResultsClauseValid(string query) {
 	regex resultRegex(RESULT_REGEX);
 	smatch matches;
 	if (regex_search(query, matches, resultRegex))
-		if (!existsInSynonymTable) return false;
+		if (!existsInSynonymTable(matches[1].str())) return false;
 	return true;
 }
 
