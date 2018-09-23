@@ -6,7 +6,7 @@
 QueryPreprocessor::QueryPreprocessor()
 {
 	synonymTable = {};
-	relParamTypes = {};
+	clauseParamTypeTable = {};
 	queryObject = new QueryObject();
 
 	vector<SUCH_THAT_CLAUSE> usesClauses;
@@ -23,12 +23,12 @@ QueryPreprocessor::QueryPreprocessor()
 	vector<string> patternParam1 = { keywords::query::VARIABLE_VAR, "_UNDERSCORE", "_QUOTED" };
 	vector<string> patternParam2 = { "_UNDERSCORE", "_SUBEXPRESSION", "_QUOTED" };
 
-	relParamTypes["Uses"] = make_pair(usesModParam1, usesModParam2);
-	relParamTypes["Modifies"] = make_pair(usesModParam1, usesModParam2);
-	relParamTypes["Follows"] = make_pair(followsParentParam1, followsParentParam2);
-	relParamTypes["Parent"] = make_pair(followsParentParam1, followsParentParam2);
+	clauseParamTypeTable["Uses"] = make_pair(usesModParam1, usesModParam2);
+	clauseParamTypeTable["Modifies"] = make_pair(usesModParam1, usesModParam2);
+	clauseParamTypeTable["Follows"] = make_pair(followsParentParam1, followsParentParam2);
+	clauseParamTypeTable["Parent"] = make_pair(followsParentParam1, followsParentParam2);
 
-	relParamTypes["pattern"] = make_pair(patternParam1, patternParam2);
+	clauseParamTypeTable["pattern"] = make_pair(patternParam1, patternParam2);
 }
 
 bool QueryPreprocessor::parseQuery(string query)
@@ -245,8 +245,8 @@ bool QueryPreprocessor::areRelationshipParamsValid(string relationship, string p
 	if (regex_match(relationship, matches, rel)) {
 		relationship = matches[1].str();
 	}
-	vector<string> expectedParam1 = relParamTypes[relationship].first;
-	vector<string> expectedParam2 = relParamTypes[relationship].second;
+	vector<string> expectedParam1 = clauseParamTypeTable[relationship].first;
+	vector<string> expectedParam2 = clauseParamTypeTable[relationship].second;
 
 	bool paramValid1 = false;
 	bool paramValid2 = false;
@@ -278,8 +278,8 @@ bool QueryPreprocessor::arePatternParamsValid(string param1, string param2) {
 
 	bool paramValid1 = false;
 	bool paramValid2 = false;
-	vector<string> expectedParam1 = relParamTypes["pattern"].first;
-	vector<string> expectedParam2 = relParamTypes["pattern"].second;
+	vector<string> expectedParam1 = clauseParamTypeTable["pattern"].first;
+	vector<string> expectedParam2 = clauseParamTypeTable["pattern"].second;
 	for (size_t i = 0; i < expectedParam1.size(); i++) {
 		if (paramType1 == expectedParam1[i]) {
 			paramValid1 = true;
