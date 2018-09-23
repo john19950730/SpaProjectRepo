@@ -12,6 +12,12 @@ IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForFollows() {
 	result = PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)
 	cout << "PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)" << endl;
 
+	// e.g. Follows(s1,s1) - always false
+	if (suchThatClause.firstParameter == suchThatClause.secondParameter) {
+		result = {};
+		cout << "Same Syonym: Follows(s1,s1)" << endl;
+	}
+
 	IntIntPairVectorResult* intIntPairVectorResult 
 		= new IntIntPairVectorResult(result, make_pair(suchThatClause.firstParameter, suchThatClause.secondParameter));
 	
@@ -27,6 +33,12 @@ IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForParent() {
 	result = PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)
 	cout << "PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)" << endl;
 	
+	// e.g. Modifies(s1,s1) - always false
+	if (suchThatClause.firstParameter == suchThatClause.secondParameter) {
+		result = {};
+		cout << "Same Syonym: Parent(s1,s1)" << endl;
+	}
+
 	IntIntPairVectorResult* intIntPairVectorResult
 		= new IntIntPairVectorResult(result, make_pair(suchThatClause.firstParameter, suchThatClause.secondParameter));
 
