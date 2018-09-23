@@ -108,34 +108,151 @@ namespace UnitTesting
 
 		}
 
-		TEST_METHOD(CheckUsesTest)
+		//TEST_METHOD(CheckUsesTest) // Verify With Joshua
+		//{
+		//	std::vector<std::string> checkUsesOutput;
+		//	std::vector<std::string> checkUsesExpectedOutPut;
+
+		//	// Test if the ouput of CheckUses is the same as expected
+		//	checkUsesExpectedOutPut.push_back("a,b");
+		//	checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
+		//	Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+
+		//	// Clear the vectors
+		//	checkUsesExpectedOutPut.clear();
+		//	checkUsesOutput.clear();
+
+		//	// Test if the output of CheckUses is the same with duplicated variable
+		//	checkUsesExpectedOutPut.push_back("a,b,c");
+		//	checkUsesOutput = CodeParser::checkUses("while", "x=a*b+b+c");
+		//	Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+
+		//	// Clear the vectors
+		//	checkUsesExpectedOutPut.clear();
+		//	checkUsesOutput.clear();
+
+		//	// Test if ouput of CheckUses is different as expected
+		//	checkUsesExpectedOutPut.push_back("b,a");
+		//	checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
+		//	Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+
+		//}
+
+		TEST_METHOD(CheckCompare_Nesting)
 		{
-			std::vector<std::string> checkUsesOutput;
-			std::vector<std::string> checkUsesExpectedOutPut;
+			// create stack to test compare_nesting method
+			std::stack <std::pair<int, string>> stackA;
+			std::stack <std::pair<int, string>> stackB;
+			bool checkOutput;
 
-			// Test if the ouput of CheckUses is the same as expected
-			checkUsesExpectedOutPut.push_back("a,b");
-			checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
-			Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+			// loading stackA with data
+			stackA.push(make_pair(1, "a"));
+			stackA.push(make_pair(1, "b"));
+			stackA.push(make_pair(2, "c"));
+			stackA.push(make_pair(3, "g"));
 
-			// Clear the vectors
-			checkUsesExpectedOutPut.clear();
-			checkUsesOutput.clear();
+			// loading stackB with data
+			stackB.push(make_pair(1, "a"));
+			stackB.push(make_pair(1, "b"));
+			stackB.push(make_pair(2, "c"));
+			stackB.push(make_pair(3, "h"));
 
-			// Test if the output of CheckUses is the same with duplicated variable
-			checkUsesExpectedOutPut.push_back("a,b,c");
-			checkUsesOutput = CodeParser::checkUses("while", "x=a*b+b+c");
-			Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+			// Comparing between stackA and stackB
+			checkOutput = CodeParser::compare_nesting(stackA, stackB);
 
-			// Clear the vectors
-			checkUsesExpectedOutPut.clear();
-			checkUsesOutput.clear();
+			// Test if compare_nesting returns true if there are difference between the stacks
+			Assert::IsTrue(checkOutput);
 
-			// Test if ouput of CheckUses is different as expected
-			checkUsesExpectedOutPut.push_back("b,a");
-			checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
-			Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+			// Clearing a stack with ClearStack() method made for this purpose
+			stackA = ClearStack();
+			stackB = ClearStack();
 
+			// loading stackA with data
+			stackA.push(make_pair(1, "a"));
+			stackA.push(make_pair(1, "b"));
+			stackA.push(make_pair(2, "c"));
+			stackA.push(make_pair(3, "g"));
+
+			// loading stackB with data
+			stackB.push(make_pair(1, "a"));
+			stackB.push(make_pair(1, "b"));
+			stackB.push(make_pair(2, "x"));
+			stackB.push(make_pair(3, "g"));
+
+			// Comparing between stackA and stackB
+			checkOutput = CodeParser::compare_nesting(stackA, stackB);
+
+			// Test if compare_nesting returns true if there are difference between the stacks
+			Assert::IsTrue(checkOutput);
+
+			// Clearing a stack with ClearStack() method made for this purpose
+			stackA = ClearStack();
+			stackB = ClearStack();
+
+			// loading stackA with data
+			stackA.push(make_pair(1, "a"));
+			stackA.push(make_pair(1, "b"));
+			stackA.push(make_pair(2, "c"));
+			stackA.push(make_pair(3, "g"));
+
+			// loading stackB with data
+			stackB.push(make_pair(1, "a"));
+			stackB.push(make_pair(2, "b"));
+			stackB.push(make_pair(2, "c"));
+			stackB.push(make_pair(3, "g"));
+
+			// Comparing between stackA and stackB
+			checkOutput = CodeParser::compare_nesting(stackA, stackB);
+
+			// Test if compare_nesting returns true if there are difference between the stacks
+			Assert::IsTrue(checkOutput);
+
+			// Clearing a stack with ClearStack() method made for this purpose
+			stackA = ClearStack();
+			stackB = ClearStack();
+
+			// Comparing between stackA and stackB 
+			checkOutput = CodeParser::compare_nesting(stackA, stackB);
+
+			// Test if compare_nesting returns false if both stacks are empty
+			Assert::IsFalse(checkOutput);
+
+			// Clearing a stack with ClearStack() method made for this purpose
+			stackA = ClearStack();
+			stackB = ClearStack();
+
+			// Loading stackA with data
+			stackA.push(make_pair(1, "h"));
+
+			// Comparing between stackA and stackB
+			checkOutput = CodeParser::compare_nesting(stackA, stackB);
+
+			// Test if compare_nesting returns true if both stacks are of different sizes
+			Assert::IsTrue(checkOutput);
+
+			// Clearing a stack with ClearStack() method made for this purpose
+			stackA = ClearStack();
+			stackB = ClearStack();
+
+			// Loading stackA with data
+			stackA.push(make_pair(1, "h"));
+			stackA.push(make_pair(1, "g"));
+
+			// Loading stackB with data
+			stackB.push(make_pair(1, "h"));
+
+			// Comparing between stackA and stackB
+			checkOutput = CodeParser::compare_nesting(stackA, stackB);
+
+			// Test if compare_nesting returns true if both stacks are of different sizes
+			Assert::IsTrue(checkOutput);
+
+		}
+
+		std::stack <std::pair<int, string>> ClearStack()
+		{
+			std::stack <std::pair<int, string>> theNewStack;
+			return theNewStack;
 		}
 
 	};
