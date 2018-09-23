@@ -6,6 +6,7 @@
 #include <algorithm> 
 #include <cctype>
 #include <locale>
+#include <fstream>
 #include <sstream>
 #include <stack>
 #include <limits>
@@ -14,6 +15,8 @@ using namespace std;
 
 class Utility {
 public:
+	static string fileToString(string filename);
+
 	static bool isValidVariableName(string s);
 	static bool isInteger(string s);
 	static bool isUnderscore(string s);

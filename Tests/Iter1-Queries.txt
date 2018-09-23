@@ -1,0 +1,10 @@
+1 - comment
+assign a;
+Select a
+2, 3, 4, 6, 8, 10, 11, 13, 19, 21, 22, 23, 25, 26, 30, 32
+5000
+2 - comment
+variable v;
+Select v
+i, x, y, z
+5000
