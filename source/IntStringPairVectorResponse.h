@@ -11,10 +11,4 @@ private:
 	IntStringPairVectorResult* apiCallForParent();
 	IntStringPairVectorResult* apiCallForUses();
 	IntStringPairVectorResult* apiCallForModifies();
-
-	vector<string> getResult(vector<pair<int, string>> result);
-
-	vector<string> extractFirstParam(vector<pair<int, string>> input);
-	vector<string> extractSecondParam(vector<pair<int, string>> input);
-	vector<string> extractedResults(vector<pair<int, string>> result);
 };

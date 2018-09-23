@@ -15,9 +15,6 @@ IntVectorResult* IntVectorResponse::apiCallForFollows() {
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 	string synonym;
 
-	string forTesting;
-	vector<string> results;
-
 	if (paramType == make_pair(SYNONYM, STMT_NO)) {
 		result = PKB::getAllStmtsFollowedBy(synonymTable[firstParam], unsigned(stoi(secondParam)), hasTransitiveClosure); 
 		synonym = firstParam;
@@ -41,9 +38,6 @@ IntVectorResult* IntVectorResponse::apiCallForFollows() {
 
 	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
 	return intVectorResult;
-
-	/*results.push_back(forTesting);
-	return results;*/
 }
 
 IntVectorResult* IntVectorResponse::apiCallForParent() {
@@ -53,9 +47,6 @@ IntVectorResult* IntVectorResponse::apiCallForParent() {
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
 	string synonym;
-
-	string forTesting;
-	vector<string> results;
 	
 	if (paramType == make_pair(SYNONYM, STMT_NO)) {
 		result = PKB::getAllStmtsThatIsParentOf(synonymTable[firstParam], unsigned(stoi(secondParam)), hasTransitiveClosure); 
@@ -80,9 +71,6 @@ IntVectorResult* IntVectorResponse::apiCallForParent() {
 
 	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
 	return intVectorResult;
-
-	/*results.push_back(forTesting);
-	return results;*/
 }
 
 IntVectorResult* IntVectorResponse::apiCallForUses() {
@@ -92,9 +80,6 @@ IntVectorResult* IntVectorResponse::apiCallForUses() {
 	string secondParam = suchThatClause.secondParameter;
 	string synonymType = synonymTable[firstParam];
 	string synonym;
-
-	string forTesting;
-	vector<string> results;
 
 	if (paramType == make_pair(SYNONYM, VARIABLE)) {
 		result = PKB::getAllStmtsThatUsesVariable(synonymType, secondParam);
@@ -111,9 +96,6 @@ IntVectorResult* IntVectorResponse::apiCallForUses() {
 
 	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
 	return intVectorResult;
-	
-	/*results.push_back(forTesting);
-	return results;*/
 }
 
 IntVectorResult* IntVectorResponse::apiCallForModifies() {
@@ -123,9 +105,6 @@ IntVectorResult* IntVectorResponse::apiCallForModifies() {
 	string secondParam = suchThatClause.secondParameter;
 	string synonymType = synonymTable[firstParam];
 	string synonym;
-
-	string forTesting; 
-	vector<string> results;
 
 	if (paramType == make_pair(SYNONYM, VARIABLE)) {
 		result = PKB::getAllStmtThatModifiesVariable(synonymType, secondParam);
@@ -142,32 +121,4 @@ IntVectorResult* IntVectorResponse::apiCallForModifies() {
 
 	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
 	return intVectorResult;
-
-	/*results.push_back(forTesting);
-	return results;*/
-}
-
-string IntVectorResponse::intVectorToString(vector<int> input) {
-	string s = "";
-	for (int i : input) {
-		s += " " + to_string(i);
-	}
-	return s;
-}
-
-vector<string> IntVectorResponse::getResults(vector<int> result) {
-	if (!result.empty()) {
-		if (!selectSynonymIsFoundInParam()) return getImmediateResults();
-		//else return intVectorToString(result);
-		else return convertVectorIntToVectorStr(result);
-	}
-	else return getNoResults();
-}
-
-vector<string> IntVectorResponse::convertVectorIntToVectorStr(vector<int> input) {
-	vector<string> strVector;
-	for (int i : input) {
-		strVector.push_back(to_string(i));
-	}
-	return strVector;
 }

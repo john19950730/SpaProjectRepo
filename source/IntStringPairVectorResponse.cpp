@@ -19,7 +19,6 @@ IntStringPairVectorResult* IntStringPairVectorResponse::apiCallForUses() {
 	vector< pair<unsigned int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
-	vector<string> results;
 
 	// First synonym is of statement type - second param is definitely variable synonym type
 		
@@ -36,7 +35,6 @@ IntStringPairVectorResult* IntStringPairVectorResponse::apiCallForModifies() {
 	vector< pair<unsigned int, string> > result;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
-	vector<string> results;
 	
 	// First synonym is of statement type - second param is definitely variable synonym type
 	
@@ -47,32 +45,4 @@ IntStringPairVectorResult* IntStringPairVectorResponse::apiCallForModifies() {
 		new IntStringPairVectorResult(result, make_pair(firstParam, secondParam));
 
 	return intStrPairResult;
-}
-
-vector<string> IntStringPairVectorResponse::getResult(vector<pair<int, string>> result) {
-	if (result.empty()) return getNoResults();
-	if (!selectSynonymIsFoundInParam()) return getImmediateResults();
-	return extractedResults(result);
-}
-
-vector<string> IntStringPairVectorResponse::extractedResults(vector<pair<int, string>> result) {
-	vector<string> extractedResult = selectSynonym == suchThatClause.firstParameter
-		? extractFirstParam(result) : extractSecondParam(result);
-	return extractedResult;
-}
-
-vector<string> IntStringPairVectorResponse::extractFirstParam(vector<pair<int, string>> input) {
-	vector<string> strVector;
-	for (pair<int, string> i : input) {
-		strVector.push_back(to_string(i.first));
-	}
-	return strVector;
-}
-
-vector<string> IntStringPairVectorResponse::extractSecondParam(vector<pair<int, string>> input) {
-	vector<string> strVector;
-	for (pair<int, string> i : input) {
-		strVector.push_back(i.second);
-	}
-	return strVector;
 }

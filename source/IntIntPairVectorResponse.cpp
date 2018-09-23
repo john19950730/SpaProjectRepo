@@ -7,7 +7,6 @@ IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForFollows() {
 	vector< pair<unsigned int, unsigned int> > result;
 	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
 	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
-	vector<string> results;
 
 	result = PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)
 	cout << "PKB::getAllFollowsPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Follows(a, b)" << endl;
@@ -28,12 +27,11 @@ IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForParent() {
 	vector< pair<unsigned int, unsigned int> > result;
 	string firstParamSyn = synonymTable[suchThatClause.firstParameter];
 	string secondParamSyn = synonymTable[suchThatClause.secondParameter];
-	vector<string> results;
 
 	result = PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)
 	cout << "PKB::getAllParentPair(firstParamSyn, secondParamSyn, suchThatClause.hasTransitiveClosure); // Parent(a, b)" << endl;
 	
-	// e.g. Modifies(s1,s1) - always false
+	// e.g. Parent(s1,s1) - always false
 	if (suchThatClause.firstParameter == suchThatClause.secondParameter) {
 		result = {};
 		cout << "Same Syonym: Parent(s1,s1)" << endl;
@@ -51,32 +49,4 @@ IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForUses() {
 
 IntIntPairVectorResult* IntIntPairVectorResponse::apiCallForModifies() {
 	return NULL;
-}
-
-vector<string> IntIntPairVectorResponse::getResult(vector<pair<int, int>> result) {
-	if (result.empty()) return getNoResults();
-	if (!selectSynonymIsFoundInParam()) return getImmediateResults();
-	return extractedResults(result);
-}
-
-vector<string> IntIntPairVectorResponse::extractedResults(vector<pair<int, int>> result) {
-	vector<string> extractedResult = selectSynonym == suchThatClause.firstParameter
-		? extractFirstParam(result) : extractSecondParam(result);
-	return extractedResult;
-}
-
-vector<string> IntIntPairVectorResponse::extractFirstParam(vector<pair<int, int>> input) {
-	vector<string> strVector;
-	for (pair<int, int> i : input) {
-		strVector.push_back(to_string(i.first));
-	}
-	return strVector;
-}
-
-vector<string> IntIntPairVectorResponse::extractSecondParam(vector<pair<int, int>> input) {
-	vector<string> strVector;
-	for (pair<int, int> i : input) {
-		strVector.push_back(to_string(i.second));
-	}
-	return strVector;
 }

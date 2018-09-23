@@ -12,7 +12,6 @@ BooleanResult* BooleanResponse::apiCallForFollows() {
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
-	string forTesting;
 
 	if (paramType == make_pair(STMT_NO, STMT_NO)) {
 		//forTesting = "isRsValid = PKB::isFollows(unsigned(stoi(firstParam)), unsigned(stoi(secondParam)), hasTransitiveClosure); // Follows(1, 2)";
@@ -33,10 +32,6 @@ BooleanResult* BooleanResponse::apiCallForFollows() {
 	
 	BooleanResult *result = new BooleanResult(isRsValid);
 	return result;
-
-	/*vector<string> result; //= isRsValid ? getImmediateResults() : getNoResults();
-	result.push_back(forTesting);
-	return result;*/
 }
 
 BooleanResult* BooleanResponse::apiCallForParent() {
@@ -44,7 +39,6 @@ BooleanResult* BooleanResponse::apiCallForParent() {
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	bool hasTransitiveClosure = suchThatClause.hasTransitiveClosure;
-	string forTesting;
 
 	if (paramType == make_pair(STMT_NO, STMT_NO)) {
 		//forTesting = "isRsValid = PKB::isParent(unsigned(stoi(firstParam)), unsigned(stoi(secondParam)), hasTransitiveClosure); // Parent(1, 2)";
@@ -65,10 +59,6 @@ BooleanResult* BooleanResponse::apiCallForParent() {
 	
 	BooleanResult *result = new BooleanResult(isRsValid);
 	return result;
-
-	/*vector<string> result; // = isRsValid ? getImmediateResults() : getNoResults();
-	result.push_back(forTesting);
-	return result;*/
 }
 
 BooleanResult* BooleanResponse::apiCallForUses() {
@@ -76,7 +66,6 @@ BooleanResult* BooleanResponse::apiCallForUses() {
 	bool isRsValid = false;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
-	string forTesting;
 	
 	if (paramType == make_pair(STMT_NO, VARIABLE)) { 
 		//forTesting = "PKB::isUses(stoi(firstParam), secondParam) // Uses(1, 'var')";
@@ -97,18 +86,13 @@ BooleanResult* BooleanResponse::apiCallForUses() {
 
 	BooleanResult *result = new BooleanResult(isRsValid);
 	return result;
-
-	/*vector<string> result; // isRsValid ? getImmediateResults() : getNoResults();
-	result.push_back(forTesting);
-	return result;*/
 }
 
 BooleanResult* BooleanResponse::apiCallForModifies() {
 	bool isRsValid = false;
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
-	string forTesting = "hello";
-
+	
 	if (paramType == make_pair(STMT_NO, VARIABLE)) {
 		//forTesting = "PKB::isModifies(stoi(firstParam), secondParam) // Modifies(1, 'var')";
 		isRsValid = PKB::isModifies(unsigned(stoi(firstParam)), secondParam); 
@@ -128,8 +112,4 @@ BooleanResult* BooleanResponse::apiCallForModifies() {
 
 	BooleanResult *result = new BooleanResult(isRsValid);
 	return result;
-
-	/*vector<string> result; // isRsValid ? getImmediateResults() : getNoResults();
-	result.push_back(forTesting);
-	return result;*/
 }

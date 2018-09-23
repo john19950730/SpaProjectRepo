@@ -23,9 +23,6 @@ StringVectorResult* StringVectorResponse::apiCallForUses() {
 	string secondParam = suchThatClause.secondParameter;
 	string synonym;
 	
-	string forTesting;
-	vector<string> results;
-
 	if (paramType == make_pair(STMT_NO, SYNONYM)) {
 		result = PKB::getAllVariablesUsedByStmtNo(unsigned(stoi(firstParam))); // Uses(1, v)
 		synonym = secondParam;
@@ -49,9 +46,6 @@ StringVectorResult* StringVectorResponse::apiCallForUses() {
 
 	StringVectorResult *strVectorResult = new StringVectorResult(result, synonym);
 	return strVectorResult;
-
-	/*results.push_back(forTesting);
-	return results;*/
 }
 
 StringVectorResult* StringVectorResponse::apiCallForModifies() {
@@ -60,10 +54,7 @@ StringVectorResult* StringVectorResponse::apiCallForModifies() {
 	string firstParam = suchThatClause.firstParameter;
 	string secondParam = suchThatClause.secondParameter;
 	string synonym;
-
-	string forTesting;
-	vector<string> results;
-
+	
 	if (paramType == make_pair(STMT_NO, SYNONYM)) {
 		result = PKB::getAllVariablesModifiedByStmtNo(unsigned(stoi(firstParam))); // Modifies(1, v)
 		synonym = secondParam;
@@ -87,24 +78,4 @@ StringVectorResult* StringVectorResponse::apiCallForModifies() {
 
 	StringVectorResult *strVectorResult = new StringVectorResult(result, synonym);
 	return strVectorResult;
-
-	/*results.push_back(forTesting);
-	return results;*/
-}
-
-string StringVectorResponse::strVectorToString(vector<string> input) {
-	string s = "";
-	for (string i : input) {
-		s += " " + i;
-	}
-	return s;
-}
-
-vector<string> StringVectorResponse::getResults(vector<string> result) {
-	if (!result.empty()) {
-		if (!selectSynonymIsFoundInParam()) return getImmediateResults();
-		else return result;
-		//else return strVectorToString(result);
-	}
-	else return getNoResults();
 }
