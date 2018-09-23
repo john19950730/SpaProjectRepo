@@ -31,7 +31,7 @@ const string RESULT_REGEX = "Select" + SPACE + "((?:" + SYNONYM + ")(?:" + COMMA
 const string REL_REGEX = '(' + REL + "|(?:" + REL_T + ")" + ASTERISK + ')' + BRACKET_O + "(?:(" + REL_PARAM + ')' + COMMA + '(' + REL_PARAM + "))" + BRACKET_C;
 const string SUCH_THAT = SPACE + "such" + SPACE + "that" + SPACE + "(?:" + REL_REGEX + ")";
 const string PATTERN = SPACE + "pattern" + SPACE + '(' + SYNONYM + ')' + BRACKET_O + '(' + REL_PARAM + ')' + COMMA + '(' + PATTERN_PARAM + ')' + BRACKET_C;
-const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT + '|' + PATTERN + ")*)*)" + SEMICOLON_OPT + '$';
+const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT + '|' + PATTERN + ")*)*)$";
 
 const string TRANS_REGEX = "[*]$";					// To check for transitive closure
 const string STRING_CONTENTS = "\"([^\"0-9\\W_]*(?:" + SYNONYM + '|' + NUMBER + "))\"";		// Used to extract text between double quotes
