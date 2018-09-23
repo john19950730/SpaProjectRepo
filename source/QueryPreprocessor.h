@@ -56,7 +56,7 @@ public:
 private:
 	QueryObject *queryObject;
 	map<string, string> synonymTable;
-	map<string, pair<vector<string>, vector<string>>> relParamTypes;
+	map<string, pair<vector<string>, vector<string>>> clauseParamTypeTable;
 
 	bool buildQueryObject(string query);
 	bool setResultsClauseInQueryObject(string query);
