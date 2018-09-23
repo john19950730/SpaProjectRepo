@@ -10,6 +10,14 @@ namespace UnitTesting
 {
 	TEST_CLASS(CombineResultsTwoCommonSynonymsTest)
 	{
+	private:
+		vector<string> commonKeys;
+		QueryObject *queryObject;
+		QueryEvaluator *queryEvaluator;
+		Result *firstResult;
+		Result *secondResult;
+		vector<string> selectedResult;
+		vector<string> expectedResult;
 	public:
 		TEST_METHOD(TwoCommonSynonyms)
 		{
@@ -29,7 +37,7 @@ namespace UnitTesting
 				make_pair(5, "h")
 			};
 			pair<string, string> synonyms = { make_pair("a", "v") };
-			Result *firstResult = new IntStringPairVectorResult(result, synonyms);
+			firstResult = new IntStringPairVectorResult(result, synonyms);
 
 			result = {
 				make_pair(1, "sum"),
@@ -41,17 +49,17 @@ namespace UnitTesting
 				make_pair(2, "h"),
 				make_pair(6, "r")
 			};
-			Result *secondResult = new IntStringPairVectorResult(result, synonyms);
+			secondResult = new IntStringPairVectorResult(result, synonyms);
 
-			vector<string> commonKeys = { "a", "v" };
-			QueryObject *queryObject = new QueryObject();
+			commonKeys = { "a", "v" };
+			queryObject = new QueryObject();
 
 			// Select Synonym is "a"
 			vector<string> selectClause = { "a" };
 			queryObject->setSelectClause(selectClause);
-			QueryEvaluator *queryEvaluator = new QueryEvaluator(queryObject);
-			vector<string> selectedResult = queryEvaluator->twoCommonSynonyms(firstResult, secondResult, commonKeys);
-			vector<string> expectedResult = {"1", "3", "2"};
+			queryEvaluator = new QueryEvaluator(queryObject);
+			selectedResult = queryEvaluator->twoCommonSynonyms(firstResult, secondResult, commonKeys);
+			expectedResult = {"1", "3", "2"};
 			sort(selectedResult.begin(), selectedResult.end());
 			sort(expectedResult.begin(), expectedResult.end());
 			Assert::IsTrue(selectedResult == expectedResult);
