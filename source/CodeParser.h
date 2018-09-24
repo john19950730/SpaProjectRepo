@@ -26,7 +26,7 @@ public:
 	static bool is_duplicate(string s, std::vector<std::string> list);
 	static bool CodeParser::is_appeared(char c, string s);
 	static bool CodeParser::compare_nesting(std::stack <std::pair<int, string>> prevNestingLevel, std::stack <std::pair<int, string>> currNestingLevel);
-	static int CodeParser::checkParent(int lineNumber);
+	static int CodeParser::checkParent(int lineNumber, stack < std::pair<int, string> >currNestingLevel);
 private:
 	static vector<LineOfCodeData> CodeParser::lineData;
 	static int CodeParser::lineNumber;

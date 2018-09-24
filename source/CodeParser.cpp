@@ -38,7 +38,6 @@ int CodeParser::parse(string code) {
 			start = length;
 		}
 	}
-
 	std::cout << lineData.size();
 
 	std::cout << lineNumber;
@@ -78,36 +77,44 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lcd.store("while", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
+		PKB::addWhile(lineNumber);
 		CodeParser::nesting_level.push(make_pair(lineNumber, "while"));
 		//find var being used
 		std::vector<std::string> variables = checkUses("while", lineOfCode);
 		for (int i = 0; i < variables.size(); i++) { //for every variable being used
+			PKB::addVariable(variables.at(i));
+		}
+		for (int i = 0; i < variables.size(); i++) { //for every variable being used
 			PKB::addUses(lineNumber, variables.at(i));
+			PKB::addProcedureUses("while", variables.at(i));
 		}
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
 		//TODO: addProcedureUses (main,'x')
-		PKB::addWhile(lineNumber); //DONE
-		//checkFollows(lineNumber);
-	    checkParent(lineNumber);
+		checkFollows(lineNumber);
+	    //checkParent(lineNumber,nesting_level);
 	}
 	if (foundIf == 1 && foundThen == 1) {
 		LineOfCodeData lcd;
 		lcd.store("if", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
+		PKB::addIf(lineNumber);
 		CodeParser::nesting_level.push(make_pair(lineNumber, "if"));
 		//find var being used
 		std::vector<std::string> variables = checkUses("if", lineOfCode);
 		for (int i = 0; i < variables.size(); i++) { //for every variable being used
+			PKB::addVariable(variables.at(i));
+		}
+		for (int i = 0; i < variables.size(); i++) { //for every variable being used
 			PKB::addUses(lineNumber, variables.at(i));
+			PKB::addProcedureUses("if", variables.at(i));
 		}
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
 		//TODO: addProcedureUses (main,'x')
-		PKB::addIf(lineNumber); //DONE
-		//checkFollows(lineNumber);
-		checkParent(lineNumber);
+		checkFollows(lineNumber);
+		//checkParent(lineNumber,nesting_level);
 	}
 	if (foundClose == 1 && foundElse != 1) {
 		CodeParser::nesting_level.pop();
@@ -121,27 +128,31 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lcd.store("read", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
+		PKB::addRead(lineNumber);
+		PKB::addVariable(checkModifies("read", lineOfCode));
 		//find var being modified
 		PKB::addModifies(lineNumber,checkModifies("read",lineOfCode));
+		PKB::addProcedureModifies("main", checkModifies("read", lineOfCode)); //TODO: detect procedure
 		//check if being modifies in parent nesting
 		checkForNestingModifies("read", lineOfCode);
-		PKB::addRead(lineNumber);
-		//checkFollows(lineNumber);
-		checkParent(lineNumber);
+		checkFollows(lineNumber);
+		//checkParent(lineNumber,nesting_level);
 	}
 	if (foundPrint == 1) {
 		LineOfCodeData lcd;
 		lcd.store("print", lineOfCode, nesting_level);
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
+		PKB::addPrint(lineNumber);
 		//find var being used
 		std::vector<std::string> variables = checkUses("print", lineOfCode);
+		PKB::addVariable(variables.at(0));
 		PKB::addUses(lineNumber, variables.at(0)); //only one variable
+		PKB::addProcedureUses("main", variables.at(0));
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
-		PKB::addPrint(lineNumber);
-		//checkFollows(lineNumber);
-		checkParent(lineNumber);
+		checkFollows(lineNumber);
+		//checkParent(lineNumber,nesting_level);
 	}
 	if (foundProcedure != 1 && foundWhile != 1 && foundIf != 1 && foundThen != 1 && foundElse != 1
 		&& foundRead != 1 && foundPrint != 1 && foundEquals == 1) { //TODO: input validation, detect invalid line: clearPKB(), or when new program loaded
@@ -151,27 +162,31 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lineNumber++;
 		PKB::addAssign(lineNumber);
 		//find var being modified
+		//add it to VarTable and Modifies relationship
+		PKB::addVariable(checkModifies("assignment", lineOfCode));
 		PKB::addModifies(lineNumber,checkModifies("assignment", lineOfCode));
-		std::cout << "check uses: ";
+		PKB::addProcedureModifies("main", checkModifies("assignment", lineOfCode)); //TODO: detect procedure
 		//find var being used
 		std::vector<std::string> variables = checkUses("assignment", lineOfCode);
 		for (int i = 0; i < variables.size(); i++) { //for every variable being used
-			PKB::addUses(lineNumber, variables.at(i));
+			PKB::addVariable(variables.at(i));
+		}
+		for (int i = 0; i < variables.size(); i++) { //for every variable being used
+			PKB::addUses(lineNumber, variables.at(i)); //add it to uses relationship
+			PKB::addProcedureUses("main", variables.at(i));
 		}
 		//check if being used/modifies in parent nesting
 		checkForNestingModifies("assignment", lineOfCode);
 		checkForNestingUses(variables);
-		//checkFollows(lineNumber);
-		checkParent(lineNumber);
+		checkFollows(lineNumber);
+		//checkParent(lineNumber,nesting_level);
 		//TODO: addProcedureModifies(procName,varName);
 	}
 
 	return 0;
 }
 
-int CodeParser::checkParent(int lineNumber) {
-	std::stack <std::pair<int, string>> currNestingLevel;
-	currNestingLevel = nesting_level;
+int CodeParser::checkParent(int lineNumber , stack < std::pair<int, string> >currNestingLevel) {
 	while (!currNestingLevel.empty()) { //if 
 		pair<int, string> nestingStackElement = currNestingLevel.top();
 		currNestingLevel.pop();
@@ -209,8 +224,9 @@ int CodeParser::checkFollows(int lineNumber) {
 		}
 		//account for if else nesting
 	}
-
-
+	else {
+		return 0;
+	}
 	return 0;
 }
 
@@ -337,7 +353,7 @@ bool CodeParser::is_appeared(char c, string s) { //if c appears in cA, return tr
 std::vector<std::string> CodeParser::split(string s) {
 	//split a string e.g. cenX+x+1*y/x;
 	//eliminate duplicate variables
-	//eliminate int constants
+	//eliminate int constants (TODO: SAVE IT LATER??)
 	std::vector<std::string> splitted;
 	string delim = "*+-/%;";
 
