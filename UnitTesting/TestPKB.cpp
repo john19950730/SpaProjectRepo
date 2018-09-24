@@ -74,6 +74,14 @@ namespace UnitTesting
 			vector<unsigned int> lists2 = PKB::getAllStmtsFollowedBy("assign", 8, false);
 			Assert::AreEqual(lists2.size(), (size_t)0); //Follows(a, 8) should have no entries
 		}
+		TEST_METHOD(Parent)
+		{
+			//Reusing the sample program above
+			Assert::IsTrue(PKB::isParent(3, 4, false)); //Parent(3, 4) should be true
+			Assert::IsFalse(PKB::isParent(3, 6, false)); //Parent(3, 6) should be false but...
+			Assert::IsTrue(PKB::isParent(3, 6, true)); //Parent*(3, 6) should be true
+			Assert::IsFalse(PKB::isParent(4, 5, false)); //Parent(4, 5) should be false
 
+		}
 	};
 }
