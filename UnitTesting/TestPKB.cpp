@@ -9,30 +9,6 @@ namespace UnitTesting
 	TEST_CLASS(TestPKB)
 	{
 	public:
-		TEST_METHOD(Utility)
-		{
-			/*	Using sample (invalid) SIMPLE Program as follows for reference:
-			procedure main {
-		1		read x;
-		2		while (x > 0) {
-		3			y = y + 1;
-		4			if (y > 5) {
-		5				print x;
-					} else {
-		6				call main;
-					}
-				}
-		7		y = 0;
-			} */
-			// Populating PKB with relevant data
-			/*PKB::addRead(1);
-			PKB::addWhile(2);
-			PKB::addAssign(3);
-			PKB::addIf(4);
-			PKB::addPrint(5);
-			PKB::addCall(6);
-			PKB::addAssign(7);*/
-		}
 		TEST_METHOD(Follows)
 		{
 			/*	Using sample SIMPLE Program as follows for reference:
@@ -50,6 +26,7 @@ namespace UnitTesting
 		8		y = 0;
 			} */
 			// Populating PKB with relevant data
+			PKB::clearPKB();
 			PKB::addRead(1);
 			PKB::addAssign(2);
 			PKB::addWhile(3);
