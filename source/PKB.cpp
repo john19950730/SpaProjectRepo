@@ -196,6 +196,10 @@ unsigned int PKB::addProcedure(string procName)
 	return procedureListIndex++;
 }
 
+void PKB::addConstant(unsigned int stmtNo, string constant)
+{
+}
+
 void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 {
 	followsList[stmtBefore] = stmtAfter;
