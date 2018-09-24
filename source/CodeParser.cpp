@@ -89,7 +89,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		//TODO: addProcedureUses (main,'x')
 		PKB::addWhile(lineNumber); //DONE
 		//checkFollows(lineNumber);
-		//checkParent(lineNumber);
+	    checkParent(lineNumber);
 	}
 	if (foundIf == 1 && foundThen == 1) {
 		LineOfCodeData lcd;
@@ -107,7 +107,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		//TODO: addProcedureUses (main,'x')
 		PKB::addIf(lineNumber); //DONE
 		//checkFollows(lineNumber);
-		//checkParent(lineNumber);
+		checkParent(lineNumber);
 	}
 	if (foundClose == 1 && foundElse != 1) {
 		CodeParser::nesting_level.pop();
@@ -127,7 +127,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		checkForNestingModifies("read", lineOfCode);
 		PKB::addRead(lineNumber);
 		//checkFollows(lineNumber);
-		//checkParent(lineNumber);
+		checkParent(lineNumber);
 	}
 	if (foundPrint == 1) {
 		LineOfCodeData lcd;
@@ -141,7 +141,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		checkForNestingUses(variables);
 		PKB::addPrint(lineNumber);
 		//checkFollows(lineNumber);
-		//checkParent(lineNumber);
+		checkParent(lineNumber);
 	}
 	if (foundProcedure != 1 && foundWhile != 1 && foundIf != 1 && foundThen != 1 && foundElse != 1
 		&& foundRead != 1 && foundPrint != 1 && foundEquals == 1) { //TODO: input validation, detect invalid line: clearPKB(), or when new program loaded
@@ -162,7 +162,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		checkForNestingModifies("assignment", lineOfCode);
 		checkForNestingUses(variables);
 		//checkFollows(lineNumber);
-		//checkParent(lineNumber);
+		checkParent(lineNumber);
 		//TODO: addProcedureModifies(procName,varName);
 	}
 
