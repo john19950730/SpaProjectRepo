@@ -14,11 +14,8 @@ APICallPatternClause::APICallPatternClause(pair<string, string> paramType, PATTE
 
 Result* APICallPatternClause::executeApiCall() {
 	if (paramType == make_pair(VARIABLE, UNDERSCORE) || paramType == make_pair(UNDERSCORE, CONSTANT) || paramType == make_pair(UNDERSCORE, VARIABLE)
-		|| paramType == make_pair(VARIABLE, CONSTANT) || paramType == make_pair(VARIABLE, VARIABLE)) {
+		|| paramType == make_pair(VARIABLE, CONSTANT) || paramType == make_pair(VARIABLE, VARIABLE) || paramType == make_pair(UNDERSCORE, UNDERSCORE)) {
 		return getIntVectorResponse();
-	}
-	else if (paramType == make_pair(UNDERSCORE, UNDERSCORE)) {
-		return getBooleanResponse();
 	}
 	else if (paramType == make_pair(SYNONYM, UNDERSCORE) || paramType == make_pair(SYNONYM, CONSTANT)
 		|| paramType == make_pair(SYNONYM, VARIABLE)) {
@@ -30,7 +27,6 @@ Result* APICallPatternClause::executeApiCall() {
 
 IntVectorResult* APICallPatternClause::getIntVectorResponse() {
 	vector<unsigned int> result;
-	vector<string> results;
 	string synonym = patternClause.synonym;
 	string firstParam = patternClause.firstParam;
 	string secondParam = patternClause.secondParam;
@@ -76,18 +72,13 @@ IntVectorResult* APICallPatternClause::getIntVectorResponse() {
 
 		cout << "// a('v', _'h'_)" << endl;
 	}
+	else if (paramType == make_pair(UNDERSCORE, UNDERSCORE)) {
+		cout << "// a(_,_)" << endl;
+		cout << "result = PKB::getAssigns();" << endl;
+		result = PKB::getAssigns();
+	}
 
 	IntVectorResult* intVectorResult = new IntVectorResult(result, synonym);
-	return intVectorResult;
-}
-
-BooleanResult* APICallPatternClause::getBooleanResponse() {
-	// a(_,_)
-	bool isPatternValid = PKB::hasAssignmentStmt();
-
-	cout << "// a(_,_)" << endl;
-
-	BooleanResult* intVectorResult = new BooleanResult(isPatternValid);
 	return intVectorResult;
 }
 
@@ -129,33 +120,4 @@ IntStringPairVectorResult* APICallPatternClause::getIntStringVectorResponse() {
 
 	IntStringPairVectorResult *intStrResult = new IntStringPairVectorResult(result, make_pair(synonym1, firstParam));
 	return intStrResult;
-}
-
-vector<string> APICallPatternClause::selectResults(bool hasResults, vector<int> results) {
-	string patternSynonym = patternClause.synonym;
-	if (!hasResults) return getNoResults();
-
-	if (patternSynonym != selectSynonym) {
-		return getImmediateResults();
-	}
-	else {
-		//return intVectorToString(results); // select the results - convert vector<int> into string
-		return convertVectorIntToVectorStr(results);
-	}
-}
-
-string APICallPatternClause::intVectorToString(vector<int> input) {
-	string s = "";
-	for (int i : input) {
-		s += " " + to_string(i);
-	}
-	return s;
-}
-
-vector<string> APICallPatternClause::convertVectorIntToVectorStr(vector<int> input) {
-	vector<string> strVector;
-	for (int i : input) {
-		strVector.push_back(to_string(i));
-	}
-	return strVector;
 }

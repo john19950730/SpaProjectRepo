@@ -26,22 +26,22 @@ StringVectorResult* StringVectorResponse::apiCallForUses() {
 	if (paramType == make_pair(STMT_NO, SYNONYM)) {
 		result = PKB::getAllVariablesUsedByStmtNo(unsigned(stoi(firstParam))); // Uses(1, v)
 		synonym = secondParam;
-		//forTesting = "getAllVariablesUsedByStmtNo // Uses(1, v)";
+		cout << "getAllVariablesUsedByStmtNo // Uses(1, v)" << endl;
 	}
 	else if (paramType == make_pair(PROC_NAME, SYNONYM)) {
 		result = PKB::getAllVariablesUsedByProcedure(firstParam);	// Uses("proc" , v)
 		synonym = secondParam;
-		//forTesting = "getAllVariablesUsedByProcedure // Uses('proc' , v)";
+		cout << "getAllVariablesUsedByProcedure // Uses('proc' , v)" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
 		result = PKB::getAllProceduresThatUses(); // Uses(p, _)
 		synonym = firstParam;
-		//forTesting = "getAllProceduresThatUses // Uses(p, _)";
+		cout << "getAllProceduresThatUses // Uses(p, _)" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, VARIABLE)) {
 		result = PKB::getAllProceduresThatUsesVariable(secondParam);	// Uses(p, "var")
 		synonym = firstParam;
-		//forTesting = "getAllProceduresThatUsesVariable // Uses(p, 'var')";
+		cout << "getAllProceduresThatUsesVariable // Uses(p, 'var')" << endl;
 	}
 
 	StringVectorResult *strVectorResult = new StringVectorResult(result, synonym);
@@ -58,22 +58,22 @@ StringVectorResult* StringVectorResponse::apiCallForModifies() {
 	if (paramType == make_pair(STMT_NO, SYNONYM)) {
 		result = PKB::getAllVariablesModifiedByStmtNo(unsigned(stoi(firstParam))); // Modifies(1, v)
 		synonym = secondParam;
-		//forTesting = "getAllVariablesModifiedByStmtNo // Modifies(1, v)";
+		cout << "getAllVariablesModifiedByStmtNo // Modifies(1, v)" << endl;
 	}
 	else if (paramType == make_pair(PROC_NAME, SYNONYM)) {
 		result = PKB::getAllVariablesModifiedByProcedure(firstParam);	// Modifies("proc" , v)
 		synonym = secondParam;
-		//forTesting = "getAllVariablesUsedByProcedure // Modifies('proc' , v)";
+		cout << "getAllVariablesUsedByProcedure // Modifies('proc' , v)" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, UNDERSCORE)) {
 		result = PKB::getAllProceduresThatModifies(); // Modifies(p, _)
 		synonym = firstParam;
-		//forTesting = "getAllProceduresThatModifies // Modifies(p, _)";
+		cout << "getAllProceduresThatModifies // Modifies(p, _)" << endl;
 	}
 	else if (paramType == make_pair(SYNONYM, VARIABLE)) {
 		result = PKB::getAllProceduresThatModifiesVariable(secondParam);	// Modifies(p, "var")
 		synonym = firstParam;
-		//forTesting = "getAllProceduresThatModifiesVariable // Modifies(p, 'var')";
+		cout << "getAllProceduresThatModifiesVariable // Modifies(p, 'var')" << endl;
 	}
 
 	StringVectorResult *strVectorResult = new StringVectorResult(result, synonym);
