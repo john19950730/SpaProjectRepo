@@ -36,12 +36,13 @@ void MainWindow::btnLoad_clicked() {
 	QString m_fileContents = file.readAll();
 	ui->txtCodeEditor->document()->setPlainText(m_fileContents);	
 	wrapper->parse(src_name.toStdString());
+	wrapper->parseFromCode(ui->txtCodeEditor->toPlainText().toStdString());
 }
 
 void MainWindow::btnRun_clicked() {
 	std::list<std::string> results;
 	wrapper->evaluate(ui->txtQuery->toPlainText().toStdString(),results);
-	wrapper->parseFromCode(ui->txtCodeEditor->toPlainText().toStdString());
+	//wrapper->parseFromCode(ui->txtCodeEditor->toPlainText().toStdString());
 	//std::cout << ui->txtCodeEditor->toPlainText().toStdString();
 	QString result_str;
 

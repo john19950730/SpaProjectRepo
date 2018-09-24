@@ -36,6 +36,9 @@ public:
 	static unsigned int addCall(unsigned int stmtNo);
 	static unsigned int addProcedure(string procName);
 
+	/* SPA pattern table */
+	static void addConstant(unsigned int stmtNo, string constant);
+
 	// FOR PQL
 	/* SPA Follows Relations query */
 	static bool isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star); // Follows(1, 2)
