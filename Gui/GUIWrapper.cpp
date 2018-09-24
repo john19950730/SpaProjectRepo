@@ -2,6 +2,7 @@
 #include "QueryPreprocessor.h"
 #include "CodeParser.h"
 #include "QueryEvaluator.h"
+#include "PKB.h"
 
 #include <iostream>
 #include <vector>
@@ -16,6 +17,7 @@ GUIWrapper::GUIWrapper() {
 void GUIWrapper::parse(std::string filename) {
 	// call your parser to do the parsing
 	std::cout << "parsed " << filename << std::endl;
+	PKB::clearPKB();
   // ...rest of your code...
 }
 //from code editor
