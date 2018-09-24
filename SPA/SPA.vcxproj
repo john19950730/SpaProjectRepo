@@ -26,6 +26,7 @@
     <ClCompile Include="..\source\QueryObject.cpp" />
     <ClCompile Include="..\source\QueryObjStructures.h" />
     <ClCompile Include="..\source\QueryPreprocessor.cpp" />
+    <ClCompile Include="..\source\Result.cpp" />
     <ClCompile Include="..\source\StringStringPairVectorResponse.cpp" />
     <ClCompile Include="..\source\StringVectorResponse.cpp" />
     <ClCompile Include="..\source\TNode.cpp" />
@@ -47,6 +48,7 @@
     <ClInclude Include="..\source\QueryEvaluator.h" />
     <ClInclude Include="..\source\QueryObject.h" />
     <ClInclude Include="..\source\QueryPreprocessor.h" />
+    <ClInclude Include="..\source\Result.h" />
     <ClInclude Include="..\source\StringStringPairVectorResponse.h" />
     <ClInclude Include="..\source\StringVectorResponse.h" />
     <ClInclude Include="..\source\TNode.h" />

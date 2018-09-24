@@ -1,4 +1,8 @@
 #include "TestWrapper.h"
+#include "QueryPreprocessor.h"
+#include "CodeParser.h"
+#include "QueryEvaluator.h"
+#include "Utility.h"
 
 // implementation code of WrapperFactory - do NOT modify the next 5 lines
 AbstractWrapper* WrapperFactory::wrapper = 0;
@@ -19,6 +23,8 @@ TestWrapper::TestWrapper() {
 void TestWrapper::parse(std::string filename) {
 	// call your parser to do the parsing
   // ...rest of your code...
+	string codeStr = Utility::fileToString(filename);
+	CodeParser::parse(codeStr);
 }
 
 // method to evaluating a query
@@ -28,4 +34,25 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 
   // store the answers to the query in the results list (it is initially empty)
   // each result must be a string.
+
+	QueryPreprocessor queryPreprocessor;
+	bool isQueryParseSuccessful = queryPreprocessor.parseQuery(query);	// create a query object
+
+	// code to pass query object to query evaluator
+	if (isQueryParseSuccessful) {
+		QueryEvaluator *queryEvaluator = new QueryEvaluator(queryPreprocessor.getQueryObject());
+		vector<string> result = queryEvaluator->evaluateQueryObject();
+
+		string strResult = "";
+		for (string i : result) {
+			strResult += " " + i;
+		}
+
+		// store the answers to the query in the results list (it is initially empty)
+		// each result must be a string.
+		results.push_back(strResult);
+	}
+	else {
+		results.push_back(query + "\nQuery result: Invalid query!");
+	}
 }
