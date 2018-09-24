@@ -68,9 +68,9 @@ static map<unsigned int, unsigned int> parentList;
 static map<unsigned int, vector<unsigned int> > childList;
 // element at index i, j means Parent*(i, j) holds
 static map<pair<unsigned int, unsigned int>, bool> parentStarTable;
-// Parent*(i, j) holds for each element j in list at index i, filtered by synonym type
-static map<string, map<unsigned int, vector<unsigned int> > > parentStarList;
 // Parent*(i, j) holds for each element i in list at index j, filtered by synonym type
+static map<string, map<unsigned int, vector<unsigned int> > > parentStarList;
+// Parent*(i, j) holds for each element j in list at index i, filtered by synonym type
 static map<string, map<unsigned int, vector<unsigned int> > > childStarList;
 // Parent pair storage, maps synonym pairs to appropriate parent pair
 static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > parentPairs;
@@ -348,11 +348,8 @@ vector<unsigned int> PKB::getAllFollowedStmts(string synonym1, bool star)
 vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
 	vector<unsigned int> result;
-	if (!star) {
-		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
-		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo1) {
-			return isFollows(stmtNo1, stmtNo2, false);
-		});
+	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(followedList[stmtNo2]))) {
+		result.push_back(followedList[stmtNo2]);
 	}
 	else {
 		result = followedStarList[synonym1][stmtNo2];
@@ -375,11 +372,8 @@ vector<unsigned int> PKB::getAllFollowsStmts(string synonym2, bool star)
 vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
 	vector<unsigned int> result;
-	if (!star) {
-		vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
-		copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo2) {
-			return isFollows(stmtNo1, stmtNo2, false);
-		});
+	if (!star && exactMatch(synonym2, getSynonymTypeOfStmt(followsList[stmtNo1]))) {
+		result.push_back(followsList[stmtNo1]);
 	}
 	else {
 		result = followsStarList[synonym2][stmtNo1];
@@ -396,70 +390,85 @@ vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string sy
 //represents: Parent(1, 2) or Parent*(1, 2)
 bool PKB::isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	if (stmtNo1 >= parentList.size() || stmtNo2 >= parentList.size())
-		return false;
-	if (!star) {
-		return parentList[stmtNo2] == stmtNo1;
-	}
-	else {
-		return parentStarTable[make_pair(stmtNo1, stmtNo2)];
-	}
+	return (!star && parentList[stmtNo2] == stmtNo1) ||
+		(star && parentStarTable[make_pair(stmtNo1, stmtNo2)]);
 }
 
 //represents: Parent(1, _), Parent*(1, _)
 bool PKB::hasChild(unsigned int stmtNo1, bool star)
 {
-	//TODO
-	return false;
+	return childList[stmtNo1].size() > 0;
 }
 
 //represents: Parent(_, 2) or Parent*(_, 2)
 bool PKB::hasParent(unsigned int stmtNo2, bool star)
 {
-	//TODO
-	return false;
+	return parentList[stmtNo2] != 0;
 }
 
 //represents: Parent(_, _) or Parent*(_, _)
 bool PKB::hasParentPair(bool star)
 {
-	//TODO
-	return false;
+	return parentPairs.size();
 }
 
 //represents: Parent(a, b) or Parent*(a, b)
 vector<pair<unsigned int, unsigned int>> PKB::getAllParentPair(string synonym1, string synonym2, bool star)
 {
-	//TODO
-	return vector<pair<unsigned int, unsigned int>>();
+	if (star)
+		return parentStarPairs[make_pair(synonym1, synonym2)];
+	return parentPairs[make_pair(synonym1, synonym2)];
 }
 
 //represents: Parent(a, _) or Parent*(a, _)
 vector<unsigned int> PKB::getAllParentStmts(string synonym1, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
+	vector<unsigned int> result;
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+		return hasChild(stmtNo, star);
+	});
+	return result;
 }
 
 //represents: Parent(a, 2) or Parent*(a, 2)
 vector<unsigned int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned int stmtNo2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> result;
+	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(parentList[stmtNo2]))) {
+		result.push_back(parentList[stmtNo2]);
+	}
+	else {
+		result = parentStarList[synonym1][stmtNo2];
+	}
+	return result;
 }
 
 //represents: Parent(_, b) or Parent*(_, b)
 vector<unsigned int> PKB::getAllChildStmts(string synonym2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
+	vector<unsigned int> result;
+	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
+		return hasParent(stmtNo, star);
+	});
+	return result;
 }
 
 //represents: Parent(1, b) or Parent*(1, b)
 vector<unsigned int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string synonym2, bool star)
 {
-	//TODO
-	return vector<unsigned int>();
+	vector<unsigned int> result;
+	if (!star) {
+		result = childList[stmtNo1];
+		remove_if(result.begin(), result.end(), [=](unsigned int stmtNo2) {
+			return exactMatch(synonym2, getSynonymTypeOfStmt(stmtNo2));
+		});
+	}
+	else {
+		result = childStarList[synonym2][stmtNo1];
+	}
+	return result;
 }
 
 /****************************************
