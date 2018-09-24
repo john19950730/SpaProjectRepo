@@ -97,6 +97,25 @@ vector<string> QueryEvaluator::getResults(Result* firstResult, Result* secondRes
 		return APICall::apiCallForImmediateResults(synonymType);
 	}
 
+	// One clause is boolean response which returns true and another is a clause that returns results
+	if (firstResultTable.empty()) {
+		if (secondResult->isSelectSynonymFound(selectSynonym)) {
+			return selectFrom(secondResultTable);
+		}
+		else {
+			return APICall::apiCallForNoResults();
+		}		
+	}
+
+	if (secondResultTable.empty()) {
+		if (firstResult->isSelectSynonymFound(selectSynonym)) {
+			return selectFrom(firstResultTable);
+		}
+		else {
+			return APICall::apiCallForNoResults();
+		}
+	}
+
 	// Both clauses have results but select synonym is not found in any of the clause
 	if (!firstResult->isSelectSynonymFound(selectSynonym) && !secondResult->isSelectSynonymFound(selectSynonym)) {
 		return APICall::apiCallForImmediateResults(synonymType);
