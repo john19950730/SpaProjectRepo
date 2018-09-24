@@ -1,0 +1,5 @@
+procedure Example {
+  x = 2;
+  z = k;
+  i = 5;
+  }
