@@ -262,7 +262,7 @@ void PKB::addConstant(unsigned int stmtNo, string constant)
 {
 	stmtConstantPairMap[STMT_VAR][make_pair(stmtNo, constant)] = true;
 	stmtConstantPairMap[getSynonymTypeOfStmt(stmtNo)][make_pair(stmtNo, constant)] = true;
-	if (find(constantStmtsMap[STMT_VAR][constant].begin(), constantStmtsMap[STMT_VAR][constant].end(), stmtNo) != constantStmtsMap[STMT_VAR][constant].end()) {
+	if (find(constantStmtsMap[STMT_VAR][constant].begin(), constantStmtsMap[STMT_VAR][constant].end(), stmtNo) == constantStmtsMap[STMT_VAR][constant].end()) {
 		constantStmtsMap[STMT_VAR][constant].push_back(stmtNo);
 		constantStmtsMap[getSynonymTypeOfStmt(stmtNo)][constant].push_back(stmtNo);
 	}
