@@ -4,9 +4,9 @@ Our project focuses on developing a C++ project that does static program analysi
 
 ###### Currently our prototype is able to do the following:
 - Get results from "Select" synonym
-- Evaluate "Follows" queries
-- Evaluate "Follows*" queries
-- Evaluate "Modifies" queries
+- Evaluate "Follows" relationship clause
+- Evaluate "Follows*" relationship clause
+- Evaluate "Modifies" relationship clause
 - Evaluate "Parent" relationship clause
 - Evaluate "Parents*" relationship clauses
 - Evaluate "Pattern" clauses
