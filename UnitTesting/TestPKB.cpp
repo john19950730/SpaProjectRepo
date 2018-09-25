@@ -140,6 +140,12 @@ namespace UnitTesting
 
 			vector<unsigned int> list1p = PKB::getAllStmtsThatIsParentOf("while", 6, false);
 			Assert::AreEqual(list1p.size(), (size_t)0); //Parent(w, 6) should return empty set
+
+			vector<unsigned int> list_p = PKB::getAllChildStmts("print", true);
+			Assert::AreEqual(list_p.size(), (size_t)2); //Parent*(_, p) should have two entries
+
+			vector<unsigned int> list1a = PKB::getAllStmtsThatIsChildOf(3, "print", true);
+			Assert::AreEqual(list1a.size(), (size_t)2); //Parent*(3, p) should have 6, 7
 		}
 		TEST_METHOD(Uses)
 		{
