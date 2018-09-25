@@ -416,9 +416,7 @@ bool PKB::hasFollowsPair(bool star)
 //represents Follows(a, b) or Follows*(a, b)
 vector<pair<unsigned int, unsigned int> > PKB::getAllFollowsPair(string synonym1, string synonym2, bool star)
 {
-	if (!star)
-		return followsPairs[make_pair(synonym1, synonym2)];
-	return followsStarPairs[make_pair(synonym1, synonym2)];
+	return star ? followsStarPairs[make_pair(synonym1, synonym2)] : followsPairs[make_pair(synonym1, synonym2)];
 }
 
 //represents Follows(a, _) or Follows*(a, _)
@@ -503,9 +501,7 @@ bool PKB::hasParentPair(bool star)
 //represents: Parent(a, b) or Parent*(a, b)
 vector<pair<unsigned int, unsigned int>> PKB::getAllParentPair(string synonym1, string synonym2, bool star)
 {
-	if (star)
-		return parentStarPairs[make_pair(synonym1, synonym2)];
-	return parentPairs[make_pair(synonym1, synonym2)];
+	return star ? parentStarPairs[make_pair(synonym1, synonym2)] : parentPairs[make_pair(synonym1, synonym2)];
 }
 
 //represents: Parent(a, _) or Parent*(a, _)
