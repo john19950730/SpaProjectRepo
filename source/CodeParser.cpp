@@ -41,7 +41,7 @@ int CodeParser::parse(string code) {
 		if (code[i] == '\n') { // encounter a nextline
 			int length = i + 1; 
 			std::string subString = code.substr(start, length - start);
-			processLine(subString,lineCount);//process this line
+			processLine(subString);//process this line
 			line.push_back(subString); //save into vector
 			std::cout << lineCount << " line is: " << line.at(lineCount-1);
 			lineCount++;
@@ -53,7 +53,7 @@ int CodeParser::parse(string code) {
 	return 0;
 }
 
-int CodeParser::processLine(string lineOfCode, int lineNum) {
+int CodeParser::processLine(string lineOfCode) {
 
 	std::regex equals_regex("={1,1}");
 	std::regex close_regex("\\}");
@@ -86,7 +86,6 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
 		PKB::addWhile(lineNumber);
-		CodeParser::nesting_level.push(make_pair(lineNumber, "while"));
 		//find var being used
 		std::vector<std::string> variables = checkUses("while", lineOfCode, lineNumber);
 		for (int i = 0; i < variables.size(); i++) { //for every variable being used
@@ -99,6 +98,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
 		checkFollows(lineNumber);
+		CodeParser::nesting_level.push(make_pair(lineNumber, "while"));
 	    //checkParent(lineNumber,nesting_level);
 	}
 	if (foundIf == 1) {
@@ -107,7 +107,6 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		lineData.push_back(lcd); //add line object into vector
 		lineNumber++;
 		PKB::addIf(lineNumber);
-		CodeParser::nesting_level.push(make_pair(lineNumber, "if"));
 		//find var being used
 		std::vector<std::string> variables = checkUses("if", lineOfCode, lineNumber);
 		for (int i = 0; i < variables.size(); i++) { //for every variable being used
@@ -120,6 +119,7 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
 		checkFollows(lineNumber);
+		CodeParser::nesting_level.push(make_pair(lineNumber, "if"));
 		//checkParent(lineNumber,nesting_level);
 	}
 	if (foundElse == 1) { //else encounter
