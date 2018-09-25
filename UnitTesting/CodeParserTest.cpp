@@ -108,35 +108,71 @@ namespace UnitTesting
 
 		}
 
-		//TEST_METHOD(CheckUsesTest) // Verify With Joshua
-		//{
-		//	std::vector<std::string> checkUsesOutput;
-		//	std::vector<std::string> checkUsesExpectedOutPut;
+		TEST_METHOD(CheckUsesTest) // Verify With Joshua
+		{
+			std::vector<std::string> checkUsesOutput;
+			std::vector<std::string> checkUsesExpectedOutPut;
+			int count;
 
-		//	// Test if the ouput of CheckUses is the same as expected
-		//	checkUsesExpectedOutPut.push_back("a,b");
-		//	checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
-		//	Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+			// Loading data to checkUsesExpectedOutput Vector & checkUsesOutput Vector
+			checkUsesExpectedOutPut.push_back("x");
+			checkUsesExpectedOutPut.push_back("a");
+			checkUsesOutput = CodeParser::checkUses("while", "while(x!=0&&a!=0)",1);
 
-		//	// Clear the vectors
-		//	checkUsesExpectedOutPut.clear();
-		//	checkUsesOutput.clear();
+			// Test if every item in the vectors are the same
+			for (count = 0; count < checkUsesOutput.size(); count++)
+			{
+				Assert::AreEqual(checkUsesExpectedOutPut[count], checkUsesOutput[count]);
+			}
 
-		//	// Test if the output of CheckUses is the same with duplicated variable
-		//	checkUsesExpectedOutPut.push_back("a,b,c");
-		//	checkUsesOutput = CodeParser::checkUses("while", "x=a*b+b+c");
-		//	Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+			// Clear the vectors
+			checkUsesExpectedOutPut.clear();
+			checkUsesOutput.clear();
 
-		//	// Clear the vectors
-		//	checkUsesExpectedOutPut.clear();
-		//	checkUsesOutput.clear();
+			// Loading data to checkUsesExpectedOutput Vector & checkUsesOutput Vector
+			checkUsesExpectedOutPut.push_back("a");
+			checkUsesExpectedOutPut.push_back("b");
+			checkUsesExpectedOutPut.push_back("c");
+			checkUsesOutput = CodeParser::checkUses("while", "while(a!=b && b!=c && c!=a && a!=1 || b!=2 || c!=3)",2);
 
-		//	// Test if ouput of CheckUses is different as expected
-		//	checkUsesExpectedOutPut.push_back("b,a");
-		//	checkUsesOutput = CodeParser::checkUses("while", "x=a+b");
-		//	Assert::AreSame(checkUsesExpectedOutPut[0], checkUsesOutput[0]);
+			// Test if every item in the vectors are the same
+			for (count = 0; count < checkUsesOutput.size(); count++)
+			{
+				Assert::AreEqual(checkUsesExpectedOutPut[count], checkUsesOutput[count]);
+			}
 
-		//}
+			// Clear the vectors
+			checkUsesExpectedOutPut.clear();
+			checkUsesOutput.clear();
+
+			// Loading data to checkUsesExpectedOutput Vector & checkUsesOutput Vector
+			checkUsesExpectedOutPut.push_back("x");
+			checkUsesExpectedOutPut.push_back("a");
+			checkUsesOutput = CodeParser::checkUses("if", "if(x!=0&&a!=0)", 1);
+
+			// Test if every item in the vectors are the same
+			for (count = 0; count < checkUsesOutput.size(); count++)
+			{
+				Assert::AreEqual(checkUsesExpectedOutPut[count], checkUsesOutput[count]);
+			}
+
+			// Clear the vectors
+			checkUsesExpectedOutPut.clear();
+			checkUsesOutput.clear();
+
+			// Loading data to checkUsesExpectedOutput Vector & checkUsesOutput Vector
+			checkUsesExpectedOutPut.push_back("a");
+			checkUsesExpectedOutPut.push_back("b");
+			checkUsesExpectedOutPut.push_back("c");
+			checkUsesOutput = CodeParser::checkUses("if", "if(a!=b && b!=c && c!=a && a!=1 || b!=2 || c!=3)", 2);
+
+			// Test if every item in the vectors are the same
+			for (count = 0; count < checkUsesOutput.size(); count++)
+			{
+				Assert::AreEqual(checkUsesExpectedOutPut[count], checkUsesOutput[count]);
+			}
+
+		}
 
 		TEST_METHOD(CheckCompare_Nesting)
 		{

@@ -355,7 +355,7 @@ vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int st
 	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(followedList[stmtNo2]))) {
 		result.push_back(followedList[stmtNo2]);
 	}
-	else {
+	else if (star) {
 		result = followedStarList[synonym1][stmtNo2];
 	}
 	return result;
@@ -379,7 +379,7 @@ vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string sy
 	if (!star && exactMatch(synonym2, getSynonymTypeOfStmt(followsList[stmtNo1]))) {
 		result.push_back(followsList[stmtNo1]);
 	}
-	else {
+	else if (star) {
 		result = followsStarList[synonym2][stmtNo1];
 	}
 	return result;
@@ -442,7 +442,7 @@ vector<unsigned int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned in
 	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(parentList[stmtNo2]))) {
 		result.push_back(parentList[stmtNo2]);
 	}
-	else {
+	else if (star) {
 		result = parentStarList[synonym1][stmtNo2];
 	}
 	return result;
