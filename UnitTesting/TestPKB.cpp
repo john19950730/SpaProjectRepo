@@ -51,7 +51,7 @@ namespace UnitTesting
 			Assert::IsFalse(PKB::hasFollows(5, false)); //Follows(5, _) is false
 			Assert::IsTrue(PKB::hasFollowedBy(8, false)); //Follows(_, 8) is true
 			Assert::IsFalse(PKB::hasFollowedBy(7, false)); //Follows(_, 7) is false
-			Assert::IsTrue(PKB::hasFollowsPair); //Follows(_, _) is true
+			Assert::IsTrue(PKB::hasFollowsPair(false)); //Follows(_, _) is true
 
 			vector<pair<unsigned int, unsigned int> > pairs = PKB::getAllFollowsPair("assign", "stmt", false);
 			Assert::AreEqual(pairs.size(), (size_t)2); //Follows(a, s) should have 2 pairs
@@ -93,7 +93,21 @@ namespace UnitTesting
 			Assert::IsFalse(PKB::hasParent(3, false)); //Parent(3, _) should be false
 			Assert::IsTrue(PKB::hasParentPair(false)); //Parent(_, _) should be true
 			
-			vector<pair<unsigned int, unsigned int> > pairs = PKB::getAllParentPair("stmt", "stmt");
+			vector<pair<unsigned int, unsigned int> > pairs = PKB::getAllParentPair("stmt", "stmt", true);
+			Assert::AreEqual(pairs.size(), (size_t)6); //Parent(stmt, stmt) should have 6 pairs as below
+			Assert::IsTrue(find(pairs.begin(), pairs.end(), pair<unsigned int, unsigned int>(3, 4)) != pairs.end() &&
+				find(pairs.begin(), pairs.end(), pair<unsigned int, unsigned int>(3, 5)) != pairs.end() &&
+				find(pairs.begin(), pairs.end(), pair<unsigned int, unsigned int>(3, 6)) != pairs.end() &&
+				find(pairs.begin(), pairs.end(), pair<unsigned int, unsigned int>(3, 7)) != pairs.end() &&
+				find(pairs.begin(), pairs.end(), pair<unsigned int, unsigned int>(5, 6)) != pairs.end() &&
+				find(pairs.begin(), pairs.end(), pair<unsigned int, unsigned int>(5, 7)) != pairs.end());
+			
+			vector<unsigned int> listw_ = PKB::getAllParentStmts("while", false);
+			Assert::AreEqual(listw_.size(), (size_t)1); //Parent(w, _) should have only 1 stmt
+			Assert::IsTrue(listw_[0] == 3);
+
+			vector<unsigned int> list1p = PKB::getAllStmtsThatIsParentOf("while", 6, false);
+			Assert::AreEqual(list1p.size(), (size_t)0); //Parent(w, 6) should return empty set
 		}
 	};
 }
