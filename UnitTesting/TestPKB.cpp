@@ -153,5 +153,22 @@ namespace UnitTesting
 
 			Assert::IsTrue(PKB::hasProcedureUses("main")); //Uses("main", _) should be true
 		}
+
+		TEST_METHOD(Modifies)
+		{
+			//Reusing the sample program
+			//Populating the PKB
+			PKB::addModifies(1, "x");
+			PKB::addModifies(2, "y");
+			PKB::addModifies(4, "y");
+			PKB::addModifies(3, "y");
+
+			//Tests
+			Assert::IsTrue(PKB::isModifies(1, "x")); //Modifies(1, "x") is true
+			Assert::IsFalse(PKB::isModifies(3, "x")); //Modifies(2, "x") is false
+			Assert::IsTrue(PKB::hasModifies(3)); //Modifies(3, _) is true
+			Assert::IsFalse(PKB::hasModifies(5)); //Modifies(5, _) is false
+
+		}
 	};
 }
