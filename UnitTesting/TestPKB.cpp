@@ -159,9 +159,13 @@ namespace UnitTesting
 			//Reusing the sample program
 			//Populating the PKB
 			PKB::addModifies(1, "x");
+			PKB::addProcedureModifies("main", "x");
 			PKB::addModifies(2, "y");
+			PKB::addProcedureModifies("main", "y");
 			PKB::addModifies(4, "y");
+			PKB::addProcedureModifies("main", "y");
 			PKB::addModifies(3, "y");
+			PKB::addProcedureModifies("main", "y");
 
 			//Tests
 			Assert::IsTrue(PKB::isModifies(1, "x")); //Modifies(1, "x") is true
@@ -169,6 +173,26 @@ namespace UnitTesting
 			Assert::IsTrue(PKB::hasModifies(3)); //Modifies(3, _) is true
 			Assert::IsFalse(PKB::hasModifies(5)); //Modifies(5, _) is false
 
+			vector<pair<unsigned int, string> > pairs = PKB::getAllStmtModifiesVariablePairs("stmt");
+			Assert::AreEqual(pairs.size(), (size_t)4); //Modifies(s, v) should have <1, "x">, <2, "y">, <4, "y"> and <3, "y">
+			Assert::IsTrue(pairs[0] == pair<unsigned int, string>(1, "x") &&
+				pairs[1] == pair<unsigned int, string>(2, "y") &&
+				pairs[2] == pair<unsigned int, string>(4, "y") &&
+				pairs[3] == pair<unsigned int, string>(3, "y"));
+
+			vector<unsigned int> lista_ = PKB::getAllStmtThatModifies("assign");
+			Assert::AreEqual(lista_.size(), (size_t)2); //Modifies(a, _) should return 2 and 4
+			Assert::IsTrue(lista_[0] == 2 && lista_[1] == 4);
+
+			vector<unsigned int> listwx = PKB::getAllStmtThatModifiesVariable("while", "x");
+			Assert::AreEqual(listwx.size(), (size_t)0); //Modifies(w, "x") returns nothing
+
+			vector<string> procMs = PKB::getAllVariablesModifiedByProcedure("main");
+			Assert::AreEqual(procMs.size(), (size_t)2); //Modifies("main", v) returns "x", "y"
+			Assert::IsTrue(procMs[0] == string("x") && procMs[1] == string("y"));
+
+			vector<string> noProc = PKB::getAllVariablesModifiedByProcedure("insignificant");
+			Assert::AreEqual(noProc.size(), (size_t)0); //procedure non existant should return empty set
 		}
 	};
 }
