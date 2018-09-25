@@ -200,8 +200,8 @@ namespace UnitTesting
 			Assert::IsTrue(checkOutput);
 
 			// Clearing a stack with ClearStack() method made for this purpose
-			stackA = ClearStack();
-			stackB = ClearStack();
+			stackA = ClearPairStack();
+			stackB = ClearPairStack();
 
 			// loading stackA with data
 			stackA.push(make_pair(1, "a"));
@@ -222,8 +222,8 @@ namespace UnitTesting
 			Assert::IsTrue(checkOutput);
 
 			// Clearing a stack with ClearStack() method made for this purpose
-			stackA = ClearStack();
-			stackB = ClearStack();
+			stackA = ClearPairStack();
+			stackB = ClearPairStack();
 
 			// loading stackA with data
 			stackA.push(make_pair(1, "a"));
@@ -244,8 +244,8 @@ namespace UnitTesting
 			Assert::IsTrue(checkOutput);
 
 			// Clearing a stack with ClearStack() method made for this purpose
-			stackA = ClearStack();
-			stackB = ClearStack();
+			stackA = ClearPairStack();
+			stackB = ClearPairStack();
 
 			// Comparing between stackA and stackB 
 			checkOutput = CodeParser::compare_nesting(stackA, stackB);
@@ -254,8 +254,8 @@ namespace UnitTesting
 			Assert::IsFalse(checkOutput);
 
 			// Clearing a stack with ClearStack() method made for this purpose
-			stackA = ClearStack();
-			stackB = ClearStack();
+			stackA = ClearPairStack();
+			stackB = ClearPairStack();
 
 			// Loading stackA with data
 			stackA.push(make_pair(1, "h"));
@@ -267,8 +267,8 @@ namespace UnitTesting
 			Assert::IsTrue(checkOutput);
 
 			// Clearing a stack with ClearStack() method made for this purpose
-			stackA = ClearStack();
-			stackB = ClearStack();
+			stackA = ClearPairStack();
+			stackB = ClearPairStack();
 
 			// Loading stackA with data
 			stackA.push(make_pair(1, "h"));
@@ -285,9 +285,66 @@ namespace UnitTesting
 
 		}
 
-		std::stack <std::pair<int, string>> ClearStack()
+		TEST_METHOD(CheckParentTest)
+		{
+			//int lineNumber , stack < std::pair<int, string> >currNestingLevel
+			int expectOutput;
+
+			// Load inputStack with relevant data
+			stack < std::pair<int, string> > inputStack;
+			inputStack.push(make_pair(0,"main"));
+			inputStack.push(make_pair(4, "while"));
+			inputStack.push(make_pair(7, "if"));
+			inputStack.push(make_pair(0, "else"));
+
+			// Load expectOutput with data using checkParent method
+			expectOutput = CodeParser::checkParent(4, inputStack);
+
+			// Test if the expectOutput returns 1 when found a parent in the stack
+			Assert::AreEqual(expectOutput, 1);
+
+			//Clear Stack
+			inputStack = ClearIntPairStack();
+
+			// Load inputStack with relevant data
+			inputStack.push(make_pair(0, "main"));
+			inputStack.push(make_pair(7, "if"));
+
+			// Load expectOutput with data using checkParent method
+			expectOutput = CodeParser::checkParent(4, inputStack);
+
+			// Test if the expectOutput returns 1 when found a parent in the stack
+			Assert::AreEqual(expectOutput, 1);
+
+			//Clear Stack
+			inputStack = ClearIntPairStack();
+
+			// Load expectOutput with data using checkParent method
+			expectOutput = CodeParser::checkParent(4, inputStack);
+
+			// Test if the expectOutput returns 0 when stack is empty
+			Assert::AreEqual(expectOutput, 0);
+
+			//Clear Stack
+			inputStack = ClearIntPairStack();
+
+			// Load expectOutput with data using checkParent method
+			inputStack.push(make_pair(0, "main"));
+			expectOutput = CodeParser::checkParent(4, inputStack);
+
+			// Test if the expectOutput returns 0 when stack has only parent
+			Assert::AreEqual(expectOutput, 0);
+		}
+
+		std::stack <std::pair<int, string>> ClearPairStack()
 		{
 			std::stack <std::pair<int, string>> theNewStack;
+			return theNewStack;
+		}
+
+		stack < std::pair<int, string> > ClearIntPairStack()
+		{
+			stack < std::pair<int, string> > theNewStack;
 			return theNewStack;
 		}
 
