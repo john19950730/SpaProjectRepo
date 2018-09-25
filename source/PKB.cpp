@@ -82,6 +82,9 @@ static map<string, map<unsigned int, vector<string> > > usesTable;
 static map<string, map<string, vector<unsigned int> > > usedTable;
 // array of all stmtNos i where Uses(i, _) holds, filtered by synonym
 static map<string, vector<unsigned int> > usesStmtsList;
+// maps Uses(i, v) pair and Uses(p, v) pair to boolean
+static map<pair<unsigned int, string>, bool> usesMap;
+static map<pair<string, string>, bool> procedureUsesMap;
 // maps procedure name to list of variables used in the procedure
 static unordered_map<string, vector<string> > procedureUsesTable;
 // maps variable name to list of procedures that uses the variable
@@ -98,6 +101,9 @@ static map<string, map<unsigned int, vector<string> > > modifiesTable;
 static map<string, map<string, vector<unsigned int> > > modifiedTable;
 // array of all stmtNos i where Modifies(i, _) holds, filtered by synonym
 static map<string, vector<unsigned int> > modifiesStmtsList;
+// maps Modifies(i, v) pair and Modifies(p, v) pair to boolean
+static map<pair<unsigned int, string>, bool> modifiesMap;
+static map<pair<string, string>, bool> procedureModifiesMap;
 // maps procedure name to list of variables modified in the procedure
 static unordered_map<string, vector<string> > procedureModifiesTable;
 // maps variable name to list of procedures that modifies the variable
@@ -153,6 +159,8 @@ void PKB::clearPKB()
 	usesTable = map<string, map<unsigned int, vector<string> > >();
 	usedTable = map<string, map<string, vector<unsigned int> > >();
 	usesStmtsList = map<string, vector<unsigned int> >();
+	usesMap = map<pair<unsigned int, string>, bool>();
+	procedureUsesMap = map<pair<string, string>, bool>();
 	procedureUsesTable = unordered_map<string, vector<string> >();
 	procedureUsedTable = unordered_map<string, vector<string> >();
 	procedureUsesList = vector<string>();
@@ -162,6 +170,8 @@ void PKB::clearPKB()
 	modifiesTable = map<string, map<unsigned int, vector<string> > >();
 	modifiedTable = map<string, map<string, vector<unsigned int> > >();
 	modifiesStmtsList = map<string, vector<unsigned int> >();
+	modifiesMap = map<pair<unsigned int, string>, bool>();
+	procedureModifiesMap = map<pair<string, string>, bool>();
 	procedureModifiesTable = unordered_map<string, vector<string> >();
 	procedureModifiedTable = unordered_map<string, vector<string> >();
 	procedureModifiesList = vector<string>();
@@ -315,6 +325,7 @@ void PKB::addUses(unsigned int stmtNo, string varName)
 			usesStmtsList[STMT_VAR].push_back(stmtNo);
 			usesStmtsList[getSynonymTypeOfStmt(stmtNo)].push_back(stmtNo);
 		}
+		usesMap[make_pair(stmtNo, varName)] = true;
 		usesPairs[STMT_VAR].push_back(make_pair(stmtNo, varName));
 		usesPairs[getSynonymTypeOfStmt(stmtNo)].push_back(make_pair(stmtNo, varName));
 	}
@@ -329,6 +340,7 @@ void PKB::addProcedureUses(string procName, string varName)
 		procedureUsesTable[procName].push_back(varName);
 		procedureUsedTable[varName].push_back(procName);
 		procedureUsesPairs.push_back(make_pair(procName, varName));
+		procedureUsesMap[make_pair(procName, varName)] = true;
 		if (find(procedureUsesList.begin(), procedureUsesList.end(), procName) != procedureUsesList.end()) {
 			procedureUsesList.push_back(procName);
 		}
@@ -340,12 +352,13 @@ void PKB::addModifies(unsigned int stmtNo, string varName)
 	if (find(modifiesTable[STMT_VAR][stmtNo].begin(), modifiesTable[STMT_VAR][stmtNo].end(), varName) == modifiesTable[STMT_VAR][stmtNo].end()) {
 		modifiesTable[STMT_VAR][stmtNo].push_back(varName);
 		modifiesTable[getSynonymTypeOfStmt(stmtNo)][stmtNo].push_back(varName);
-		usedTable[STMT_VAR][varName].push_back(stmtNo);
-		usedTable[getSynonymTypeOfStmt(stmtNo)][varName].push_back(stmtNo);
+		modifiedTable[STMT_VAR][varName].push_back(stmtNo);
+		modifiedTable[getSynonymTypeOfStmt(stmtNo)][varName].push_back(stmtNo);
 		if (find(modifiesStmtsList[STMT_VAR].begin(), modifiesStmtsList[STMT_VAR].end(), stmtNo) == modifiesStmtsList[STMT_VAR].end()) {
 			modifiesStmtsList[STMT_VAR].push_back(stmtNo);
 			modifiesStmtsList[getSynonymTypeOfStmt(stmtNo)].push_back(stmtNo);
 		}
+		modifiesMap[make_pair(stmtNo, varName)] = true;
 		modifiesPairs[STMT_VAR].push_back(make_pair(stmtNo, varName));
 		modifiesPairs[getSynonymTypeOfStmt(stmtNo)].push_back(make_pair(stmtNo, varName));
 	}
@@ -360,6 +373,7 @@ void PKB::addProcedureModifies(string procName, string varName)
 		procedureModifiesTable[procName].push_back(varName);
 		procedureModifiedTable[varName].push_back(procName);
 		procedureModifiesPairs.push_back(make_pair(procName, varName));
+		procedureModifiesMap[make_pair(procName, varName)] = true;
 		if (find(procedureModifiesList.begin(), procedureModifiesList.end(), procName) != procedureModifiesList.end()) {
 			procedureModifiesList.push_back(procName);
 		}
@@ -554,8 +568,7 @@ vector<unsigned int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string 
 //represents: Uses(1, "var")
 bool PKB::isUses(unsigned int stmtNo1, string varName)
 {
-	return hasUses(stmtNo1) ? 
-		find(usesTable[STMT_VAR][stmtNo1].begin(), usesTable[STMT_VAR][stmtNo1].end(), varName) != usesTable[STMT_VAR][stmtNo1].end() : false;
+	return usesMap[make_pair(stmtNo1, varName)];
 }
 
 //represents: Uses(1, _)
@@ -591,8 +604,7 @@ vector< pair<unsigned int, string> > PKB::getAllStmtUsesVariablePairs(string syn
 //represents Uses("proc", "var")
 bool PKB::isProcedureUses(string procName, string varName)
 {
-	return hasProcedureUses(procName) ?
-		find(procedureUsedTable[varName].begin(), procedureUsedTable[varName].end(), procName) != procedureUsedTable[varName].end() : false;
+	return procedureUsesMap[make_pair(procName, varName)];
 }
 
 //represents Uses("proc", _)
@@ -634,8 +646,7 @@ vector< pair<string, string> > PKB::getAllProcedureUsesVariablePairs()
 //represents: Modifies(1, "var")
 bool PKB::isModifies(unsigned int stmtNo, string varName)
 {
-	return hasModifies(stmtNo) ? 
-		find(modifiesTable[STMT_VAR][stmtNo].begin(), modifiesTable[STMT_VAR][stmtNo].end(), varName) != modifiesTable[STMT_VAR][stmtNo].end() : false;
+	return modifiesMap[make_pair(stmtNo, varName)];
 }
 
 //represents: Modifies(1, _)
@@ -671,8 +682,7 @@ vector< pair<unsigned int, string> > PKB::getAllStmtModifiesVariablePairs(string
 //represents: Modifies("proc", "var")
 bool PKB::isProcedureModifies(string procName, string varName)
 {
-	return hasProcedureModifies(procName) ?
-		find(procedureModifiesTable[procName].begin(), procedureModifiesTable[procName].end(), varName) != procedureModifiesTable[procName].end() : false;
+	return procedureModifiesMap[make_pair(procName, varName)];
 }
 
 //represents: Modifies("proc", _)
