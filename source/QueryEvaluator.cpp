@@ -89,16 +89,42 @@ vector<string> QueryEvaluator::getResults(Result* firstResult, Result* secondRes
 
 	// For clauses that returns false or clauses that returns no results
 	if (!isFirstClauseValid || !isSecondClauseValid) {
+		cout << "For clauses that returns false or clauses that returns no results" << endl;
 		return APICall::apiCallForNoResults();
 	}
 
 	// Both clauses are boolean response which returns true
-	if (firstResultTable.empty() && secondResultTable.empty()) {
+	/*if (firstResultTable.empty() && secondResultTable.empty()) {
+		cout << "Both clauses are boolean response which returns true" << endl;
 		return APICall::apiCallForImmediateResults(synonymType);
+	}*/
+
+	// One clause is boolean response which returns true and another is a clause that returns results
+	if (firstResultTable.empty()) {
+		if (secondResult->isSelectSynonymFound(selectSynonym)) {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn found" << endl;
+			return selectFrom(secondResultTable);
+		}
+		else {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn NOT found" << endl;
+			return APICall::apiCallForImmediateResults(synonymType);
+		}		
+	}
+
+	if (secondResultTable.empty()) {
+		if (firstResult->isSelectSynonymFound(selectSynonym)) {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn found" << endl;
+			return selectFrom(firstResultTable);
+		}
+		else {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn NOT found" << endl;
+			return APICall::apiCallForImmediateResults(synonymType);
+		}
 	}
 
 	// Both clauses have results but select synonym is not found in any of the clause
 	if (!firstResult->isSelectSynonymFound(selectSynonym) && !secondResult->isSelectSynonymFound(selectSynonym)) {
+		cout << "// Both clauses have results but select synonym is not found in any of the clause" << endl;
 		return APICall::apiCallForImmediateResults(synonymType);
 	}
 

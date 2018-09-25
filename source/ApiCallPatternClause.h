@@ -16,11 +16,6 @@ public:
 private:
 	PATTERN_CLAUSE patternClause;
 
-	BooleanResult* getBooleanResponse();
 	IntVectorResult* getIntVectorResponse();
 	IntStringPairVectorResult* getIntStringVectorResponse();
-
-	vector<string> selectResults(bool hasResults, vector<int> results);
-	string intVectorToString(vector<int> input);
-	vector<string> convertVectorIntToVectorStr(vector<int> input);
 };
