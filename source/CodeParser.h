@@ -14,7 +14,7 @@ class LineOfCodeData;
 class CodeParser {
 public:
 	static int parse(string);
-	static int CodeParser::processLine(string lineOfCode, int lineNum);
+	static int CodeParser::processLine(string lineOfCode);
 	static int CodeParser::checkFollows(int lineNumber); //return statement before
 	static string CodeParser::checkModifies(string stmtType, string stmt); //return var being modified
 	static std::vector<std::string> CodeParser::checkUses(string stmtType, string stmt, int lineNum);
