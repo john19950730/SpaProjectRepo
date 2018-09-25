@@ -1,5 +1,15 @@
-# SpaProjectRepo
+# SpaProjectRepo - Iteration 1 Prototype Stage
 
+Our project focuses on developing a C++ project that does static program analysis known as SPA. It is a tool to do program analysis for a programming language called SIMPLE. The SPA are used to answer program queries written in Program Query Language known as PQL.
+
+Currently our prototype is able to do the following: 
+-Analyse "Select" queries
+-Analyse "Follows" queries
+-Analyse "Modifies" queries
+-Analyse "Parent" queries
+-Analyse "Parents*" queries
+
+###### Issue Reporting and Branch Creating
 - For anything you want to fix , create an issue
 - All issue will come with numbers such as #1
 - Always branch out from the dev branch
