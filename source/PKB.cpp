@@ -139,6 +139,15 @@ void PKB::clearPKB()
 	parentPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
 	parentStarPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
 
+	usesTable = map<string, map<unsigned int, vector<string> > >();
+	usedTable = map<string, map<string, vector<unsigned int> > >();
+	usesList = map<string, vector<unsigned int> >();
+	procedureUsesTable = unordered_map<string, vector<string> >();
+	procedureUsedTable = unordered_map<string, vector<string> >();
+	procedureUsesList = vector<string>();
+	usesPairs = map<string, vector<pair<unsigned int, string> > >();
+	procedureUsesPairs = vector<pair<string, string> >();
+
 	//TODO: add more resets after Uses and Modifies tables are revamped
 
 }
