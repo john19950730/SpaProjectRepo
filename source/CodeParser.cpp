@@ -155,7 +155,7 @@ int CodeParser::processLine(string lineOfCode) {
 		checkFollows(lineNumber);
 		checkParent(lineNumber,nesting_level);
 	}
-	if (foundProcedure != 1 && foundWhile != 1 && foundIf != 1 && foundElse != 1
+	if (foundProcedure != 1 && foundWhile != 1 && foundIf != 1
 		&& foundRead != 1 && foundPrint != 1 && foundEquals == 1) { //TODO: input validation, detect invalid line: clearPKB(), or when new program loaded
 		LineOfCodeData lcd;
 		lcd.store("assignment", lineOfCode, nesting_level);
