@@ -32,6 +32,12 @@ int CodeParser::parse(string code) {
 	}
 
 	for (int i = 0; i < code.length(); i++) { //logic for read code line by line
+		if (code[i] == '}') {
+			string firstHalf = code.substr(0, i+1);
+			firstHalf += '\n';
+			string secondHalf = code.substr(i+1,code.length()-1-i);
+			code = firstHalf + secondHalf;
+		}
 		if (code[i] == '\n') { // encounter a nextline
 			int length = i + 1; 
 			std::string subString = code.substr(start, length - start);
@@ -116,16 +122,6 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		checkFollows(lineNumber);
 		//checkParent(lineNumber,nesting_level);
 	}
-	if (foundClose == 1) {
-		nestingStackElement = nesting_level.top();
-		if (nestingStackElement.second != "if") {
-			CodeParser::nesting_level.pop();
-			if (nestingStackElement.second == "else") {
-				nestingStackElement = nesting_level.top();
-				CodeParser::nesting_level.pop();
-			}
-		}
-	}
 	if (foundElse == 1) { //else encounter
 		CodeParser::nesting_level.push(make_pair(0, "else"));
 	}
@@ -186,6 +182,19 @@ int CodeParser::processLine(string lineOfCode, int lineNum) {
 		checkForNestingUses(variables);
 		checkFollows(lineNumber);
 		//checkParent(lineNumber,nesting_level);
+	}
+	if (foundClose == 1) {
+		nestingStackElement = nesting_level.top();
+		if (nestingStackElement.second != "if") {
+			CodeParser::nesting_level.pop();
+			if (nestingStackElement.second == "else") {
+				nestingStackElement = nesting_level.top();
+				CodeParser::nesting_level.pop();
+			}
+		}
+		else {
+			nestingStackElement = make_pair(0, "");
+		}
 	}
 	return 0;
 }
