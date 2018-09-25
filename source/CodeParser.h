@@ -27,10 +27,11 @@ public:
 	static bool CodeParser::is_appeared(char c, string s);
 	static bool CodeParser::compare_nesting(std::stack <std::pair<int, string>> prevNestingLevel, std::stack <std::pair<int, string>> currNestingLevel);
 	static int CodeParser::checkParent(int lineNumber, stack < std::pair<int, string> >currNestingLevel);
+	static string CodeParser::extractProcedureName(string s);
 private:
 	static vector<LineOfCodeData> CodeParser::lineData;
+	static vector<string> CodeParser::procedures;
 	static int CodeParser::lineNumber;
-	static int CodeParser::prevLineNumber;
-	static int CodeParser::prevNestingLevel;
+	static pair<int, string> nestingStackElement;
 	static stack <std::pair<int, string>> CodeParser::nesting_level; //save curr nesting level at this line of code
 };
