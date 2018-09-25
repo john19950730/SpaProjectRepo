@@ -306,12 +306,16 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 			followsStarTable[make_pair(i, stmtAfter)] = followsStarTable[make_pair(i, stmtBefore)];
 			followsStarList[STMT_VAR][i].push_back(stmtAfter);
 			followsStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtAfter);
+			followedStarList[STMT_VAR][stmtAfter].push_back(i);
+			followedStarList[getSynonymTypeOfStmt(stmtAfter)][stmtAfter].push_back(i);
 			addFollowsPair(i, stmtAfter, true);
 		}
 	}
 	for (i = stmtAfter + 1; i <= totalLines; ++i) {
 		if (followsStarTable[make_pair(stmtAfter, i)]) {
 			followsStarTable[make_pair(stmtBefore, i)] = followsStarTable[make_pair(stmtAfter, i)];
+			followsStarList[STMT_VAR][stmtBefore].push_back(i);
+			followsStarList[getSynonymTypeOfStmt(stmtBefore)][stmtBefore].push_back(i);
 			followedStarList[STMT_VAR][i].push_back(stmtBefore);
 			followedStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtBefore);
 			addFollowsPair(stmtBefore, i, true);
@@ -347,12 +351,16 @@ void PKB::addParent(unsigned int stmtParent, unsigned int stmtChild)
 			parentStarTable[make_pair(i, stmtChild)] = parentStarTable[make_pair(i, stmtParent)];
 			childStarList[STMT_VAR][i].push_back(stmtChild);
 			childStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtChild);
+			parentStarList[STMT_VAR][stmtParent].push_back(i);
+			parentStarList[getSynonymTypeOfStmt(stmtParent)][stmtParent].push_back(i);
 			addParentPair(i, stmtChild, true);
 		}
 	}
 	for (i = stmtChild + 1; i <= totalLines; ++i) {
 		if (parentStarTable[make_pair(stmtChild, i)]) {
 			parentStarTable[make_pair(stmtParent, i)] = parentStarTable[make_pair(stmtChild, i)];
+			childStarList[STMT_VAR][stmtChild].push_back(i);
+			childStarList[getSynonymTypeOfStmt(stmtChild)][stmtChild].push_back(i);
 			parentStarList[STMT_VAR][i].push_back(stmtParent);
 			parentStarList[getSynonymTypeOfStmt(i)][i].push_back(stmtParent);
 			addParentPair(stmtParent, i, true);
