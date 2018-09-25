@@ -10,7 +10,8 @@ vector<string> APICall::apiCallForImmediateResults(string synonymType) {
 }
 
 vector<string> APICall::apiCallForNoResults() {
-	return vector<string>();
+	vector<string> result = { "none" };
+	return result;
 }
 
 vector<string> APICall::getImmediateResults() {
@@ -20,7 +21,8 @@ vector<string> APICall::getImmediateResults() {
 }
 
 vector<string> APICall::getNoResults() {
-	return vector<string>();
+	vector<string> result = { "none" };
+	return result;
 }
 
 vector<string> APICall::immediateResults(string synonymType) {
