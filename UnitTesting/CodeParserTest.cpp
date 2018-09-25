@@ -287,11 +287,10 @@ namespace UnitTesting
 
 		TEST_METHOD(CheckParentTest)
 		{
-			//int lineNumber , stack < std::pair<int, string> >currNestingLevel
 			int expectOutput;
+			stack < std::pair<int, string> > inputStack;
 
 			// Load inputStack with relevant data
-			stack < std::pair<int, string> > inputStack;
 			inputStack.push(make_pair(0,"main"));
 			inputStack.push(make_pair(4, "while"));
 			inputStack.push(make_pair(7, "if"));
@@ -334,6 +333,39 @@ namespace UnitTesting
 
 			// Test if the expectOutput returns 0 when stack has only parent
 			Assert::AreEqual(expectOutput, 0);
+		}
+
+		TEST_METHOD(SplitWhileIfConditionTest)
+		{
+			std::vector<std::string> expectedVectorOutput;
+			std::vector<std::string> methodVectorOutput;
+			int count;
+
+			// Load data for expectedVectorOutput & methodVectorOutput
+			expectedVectorOutput.push_back("x");
+			methodVectorOutput = CodeParser::splitWhileIfConditions("(x!=0)",2);
+
+			// Test if methodVectorOutput are the same as expectedVectorOutput
+			for (count = 0; count < methodVectorOutput.size(); count++)
+			{
+				Assert::AreEqual(expectedVectorOutput[count],methodVectorOutput[count]);
+			}
+
+			// Clear the vector
+			expectedVectorOutput.clear();
+
+			// Load data for expectedVectorOutput & methodVectorOutput
+			expectedVectorOutput.push_back("x");
+			expectedVectorOutput.push_back("y");
+			expectedVectorOutput.push_back("z");
+			expectedVectorOutput.push_back("a");
+			methodVectorOutput = CodeParser::splitWhileIfConditions("(x!=0&&y<1||y==0&&z!=a||a==1)", 2);
+
+			// Test if methodVectorOutput are the same as expectedVectorOutput
+			for (count = 0; count < methodVectorOutput.size(); count++)
+			{
+				Assert::AreEqual(expectedVectorOutput[count], methodVectorOutput[count]);
+			}
 		}
 
 		std::stack <std::pair<int, string>> ClearPairStack()
