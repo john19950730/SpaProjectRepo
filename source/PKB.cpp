@@ -351,7 +351,7 @@ void PKB::addParent(unsigned int stmtParent, unsigned int stmtChild)
 			parentStarTable[make_pair(i, stmtChild)] = parentStarTable[make_pair(i, stmtParent)];
 			childStarList[STMT_VAR][i].push_back(stmtChild);
 			childStarList[getSynonymTypeOfStmt(stmtChild)][i].push_back(stmtChild);
-			parentStarList[STMT_VAR][i].push_back(i);
+			parentStarList[STMT_VAR][stmtChild].push_back(i);
 			parentStarList[getSynonymTypeOfStmt(i)][stmtChild].push_back(i);
 			addParentPair(i, stmtChild, true);
 		}
