@@ -9,6 +9,7 @@
 using namespace std;
 
 const string SPACE = "[\\s]+";						// One or more spaces
+const string SPACE_OPT = "[\\s]*";
 const string COMMA = "[\\s]*[,][\\s]*";				// Comma (padded by zero or more spaces)
 const string SEMICOLON = "[\\s]*[;][\\s]*";			// Semicolon (padded by zero or more spaces)
 const string SEMICOLON_OPT = "[\\s]*[;]?[\\s]*";	// Semicolon (optional; padded by zero or more spaces)
@@ -31,7 +32,7 @@ const string RESULT_REGEX = "Select" + SPACE + "((?:" + SYNONYM + ")(?:" + COMMA
 const string REL_REGEX = '(' + REL + "|(?:" + REL_T + ")" + ASTERISK + ')' + BRACKET_O + "(?:(" + REL_PARAM + ')' + COMMA + '(' + REL_PARAM + "))" + BRACKET_C;
 const string SUCH_THAT_REGEX = SPACE + "such" + SPACE + "that" + SPACE + "(?:" + REL_REGEX + ")";
 const string PATTERN_REGEX = SPACE + "pattern" + SPACE + '(' + SYNONYM + ')' + BRACKET_O + '(' + REL_PARAM + ')' + COMMA + '(' + PATTERN_PARAM + ')' + BRACKET_C;
-const string QUERY_SYNTAX_REGEX = "^(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT_REGEX + '|' + PATTERN_REGEX + ")*))$";
+const string QUERY_SYNTAX_REGEX = '^' + SPACE_OPT + "(?:(?:" + DECL_REGEX + ")*" + "(?:" + RESULT_REGEX + "(?:" + SUCH_THAT_REGEX + '|' + PATTERN_REGEX + ")*))" + SPACE_OPT + '$';
 
 /* Helper regex definitions */
 const string IS_TRANS_REGEX = "[*]$";															// To check for transitive closure
