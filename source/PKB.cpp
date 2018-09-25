@@ -59,14 +59,14 @@ static map<string, map<string, vector<unsigned int> > > constantStmtsMap;
 |										|
 ****************************************/
 
-// element at key i means Follows(i, element) holds
-static map<unsigned int, unsigned int> followsMap;
-// element at key i means Follows(element, i) holds
-static map<unsigned int, unsigned int> followedMap;
-// list at index i with statements with Follows(i, _), filtered by synonym
-static map<string, map<unsigned int, vector<unsigned int> > > followsList;
-// list at index i of statements with Follows(_, i), filtered by synonym
-static map<string, map<unsigned int, vector<unsigned int> > > followedList;
+// element at key i means Follows(i, element) holds, filtered by synonym of element
+static map<string, map<unsigned int, unsigned int> > followsMap;
+// element at key i means Follows(element, i) holds, filtered by synonym of element
+static map<string, map<unsigned int, unsigned int> > followedMap;
+// list of all stmts with Follows(i, _), filtered by synonym
+static map<string, vector<unsigned int> > followsList;
+// list of all stmts with Follows(_, j), filtered by synonym
+static map<string, vector<unsigned int> > followedList;
 // element at index i, j means Follows*(i, j) holds
 static map<pair<unsigned int, unsigned int>, bool > followsStarTable;
 // Follows*(i, j) holds for each element j in list at index i, filtered by synonym type
@@ -77,10 +77,10 @@ static map<string, map<unsigned int, vector<unsigned int> > > followedStarList;
 static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsPairs;
 static map<pair<string, string>, vector<pair<unsigned int, unsigned int> > > followsStarPairs;
 
-// element at key i means Parent(element, i) holds
-static map<unsigned int, unsigned int> parentList;
-// elements at key i means Parent(i, element) holds
-static map<unsigned int, vector<unsigned int> > childList;
+// element at key i means Parent(element, i) holds, filtered by synonym of element
+static map<string, map<unsigned int, unsigned int> > parentMap;
+// elements at key i means Parent(i, element) holds, filtered by synonym of elements in list
+static map<string, map<unsigned int, vector<unsigned int> > > childTable;
 // element at index i, j means Parent*(i, j) holds
 static map<pair<unsigned int, unsigned int>, bool> parentStarTable;
 // Parent*(i, j) holds for each element i in list at index j, filtered by synonym type
@@ -158,16 +158,18 @@ void PKB::clearPKB()
 	stmtConstantPairMap = map<string, map<pair<unsigned int, string>, bool > >();
 	constantStmtsMap = map<string, map<string, vector<unsigned int> > >();
 
-	followsMap = map<unsigned int, unsigned int>();
-	followedMap = map<unsigned int, unsigned int>();
+	followsMap = map<string, map<unsigned int, unsigned int> >();
+	followedMap = map<string, map<unsigned int, unsigned int> >();
+	followsList = map<string, vector<unsigned int> >();
+	followedList = map<string, vector<unsigned int> >();
 	followsStarTable = map<pair<unsigned int, unsigned int>, bool >();
 	followsStarList = map<string, map<unsigned int, vector<unsigned int> > >();
 	followedStarList = map<string, map<unsigned int, vector<unsigned int> > >();
 	followsPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
 	followsStarPairs = map<pair<string, string>, vector<pair<unsigned int, unsigned int> > >();
 
-	parentList = map<unsigned int, unsigned int>();
-	childList = map<unsigned int, vector<unsigned int> >();
+	parentMap = map<string, map<unsigned int, unsigned int> >();
+	childTable = map<string, map<unsigned int, vector<unsigned int> > >();
 	parentStarTable = map<pair<unsigned int, unsigned int>, bool >();
 	parentStarList = map<string, map<unsigned int, vector<unsigned int> > >();
 	childStarList = map<string, map<unsigned int, vector<unsigned int> > >();
@@ -274,8 +276,14 @@ void PKB::addConstant(unsigned int stmtNo, string constant)
 
 void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 {
-	followsMap[stmtBefore] = stmtAfter;
-	followedMap[stmtAfter] = stmtBefore;
+	followsMap[STMT_VAR][stmtBefore] = stmtAfter;
+	followsMap[getSynonymTypeOfStmt(stmtAfter)][stmtBefore] = stmtAfter;
+	followsList[STMT_VAR].push_back(stmtBefore);
+	followsList[getSynonymTypeOfStmt(stmtBefore)].push_back(stmtBefore);
+	followedMap[STMT_VAR][stmtAfter] = stmtBefore;
+	followedMap[getSynonymTypeOfStmt(stmtBefore)][stmtAfter] = stmtBefore;
+	followedList[STMT_VAR].push_back(stmtAfter);
+	followedList[getSynonymTypeOfStmt(stmtAfter)].push_back(stmtAfter);
 
 	followsStarTable[make_pair(stmtBefore, stmtAfter)] = true;
 	followsStarList[STMT_VAR][stmtBefore].push_back(stmtAfter);
@@ -307,8 +315,10 @@ void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 
 void PKB::addParent(unsigned int stmtParent, unsigned int stmtChild)
 {
-	parentList[stmtChild] = stmtParent;
-	childList[stmtParent].push_back(stmtChild);
+	parentMap[STMT_VAR][stmtChild] = stmtParent;
+	parentMap[getSynonymTypeOfStmt(stmtParent)][stmtChild] = stmtParent;
+	childTable[STMT_VAR][stmtParent].push_back(stmtChild);
+	childTable[getSynonymTypeOfStmt(stmtChild)][stmtParent].push_back(stmtChild);
 
 	parentStarTable[make_pair(stmtParent, stmtChild)] = true;
 	childStarList[STMT_VAR][stmtParent].push_back(stmtChild);
@@ -365,7 +375,7 @@ void PKB::addProcedureUses(string procName, string varName)
 		procedureUsedTable[varName].push_back(procName);
 		procedureUsesPairs.push_back(make_pair(procName, varName));
 		procedureUsesMap[make_pair(procName, varName)] = true;
-		if (find(procedureUsesList.begin(), procedureUsesList.end(), procName) != procedureUsesList.end()) {
+		if (find(procedureUsesList.begin(), procedureUsesList.end(), procName) == procedureUsesList.end()) {
 			procedureUsesList.push_back(procName);
 		}
 	}
@@ -398,7 +408,7 @@ void PKB::addProcedureModifies(string procName, string varName)
 		procedureModifiedTable[varName].push_back(procName);
 		procedureModifiesPairs.push_back(make_pair(procName, varName));
 		procedureModifiesMap[make_pair(procName, varName)] = true;
-		if (find(procedureModifiesList.begin(), procedureModifiesList.end(), procName) != procedureModifiesList.end()) {
+		if (find(procedureModifiesList.begin(), procedureModifiesList.end(), procName) == procedureModifiesList.end()) {
 			procedureModifiesList.push_back(procName);
 		}
 	}
@@ -413,28 +423,28 @@ void PKB::addProcedureModifies(string procName, string varName)
 //represents Follows(1, 2) or Follows*(1, 2)
 bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	return (!star && followsMap[stmtNo1] == stmtNo2) ||
+	return (!star && followsMap[STMT_VAR][stmtNo1] == stmtNo2) ||
 		(star && followsStarTable[make_pair(stmtNo1, stmtNo2)]);
 }
 
 //represents Follows(1, _) or Follows*(1, _)
 bool PKB::hasFollows(unsigned int stmtNo1, bool star)
 {
-	return (!star && followsMap[stmtNo1] != 0) ||
+	return (!star && followsMap[STMT_VAR][stmtNo1] != 0) ||
 		(star && followsStarList[STMT_VAR][stmtNo1].size() != 0);
 }
 
 //represents Follows(_, 2) or Follows*(_, 2)
 bool PKB::hasFollowedBy(unsigned int stmtNo2, bool star)
 {
-	return (!star && followedMap[stmtNo2] != 0) ||
+	return (!star && followedMap[STMT_VAR][stmtNo2] != 0) ||
 		(star && followedStarList[STMT_VAR][stmtNo2].size() != 0);
 }
 
 //represents Follows(_, _) or Follows*(_, _)
 bool PKB::hasFollowsPair(bool star)
 {
-	return followsMap[1] != 0;
+	return followsMap[STMT_VAR][1] != 0;
 }
 
 //represents Follows(a, b) or Follows*(a, b)
@@ -446,49 +456,27 @@ vector<pair<unsigned int, unsigned int> > PKB::getAllFollowsPair(string synonym1
 //represents Follows(a, _) or Follows*(a, _)
 vector<unsigned int> PKB::getAllFollowedStmts(string synonym1, bool star)
 {
-	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym1);
-	vector<unsigned int> result;
-	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
-		return hasFollows(stmtNo, star);
-	});
-	return result;
+	return followsList[synonym1];
 }
 
 //represents Follows(a, 2) or Follows*(a, 2)
 vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
-	vector<unsigned int> result;
-	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(followedMap[stmtNo2]))) {
-		result.push_back(followedMap[stmtNo2]);
-	}
-	else if (star) {
-		result = followedStarList[synonym1][stmtNo2];
-	}
-	return result;
+	return star ? followedStarList[synonym1][stmtNo2] :	followedMap[synonym1][stmtNo2] == 0 ?
+		vector<unsigned int>() : vector<unsigned int> { followedMap[synonym1][stmtNo2] };
 }
 
 //represents: Follows(_, b) or Follows*(_, b)
 vector<unsigned int> PKB::getAllFollowsStmts(string synonym2, bool star)
 {
-	vector<unsigned int> stmts = getAllStmtsThatFitSynonym(synonym2);
-	vector<unsigned int> result;
-	copy_if(stmts.begin(), stmts.end(), back_inserter(result), [=](unsigned int stmtNo) {
-		return hasFollowedBy(stmtNo, star);
-	});
-	return result;
+	return followedList[synonym2];
 }
 
 //represents: Follows(1, b) or Follows*(1, b)
 vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
-	vector<unsigned int> result;
-	if (!star && exactMatch(synonym2, getSynonymTypeOfStmt(followsMap[stmtNo1]))) {
-		result.push_back(followsMap[stmtNo1]);
-	}
-	else if (star) {
-		result = followsStarList[synonym2][stmtNo1];
-	}
-	return result;
+	return star ? followsStarList[synonym2][stmtNo1] : followsMap[synonym2][stmtNo1] == 0 ?
+		vector<unsigned int>() : vector<unsigned int> { followsMap[synonym2][stmtNo1] };
 }
 
 /****************************************
@@ -500,20 +488,20 @@ vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string sy
 //represents: Parent(1, 2) or Parent*(1, 2)
 bool PKB::isParent(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	return (!star && parentList[stmtNo2] == stmtNo1) ||
+	return (!star && parentMap[stmtNo2] == stmtNo1) ||
 		(star && parentStarTable[make_pair(stmtNo1, stmtNo2)]);
 }
 
 //represents: Parent(1, _), Parent*(1, _)
 bool PKB::hasChild(unsigned int stmtNo1, bool star)
 {
-	return childList[stmtNo1].size() > 0;
+	return childTable[stmtNo1].size() > 0;
 }
 
 //represents: Parent(_, 2) or Parent*(_, 2)
 bool PKB::hasParent(unsigned int stmtNo2, bool star)
 {
-	return parentList[stmtNo2] != 0;
+	return parentMap[stmtNo2] != 0;
 }
 
 //represents: Parent(_, _) or Parent*(_, _)
@@ -543,8 +531,8 @@ vector<unsigned int> PKB::getAllParentStmts(string synonym1, bool star)
 vector<unsigned int> PKB::getAllStmtsThatIsParentOf(string synonym1, unsigned int stmtNo2, bool star)
 {
 	vector<unsigned int> result;
-	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(parentList[stmtNo2]))) {
-		result.push_back(parentList[stmtNo2]);
+	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(parentMap[stmtNo2]))) {
+		result.push_back(parentMap[stmtNo2]);
 	}
 	else if (star) {
 		result = parentStarList[synonym1][stmtNo2];
@@ -568,7 +556,7 @@ vector<unsigned int> PKB::getAllStmtsThatIsChildOf(unsigned int stmtNo1, string 
 {
 	vector<unsigned int> result;
 	if (!star) {
-		result = childList[stmtNo1];
+		result = childTable[stmtNo1];
 		remove_if(result.begin(), result.end(), [=](unsigned int stmtNo2) {
 			return exactMatch(synonym2, getSynonymTypeOfStmt(stmtNo2));
 		});
