@@ -27,6 +27,7 @@ namespace UnitTesting
 			} */
 			// Populating PKB with relevant data
 			PKB::clearPKB();
+			PKB::addProcedure("main");
 			PKB::addRead(1);
 			PKB::addAssign(2);
 			PKB::addWhile(3);
@@ -108,6 +109,49 @@ namespace UnitTesting
 
 			vector<unsigned int> list1p = PKB::getAllStmtsThatIsParentOf("while", 6, false);
 			Assert::AreEqual(list1p.size(), (size_t)0); //Parent(w, 6) should return empty set
+		}
+		TEST_METHOD(Uses)
+		{
+			//Reusing the sample program above
+			//Populating the PKB with relationships
+			PKB::addUses(3, "x");
+			PKB::addProcedureUses("main", "x");
+			PKB::addUses(4, "y");
+			PKB::addProcedureUses("main", "y");
+			PKB::addUses(3, "y");
+			PKB::addProcedureUses("main", "y"); //front-end parsing would have added duplicate, testing duplicate removal mechanism
+			PKB::addUses(5, "y");
+			PKB::addUses(3, "y"); // testing for non-procedure duplicate removal
+			PKB::addUses(6, "x");
+			PKB::addProcedureUses("main", "x");
+			PKB::addUses(5, "x");
+			PKB::addUses(3, "x"); // ^
+			PKB::addUses(7, "y");
+
+			//Tests
+			Assert::IsTrue(PKB::isUses(5, "y")); //Uses(5, "y") is true
+			Assert::IsFalse(PKB::isUses(7, "x")); //Uses(7, "x") is false
+			Assert::IsTrue(PKB::hasUses(3)); //Uses(3, _) is true
+			Assert::IsFalse(PKB::hasUses(2)); //Uses(2, _) is false
+			
+			vector<pair<unsigned int, string> > pairs = PKB::getAllStmtUsesVariablePairs("while");
+			Assert::AreEqual(pairs.size(), (size_t)2); //Uses(w, v) should have <3, "x"> and <3, "y">
+			Assert::IsTrue(pairs[0] == pair<unsigned int, string>(3, "x") &&
+				pairs[1] == pair<unsigned int, string>(3, "y"));
+
+			vector<unsigned int> lists = PKB::getAllStmtsThatUsesVariable("stmt", "x");
+			Assert::AreEqual(lists.size(), (size_t)3); //Uses(s, "x") should have 3, 6, 5
+			Assert::IsTrue(lists[0] == 3 && lists[1] == 6 && lists[2] == 5);
+
+			vector<pair<string, string> > procPairs = PKB::getAllProcedureUsesVariablePairs();
+			Assert::AreEqual(procPairs.size(), (size_t)2); //Uses(p, v) should return <"main", "x"> and <"main", "y">
+			Assert::IsTrue(procPairs[0] == make_pair(string("main"), string("x")) && procPairs[1] == make_pair(string("main"), string("y")));
+
+			vector<string> procs = PKB::getAllProceduresThatUsesVariable("x");
+			Assert::AreEqual(procs.size(), (size_t)1); //Uses(p, "x") should return "main"
+			Assert::IsTrue(procs[0] == "main");
+
+			Assert::IsTrue(PKB::hasProcedureUses("main")); //Uses("main", _) should be true
 		}
 	};
 }
