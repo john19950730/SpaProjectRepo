@@ -43,14 +43,11 @@ void TestWrapper::evaluate(std::string query, std::list<std::string>& results){
 		QueryEvaluator *queryEvaluator = new QueryEvaluator(queryPreprocessor.getQueryObject());
 		vector<string> result = queryEvaluator->evaluateQueryObject();
 
-		string strResult = "";
-		for (string i : result) {
-			strResult += " " + i;
-		}
-
 		// store the answers to the query in the results list (it is initially empty)
 		// each result must be a string.
-		results.push_back(strResult);
+		for (string i : result) {
+			results.push_back(i);
+		}
 	}
 	else {
 		results.push_back(query + "\nQuery result: Invalid query!");
