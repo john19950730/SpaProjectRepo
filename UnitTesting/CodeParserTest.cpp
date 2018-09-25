@@ -368,6 +368,84 @@ namespace UnitTesting
 			}
 		}
 
+		TEST_METHOD(splitTest) 
+		{
+			std::vector<std::string> expectedVectorOutput;
+			std::vector<std::string> methodVectorOutput;
+			int count;
+			int vectorSize;
+
+			// Load data for expectedVectorOutput & methodVectorOutput
+			expectedVectorOutput.push_back("a");
+			expectedVectorOutput.push_back("b");
+			expectedVectorOutput.push_back("c");
+			expectedVectorOutput.push_back("d");
+			methodVectorOutput = CodeParser::splitWhileIfConditions("a*(b+c)/d", 2);
+
+			// Test if methodVectorOutput are the same as expectedVectorOutput
+			for (count = 0; count < methodVectorOutput.size(); count++)
+			{
+				Assert::AreEqual(expectedVectorOutput[count], methodVectorOutput[count]);
+			}
+
+			// Clearing Vector
+			expectedVectorOutput.clear();
+
+			// Load data for expectedVectorOutput & methodVectorOutput
+			expectedVectorOutput.push_back("a");
+			expectedVectorOutput.push_back("b");
+			expectedVectorOutput.push_back("c");
+			expectedVectorOutput.push_back("d");
+			methodVectorOutput = CodeParser::splitWhileIfConditions("a*b+c/d", 2);
+
+			// Test if methodVectorOutput are the same as expectedVectorOutput
+			for (count = 0; count < methodVectorOutput.size(); count++)
+			{
+				Assert::AreEqual(expectedVectorOutput[count], methodVectorOutput[count]);
+			}
+
+			// Clearing Vector
+			expectedVectorOutput.clear();
+
+			// Load data for expectedVectorOutput & methodVectorOutput
+			expectedVectorOutput.push_back("a");
+			expectedVectorOutput.push_back("b");
+			expectedVectorOutput.push_back("c");
+			expectedVectorOutput.push_back("d");
+			methodVectorOutput = CodeParser::splitWhileIfConditions("a*b+c%d+1", 2);
+
+			// Test if methodVectorOutput are the same as expectedVectorOutput
+			for (count = 0; count < methodVectorOutput.size(); count++)
+			{
+				Assert::AreEqual(expectedVectorOutput[count], methodVectorOutput[count]);
+			}
+			// Clearing Vector
+			expectedVectorOutput.clear();
+
+			// Load data for expectedVectorOutput & methodVectorOutput
+			expectedVectorOutput.push_back("a");
+			expectedVectorOutput.push_back("b");
+			expectedVectorOutput.push_back("c");
+			expectedVectorOutput.push_back("d");
+			methodVectorOutput = CodeParser::splitWhileIfConditions("a%b%c%(d+1)", 2);
+
+			// Test if methodVectorOutput are the same as expectedVectorOutput
+			for (count = 0; count < methodVectorOutput.size(); count++)
+			{
+				Assert::AreEqual(expectedVectorOutput[count], methodVectorOutput[count]);
+			}
+
+			// Clearing Vector
+			expectedVectorOutput.clear();
+
+			// Load data for expectedVectorOutput & methodVectorOutput
+			methodVectorOutput = CodeParser::splitWhileIfConditions("5%1+10*100", 2);
+			vectorSize = methodVectorOutput.size();
+			// Test if methodVectorOutput are the same as expectedVectorOutput when both are supposed to be empty
+			Assert::AreEqual(vectorSize, 0);
+
+		}
+
 		std::stack <std::pair<int, string>> ClearPairStack()
 		{
 			std::stack <std::pair<int, string>> theNewStack;
