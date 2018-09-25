@@ -27,11 +27,10 @@ int CodeParser::parse(string code) {
 	int start = 0;
 	int lineCount = 1;
 	static vector<string> line; //saves line of code
-	if (code.at(code.length() - 1) != '\n') {
+	if (code.at(code.length() - 1) != '\n') { //add nextline at the back of SIMPLE code
 		code += '\n';
 	}
-
-	for (int i = 0; i < code.length(); i++) { //logic for read code line by line
+	for (int i = 0; i < code.length(); i++) { //if encounter a close bracket
 		if (code[i] == '}') {
 			string firstHalf = code.substr(0, i+1);
 			firstHalf += '\n';
@@ -58,8 +57,8 @@ int CodeParser::processLine(string lineOfCode) {
 	std::regex equals_regex("={1,1}");
 	std::regex close_regex("\\}");
 	std::regex procedure_regex("procedure");
-	std::regex while_regex("while"); //take note of nesting lvl
-	std::regex if_regex("if"); //take note of nesting lvl
+	std::regex while_regex("while");
+	std::regex if_regex("if");
 	std::regex else_regex("else");
 	std::regex read_regex("read");
 	std::regex print_regex("print");
@@ -98,8 +97,8 @@ int CodeParser::processLine(string lineOfCode) {
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
 		checkFollows(lineNumber);
+		checkParent(lineNumber, nesting_level);
 		CodeParser::nesting_level.push(make_pair(lineNumber, "while"));
-	    //checkParent(lineNumber,nesting_level);
 	}
 	if (foundIf == 1) {
 		LineOfCodeData lcd;
@@ -119,8 +118,8 @@ int CodeParser::processLine(string lineOfCode) {
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
 		checkFollows(lineNumber);
+		checkParent(lineNumber, nesting_level);
 		CodeParser::nesting_level.push(make_pair(lineNumber, "if"));
-		//checkParent(lineNumber,nesting_level);
 	}
 	if (foundElse == 1) { //else encounter
 		CodeParser::nesting_level.push(make_pair(0, "else"));
@@ -138,7 +137,7 @@ int CodeParser::processLine(string lineOfCode) {
 		//check if being modifies in parent nesting
 		checkForNestingModifies("read", lineOfCode);
 		checkFollows(lineNumber);
-		//checkParent(lineNumber,nesting_level);
+		checkParent(lineNumber,nesting_level);
 	}
 	if (foundPrint == 1) {
 		LineOfCodeData lcd;
@@ -154,7 +153,7 @@ int CodeParser::processLine(string lineOfCode) {
 		//check if being used in parent nesting
 		checkForNestingUses(variables);
 		checkFollows(lineNumber);
-		//checkParent(lineNumber,nesting_level);
+		checkParent(lineNumber,nesting_level);
 	}
 	if (foundProcedure != 1 && foundWhile != 1 && foundIf != 1 && foundElse != 1
 		&& foundRead != 1 && foundPrint != 1 && foundEquals == 1) { //TODO: input validation, detect invalid line: clearPKB(), or when new program loaded
@@ -181,7 +180,7 @@ int CodeParser::processLine(string lineOfCode) {
 		checkForNestingModifies("assignment", lineOfCode);
 		checkForNestingUses(variables);
 		checkFollows(lineNumber);
-		//checkParent(lineNumber,nesting_level);
+		checkParent(lineNumber,nesting_level);
 	}
 	if (foundClose == 1) {
 		nestingStackElement = nesting_level.top();
