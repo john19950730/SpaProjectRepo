@@ -92,7 +92,6 @@ public:
 
 	// PKB pattern query
 	static vector<unsigned int> getAllAssignsWithConstant(string constant);
-	static bool hasAssignmentStmt(); // a(_, _)
 	static bool isAssignmentUsesConstant(unsigned int stmtNo, string constant);
 
 	// PKB synonyms query
@@ -114,4 +113,8 @@ private:
 	static const string getSynonymTypeOfStmt(unsigned int stmtNo);
 	static void addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star);
 	static void addParentPair(unsigned int stmtParent, unsigned int stmtChild, bool star);
+
+	//temporarily unused general pattern query
+	static vector<unsigned int> getAllStmtsWithConstant(string synonym, string constant);
+	static bool isStmtUsesConstant(string synonym, unsigned int stmtNo, string constant);
 };

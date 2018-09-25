@@ -9,7 +9,7 @@ namespace UnitTesting
 	TEST_CLASS(TestPKB)
 	{
 	public:
-		TEST_METHOD(Follows)
+		TEST_CLASS_INITIALIZE(Setup)
 		{
 			/*	Using sample SIMPLE Program as follows for reference:
 			procedure main {
@@ -40,8 +40,39 @@ namespace UnitTesting
 			PKB::addFollows(2, 3);
 			PKB::addFollows(4, 5);
 			PKB::addFollows(3, 8);
-			
-			// Tests
+			PKB::addParent(3, 4);
+			PKB::addParent(3, 5);
+			PKB::addParent(5, 6);
+			PKB::addParent(5, 7);
+			PKB::addUses(3, "x");
+			PKB::addProcedureUses("main", "x");
+			PKB::addUses(4, "y");
+			PKB::addProcedureUses("main", "y");
+			PKB::addUses(3, "y");
+			PKB::addProcedureUses("main", "y"); //front-end parsing would have added duplicate, testing duplicate removal mechanism
+			PKB::addUses(5, "y");
+			PKB::addUses(3, "y"); // testing for non-procedure duplicate removal
+			PKB::addUses(6, "x");
+			PKB::addProcedureUses("main", "x");
+			PKB::addUses(5, "x");
+			PKB::addUses(3, "x"); // ^
+			PKB::addUses(7, "y");
+			PKB::addModifies(1, "x");
+			PKB::addProcedureModifies("main", "x");
+			PKB::addModifies(2, "y");
+			PKB::addProcedureModifies("main", "y");
+			PKB::addModifies(4, "y");
+			PKB::addProcedureModifies("main", "y");
+			PKB::addModifies(3, "y");
+			PKB::addProcedureModifies("main", "y");
+			PKB::addConstant(2, "2");
+			PKB::addConstant(3, "0");
+			PKB::addConstant(4, "1");
+			PKB::addConstant(5, "5");
+			PKB::addConstant(8, "0");
+		}
+		TEST_METHOD(Follows)
+		{
 			Assert::IsTrue(PKB::isFollows(1, 2, false)); //Follows(1, 2) is true
 			Assert::IsTrue(PKB::isFollows(1, 2, true));
 			Assert::IsTrue(PKB::isFollows(2, 3, true));
@@ -77,13 +108,6 @@ namespace UnitTesting
 		}
 		TEST_METHOD(Parent)
 		{
-			//Reusing the sample program above, populating appropriate relations
-			PKB::addParent(3, 4);
-			PKB::addParent(3, 5);
-			PKB::addParent(5, 6);
-			PKB::addParent(5, 7);
-
-			//Tests
 			Assert::IsTrue(PKB::isParent(3, 4, false)); //Parent(3, 4) should be true
 			Assert::IsFalse(PKB::isParent(3, 6, false)); //Parent(3, 6) should be false but...
 			Assert::IsTrue(PKB::isParent(3, 6, true)); //Parent*(3, 6) should be true
@@ -112,23 +136,6 @@ namespace UnitTesting
 		}
 		TEST_METHOD(Uses)
 		{
-			//Reusing the sample program above
-			//Populating the PKB with relationships
-			PKB::addUses(3, "x");
-			PKB::addProcedureUses("main", "x");
-			PKB::addUses(4, "y");
-			PKB::addProcedureUses("main", "y");
-			PKB::addUses(3, "y");
-			PKB::addProcedureUses("main", "y"); //front-end parsing would have added duplicate, testing duplicate removal mechanism
-			PKB::addUses(5, "y");
-			PKB::addUses(3, "y"); // testing for non-procedure duplicate removal
-			PKB::addUses(6, "x");
-			PKB::addProcedureUses("main", "x");
-			PKB::addUses(5, "x");
-			PKB::addUses(3, "x"); // ^
-			PKB::addUses(7, "y");
-
-			//Tests
 			Assert::IsTrue(PKB::isUses(5, "y")); //Uses(5, "y") is true
 			Assert::IsFalse(PKB::isUses(7, "x")); //Uses(7, "x") is false
 			Assert::IsTrue(PKB::hasUses(3)); //Uses(3, _) is true
@@ -156,18 +163,6 @@ namespace UnitTesting
 
 		TEST_METHOD(Modifies)
 		{
-			//Reusing the sample program
-			//Populating the PKB
-			PKB::addModifies(1, "x");
-			PKB::addProcedureModifies("main", "x");
-			PKB::addModifies(2, "y");
-			PKB::addProcedureModifies("main", "y");
-			PKB::addModifies(4, "y");
-			PKB::addProcedureModifies("main", "y");
-			PKB::addModifies(3, "y");
-			PKB::addProcedureModifies("main", "y");
-
-			//Tests
 			Assert::IsTrue(PKB::isModifies(1, "x")); //Modifies(1, "x") is true
 			Assert::IsFalse(PKB::isModifies(3, "x")); //Modifies(2, "x") is false
 			Assert::IsTrue(PKB::hasModifies(3)); //Modifies(3, _) is true
@@ -193,6 +188,18 @@ namespace UnitTesting
 
 			vector<string> noProc = PKB::getAllVariablesModifiedByProcedure("insignificant");
 			Assert::AreEqual(noProc.size(), (size_t)0); //procedure non existant should return empty set
+		}
+
+		TEST_METHOD(ConstantPattern)
+		{
+			vector<unsigned int> lista0 = PKB::getAllAssignsWithConstant("0");
+			Assert::AreEqual(lista0.size(), (size_t)1); //pattern a(_, _"0"_) should return 8
+			Assert::IsTrue(lista0[0] == 8);
+
+			Assert::IsTrue(PKB::isAssignmentUsesConstant(2, "2")); //a(2, _"2"_) should be 2, so true
+			Assert::IsFalse(PKB::isAssignmentUsesConstant(4, "2")); //stmtNo #4 doesn't use 2, so false
+			Assert::IsFalse(PKB::isAssignmentUsesConstant(3, "0")); //stmtNo #3 is not assignment, so false
+			Assert::IsFalse(PKB::isAssignmentUsesConstant(6, "x")); //invalid and non-existent entry
 		}
 	};
 }

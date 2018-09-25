@@ -1,1 +1,1 @@
-<Playlist Version="1.0"><Add Test="UnitTesting::TestPKB::Follows" /><Add Test="UnitTesting::TestPKB::Utility" /><Add Test="UnitTesting::TestPKB::Parent" /><Add Test="UnitTesting::TestPKB::Uses" /><Add Test="UnitTesting::TestPKB::Modifies" /></Playlist>
+<Playlist Version="1.0"><Add Test="UnitTesting::TestPKB::Follows" /><Add Test="UnitTesting::TestPKB::Utility" /><Add Test="UnitTesting::TestPKB::Parent" /><Add Test="UnitTesting::TestPKB::Uses" /><Add Test="UnitTesting::TestPKB::Modifies" /><Add Test="UnitTesting::TestPKB::ConstantPattern" /></Playlist>

@@ -44,6 +44,17 @@ static vector<unsigned int> * synonymsList[] = { &stmtsList, &assignList, &ifLis
 
 /****************************************
 |										|
+|		PKB Patterns Storage			|
+|										|
+****************************************/
+
+//maps stmtNo constant pair to bool, filtered by synonym
+static map<string, map<pair<unsigned int, string>, bool > > stmtConstantPairMap;
+//maps constant to list of stmtNos which uses it, filtered by synonym
+static map<string, map<string, vector<unsigned int> > > constantStmtsMap;
+
+/****************************************
+|										|
 |		PKB Relations Storage			|
 |										|
 ****************************************/
@@ -139,6 +150,9 @@ void PKB::clearPKB()
 	callListIndex = 0;
 	procedureList = vector<string>();
 	procedureListIndex = 0;
+
+	stmtConstantPairMap = map<string, map<pair<unsigned int, string>, bool > >();
+	constantStmtsMap = map<string, map<string, vector<unsigned int> > >();
 
 	followsList = map<unsigned int, unsigned int>();
 	followedList = map<unsigned int, unsigned int>();
@@ -246,6 +260,12 @@ unsigned int PKB::addProcedure(string procName)
 
 void PKB::addConstant(unsigned int stmtNo, string constant)
 {
+	stmtConstantPairMap[STMT_VAR][make_pair(stmtNo, constant)] = true;
+	stmtConstantPairMap[getSynonymTypeOfStmt(stmtNo)][make_pair(stmtNo, constant)] = true;
+	if (find(constantStmtsMap[STMT_VAR][constant].begin(), constantStmtsMap[STMT_VAR][constant].end(), stmtNo) == constantStmtsMap[STMT_VAR][constant].end()) {
+		constantStmtsMap[STMT_VAR][constant].push_back(stmtNo);
+		constantStmtsMap[getSynonymTypeOfStmt(stmtNo)][constant].push_back(stmtNo);
+	}
 }
 
 void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
@@ -719,17 +739,12 @@ vector< pair<string, string> > PKB::getAllProcedureModifiesVariablePairs()
 
 vector<unsigned int> PKB::getAllAssignsWithConstant(string constant)
 {
-	return vector<unsigned int>();
-}
-
-bool PKB::hasAssignmentStmt()
-{
-	return false;
+	return getAllStmtsWithConstant(ASSIGNMENT_VAR, constant);
 }
 
 bool PKB::isAssignmentUsesConstant(unsigned int stmtNo, string constant)
 {
-	return false;
+	return isStmtUsesConstant(ASSIGNMENT_VAR, stmtNo, constant);
 }
 
 /****************************************
@@ -852,4 +867,14 @@ void PKB::addParentPair(unsigned int stmtParent, unsigned int stmtChild, bool st
 		parentPairs[make_pair(STMT_VAR, getSynonymTypeOfStmt(stmtChild))].push_back(make_pair(stmtParent, stmtChild));
 		parentPairs[make_pair(getSynonymTypeOfStmt(stmtParent), getSynonymTypeOfStmt(stmtChild))].push_back(make_pair(stmtParent, stmtChild));
 	}
+}
+
+vector<unsigned int> PKB::getAllStmtsWithConstant(string synonym, string constant)
+{
+	return constantStmtsMap[synonym][constant];
+}
+
+bool PKB::isStmtUsesConstant(string synonym, unsigned int stmtNo, string constant)
+{
+	return stmtConstantPairMap[synonym][make_pair(stmtNo, constant)];
 }
