@@ -103,6 +103,9 @@ namespace UnitTesting
 			Assert::AreEqual(list1s.size(), (size_t)3); //Follows*(1, s) should have 3 entries
 			Assert::IsTrue(list1s[0] == 2 && list1s[1] == 3 && list1s[2] == 8); // s = 2, 3, 8
 
+			vector<unsigned int> list8s = PKB::getAllStmtsThatFollows(8, "stmt", false);
+			Assert::AreEqual(list8s.size(), (size_t)0); //Follows*(8, s) should have no entries
+
 			vector<unsigned int> lists2 = PKB::getAllStmtsFollowedBy("assign", 8, false);
 			Assert::AreEqual(lists2.size(), (size_t)0); //Follows(a, 8) should have no entries
 		}

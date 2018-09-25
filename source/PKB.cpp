@@ -60,9 +60,13 @@ static map<string, map<string, vector<unsigned int> > > constantStmtsMap;
 ****************************************/
 
 // element at key i means Follows(i, element) holds
-static map<unsigned int, unsigned int> followsList;
+static map<unsigned int, unsigned int> followsMap;
 // element at key i means Follows(element, i) holds
-static map<unsigned int, unsigned int> followedList;
+static map<unsigned int, unsigned int> followedMap;
+// list at index i with statements with Follows(i, _), filtered by synonym
+static map<string, map<unsigned int, vector<unsigned int> > > followsList;
+// list at index i of statements with Follows(_, i), filtered by synonym
+static map<string, map<unsigned int, vector<unsigned int> > > followedList;
 // element at index i, j means Follows*(i, j) holds
 static map<pair<unsigned int, unsigned int>, bool > followsStarTable;
 // Follows*(i, j) holds for each element j in list at index i, filtered by synonym type
@@ -154,8 +158,8 @@ void PKB::clearPKB()
 	stmtConstantPairMap = map<string, map<pair<unsigned int, string>, bool > >();
 	constantStmtsMap = map<string, map<string, vector<unsigned int> > >();
 
-	followsList = map<unsigned int, unsigned int>();
-	followedList = map<unsigned int, unsigned int>();
+	followsMap = map<unsigned int, unsigned int>();
+	followedMap = map<unsigned int, unsigned int>();
 	followsStarTable = map<pair<unsigned int, unsigned int>, bool >();
 	followsStarList = map<string, map<unsigned int, vector<unsigned int> > >();
 	followedStarList = map<string, map<unsigned int, vector<unsigned int> > >();
@@ -270,8 +274,8 @@ void PKB::addConstant(unsigned int stmtNo, string constant)
 
 void PKB::addFollows(unsigned int stmtBefore, unsigned int stmtAfter)
 {
-	followsList[stmtBefore] = stmtAfter;
-	followedList[stmtAfter] = stmtBefore;
+	followsMap[stmtBefore] = stmtAfter;
+	followedMap[stmtAfter] = stmtBefore;
 
 	followsStarTable[make_pair(stmtBefore, stmtAfter)] = true;
 	followsStarList[STMT_VAR][stmtBefore].push_back(stmtAfter);
@@ -409,28 +413,28 @@ void PKB::addProcedureModifies(string procName, string varName)
 //represents Follows(1, 2) or Follows*(1, 2)
 bool PKB::isFollows(unsigned int stmtNo1, unsigned int stmtNo2, bool star)
 {
-	return (!star && followsList[stmtNo1] == stmtNo2) ||
+	return (!star && followsMap[stmtNo1] == stmtNo2) ||
 		(star && followsStarTable[make_pair(stmtNo1, stmtNo2)]);
 }
 
 //represents Follows(1, _) or Follows*(1, _)
 bool PKB::hasFollows(unsigned int stmtNo1, bool star)
 {
-	return (!star && followsList[stmtNo1] != 0) ||
+	return (!star && followsMap[stmtNo1] != 0) ||
 		(star && followsStarList[STMT_VAR][stmtNo1].size() != 0);
 }
 
 //represents Follows(_, 2) or Follows*(_, 2)
 bool PKB::hasFollowedBy(unsigned int stmtNo2, bool star)
 {
-	return (!star && followedList[stmtNo2] != 0) ||
+	return (!star && followedMap[stmtNo2] != 0) ||
 		(star && followedStarList[STMT_VAR][stmtNo2].size() != 0);
 }
 
 //represents Follows(_, _) or Follows*(_, _)
 bool PKB::hasFollowsPair(bool star)
 {
-	return followsList[1] != 0;
+	return followsMap[1] != 0;
 }
 
 //represents Follows(a, b) or Follows*(a, b)
@@ -454,8 +458,8 @@ vector<unsigned int> PKB::getAllFollowedStmts(string synonym1, bool star)
 vector<unsigned int> PKB::getAllStmtsFollowedBy(string synonym1, unsigned int stmtNo2, bool star)
 {
 	vector<unsigned int> result;
-	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(followedList[stmtNo2]))) {
-		result.push_back(followedList[stmtNo2]);
+	if (!star && exactMatch(synonym1, getSynonymTypeOfStmt(followedMap[stmtNo2]))) {
+		result.push_back(followedMap[stmtNo2]);
 	}
 	else if (star) {
 		result = followedStarList[synonym1][stmtNo2];
@@ -478,8 +482,8 @@ vector<unsigned int> PKB::getAllFollowsStmts(string synonym2, bool star)
 vector<unsigned int> PKB::getAllStmtsThatFollows(unsigned int stmtNo1, string synonym2, bool star)
 {
 	vector<unsigned int> result;
-	if (!star && exactMatch(synonym2, getSynonymTypeOfStmt(followsList[stmtNo1]))) {
-		result.push_back(followsList[stmtNo1]);
+	if (!star && exactMatch(synonym2, getSynonymTypeOfStmt(followsMap[stmtNo1]))) {
+		result.push_back(followsMap[stmtNo1]);
 	}
 	else if (star) {
 		result = followsStarList[synonym2][stmtNo1];
