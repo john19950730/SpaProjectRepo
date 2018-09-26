@@ -93,6 +93,7 @@ public:
 	// PKB pattern query
 	static vector<unsigned int> getAllAssignsWithConstant(string constant);
 	static bool isAssignmentUsesConstant(unsigned int stmtNo, string constant);
+	static vector<string> getAllConstants();
 
 	// PKB synonyms query
 	static vector<string> getVariables();
