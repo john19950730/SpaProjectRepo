@@ -68,6 +68,11 @@ vector<string> APICall::immediateResults(string synonymType) {
 		intResults = PKB::getPrints();
 		return Utility::intVectorToStrVector(intResults);
 	}
+	else if (synonymType == CONSTANT_VAR) {
+		cout << "allConstants" << endl;
+		strResults = PKB::getAllConstants();
+		return strResults;
+	}
 
 	return vector<string>();
 }
