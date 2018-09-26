@@ -48,6 +48,8 @@ static vector<unsigned int> * synonymsList[] = { &stmtsList, &assignList, &ifLis
 |										|
 ****************************************/
 
+//list of all constants
+static vector<string> constantsList;
 //maps stmtNo constant pair to bool, filtered by synonym
 static map<string, map<pair<unsigned int, string>, bool > > stmtConstantPairMap;
 //maps constant to list of stmtNos which uses it, filtered by synonym
@@ -159,6 +161,7 @@ void PKB::clearPKB()
 	procedureList = vector<string>();
 	procedureListIndex = 0;
 
+	constantsList = vector<string>();
 	stmtConstantPairMap = map<string, map<pair<unsigned int, string>, bool > >();
 	constantStmtsMap = map<string, map<string, vector<unsigned int> > >();
 
@@ -277,6 +280,9 @@ void PKB::addConstant(unsigned int stmtNo, string constant)
 	if (find(constantStmtsMap[STMT_VAR][constant].begin(), constantStmtsMap[STMT_VAR][constant].end(), stmtNo) == constantStmtsMap[STMT_VAR][constant].end()) {
 		constantStmtsMap[STMT_VAR][constant].push_back(stmtNo);
 		constantStmtsMap[getSynonymTypeOfStmt(stmtNo)][constant].push_back(stmtNo);
+	}
+	if (find(constantsList.begin(), constantsList.end(), constant) == constantsList.end()) {
+		constantsList.push_back(constant);
 	}
 }
 
@@ -731,6 +737,11 @@ vector<unsigned int> PKB::getAllAssignsWithConstant(string constant)
 bool PKB::isAssignmentUsesConstant(unsigned int stmtNo, string constant)
 {
 	return isStmtUsesConstant(ASSIGNMENT_VAR, stmtNo, constant);
+}
+
+vector<string> PKB::getAllConstants()
+{
+	return constantsList;
 }
 
 /****************************************
