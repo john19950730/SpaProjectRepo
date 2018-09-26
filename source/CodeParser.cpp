@@ -16,6 +16,7 @@ using namespace std;
 #include "CodeParser.h"
 #include "LineOfCodeData.h"
 #include "Keywords.h"
+#include "Utility.h"
 
 stack < std::pair<int,string> > CodeParser::nesting_level;
 vector<string> CodeParser::procedures;
@@ -303,7 +304,7 @@ std::vector<std::string> CodeParser::checkUses(string stmtType, string stmt, int
 		token.erase(std::remove(token.begin(), token.end(), '\t'), token.end());//remove tab
 		token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());//remove nextline
 		token.erase(std::remove(token.begin(), token.end(), ';'), token.end());
-		if (!is_number(token)) {
+		if (Utility::isInteger(token)) {
 			PKB::addConstant(lineNum, token);
 		}
 		vars.push_back(token);
@@ -348,7 +349,7 @@ std::vector<std::string> CodeParser::splitWhileIfConditions(string s, int lineNu
 			unbrokenString += s.at(i);
 				if (is_appeared(nextChar, delim)) { //if my next char is a delim
 					//save variable so far
-					if (!is_number(unbrokenString)) { //not a num
+					if (!Utility::isInteger(unbrokenString)) { //not a num
 						if (!is_duplicate(unbrokenString, splitted)) { //not a duplicate in vector
 							//add it into splitted
 							splitted.push_back(unbrokenString);
@@ -390,7 +391,7 @@ std::vector<std::string> CodeParser::split(string s, int lineNum) {
 				}
 				else { //delimiter encountered
 					//save token so far
-					if (!is_number(temp)) { //not a num
+					if (!Utility::isInteger(temp)) { //not a num
 						if (!is_duplicate(temp, splitted)) { //not a duplicate in vector
 							//add it into splitted
 							splitted.push_back(temp);
@@ -414,28 +415,6 @@ bool CodeParser::is_duplicate(string s, std::vector<std::string> list) {
 		}
 	}
 	return false;
-}
-
-bool CodeParser::is_number(string s)
-{
-	string numbers = "0123456789";
-	int numbersIndex = 0;
-
-	for (char& c : s) {
-		for (char& n : numbers) {
-			if (c == n) {
-				//this c is a number
-				numbersIndex++;
-			}
-		}
-	}
-	if (numbersIndex == s.length()) { //if every char was a digit
-		return true;
-	}
-	else {
-		return false;
-	}
-
 }
 
 string CodeParser::checkModifies(string stmtType, string stmt) { //returns var being modified
