@@ -1,6 +1,14 @@
 # include "Utility.h"
 #include "Keywords.h"
 
+string Utility::fileToString(string filename)
+{
+	std::ifstream t(filename);
+	std::stringstream buffer;
+	buffer << t.rdbuf();
+	return buffer.str();
+}
+
 bool Utility::isValidVariableName(string s) {
 	return regex_match(s, regex("^[a-zA-Z][a-zA-Z0-9]*?$"));
 }
@@ -221,4 +229,12 @@ string Utility::trim_copy(string s) {
 	ltrim(s);
 	rtrim(s);
 	return s;
+}
+
+vector<string> Utility::intVectorToStrVector(vector<unsigned int> intVector) {
+	vector<string> strVector;
+	for (unsigned int i : intVector) {
+		strVector.push_back(to_string(i));
+	}
+	return strVector;
 }

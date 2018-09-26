@@ -22,3 +22,7 @@ int LineOfCodeData::store(string type, string aData
 
 	return 0;
 }
+
+std::stack <std::pair<int, string>> LineOfCodeData::getNestingLevel() {
+	return nesting_level;
+}

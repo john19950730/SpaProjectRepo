@@ -20,28 +20,28 @@ vector<string> QueryEvaluator::evaluateQueryObject() {
 	// No clauses
 	if (!queryObject->hasClauses()) {
 		string synonymType = queryObject->getSynonymTable()[queryObject->getSelectClause().at(0)];
-		return APICall::apiCallForNoClause(synonymType);
+		return APICall::apiCallForImmediateResults(synonymType);
 	}
 
 	// One such that clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && !queryObject->hasPatternClause()) {
-		return evaluateSuchThatClause();
+		return getResults(evaluateSuchThatClause());
 	}
 
 	// One pattern clause only
 	if (queryObject->getNumberOfSuchThatClauses() == 0 && queryObject->hasPatternClause()) {
-		return evaluatePatternClause();
+		return getResults(evaluatePatternClause());
 	}
 
 	// One such that clause and one pattern clause
 	if (queryObject->getNumberOfSuchThatClauses() == 1 && queryObject->hasPatternClause()) {
-		return evaluateSuchThatAndPatternClause();
+		return getResults(evaluateSuchThatClause(), evaluatePatternClause());
 	}
 
 	return vector<string>();
 }
 
-vector<string> QueryEvaluator::evaluateSuchThatClause() {
+Result* QueryEvaluator::evaluateSuchThatClause() {
 	string selectClause = queryObject->getSelectClause().at(0);
 	map<string, string> synonymTable = queryObject->getSynonymTable();
 
@@ -70,66 +70,320 @@ vector<string> QueryEvaluator::evaluateSuchThatClause() {
 	return apiCallResponse->executeApiCall();
 }
 
-vector<string> QueryEvaluator::evaluatePatternClause() {
+Result* QueryEvaluator::evaluatePatternClause() {
 	PATTERN_CLAUSE patternClause = queryObject->getPatternClause().at(0);
 	APICallPatternClause *apiCallPatternClause = new APICallPatternClause(getParamType(patternClause),
 		patternClause, queryObject->getSelectClause().at(0), queryObject->getSynonymTable());
 	return apiCallPatternClause->executeApiCall();
 }
 
-vector<string> QueryEvaluator::evaluateSuchThatAndPatternClause() {
-	/****
-		suchThatClauseResult - pair< map<string, vector<string> >, boolean>
-		patternClause - pair< map<string, vector<string> >, boolean>
+vector<string> QueryEvaluator::getResults(Result* firstResult, Result* secondResult) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	string synonymType = queryObject->getSynonymTable()[selectSynonym];
 
-		BooleanResponse api call returns boolean and not a vector of results, 
-		hence, manually we need to return an empty vector with the boolean value.
+	map<string, vector<string>> firstResultTable = firstResult->toComparableFormat().first;
+	map<string, vector<string>> secondResultTable = secondResult->toComparableFormat().first;
 
-		E.g.	Uses(1, "v") returns true - pair<emptyMap, true> will be returned
-				Modifies(1,"v") returns false - pair(emptyMap, false) will be returned
+	bool isFirstClauseValid = firstResult->toComparableFormat().second;
+	bool isSecondClauseValid = secondResult->toComparableFormat().second;
 
-		1) Check if any of the boolean value is false
-			if(any of the boolean value is false) return noResults()
-
-		2) For clauses without synonyms (e.g. Uses(1,"v"), Follows(1,2))
-			if(both maps() are empty && both boolean value are true)
-				return immediateResults();
-			else if(any of the maps are empty && any of the boolean value is false)
-				return noResults();
-
-		3) Check if the select synonym is found in any of the synonym between the two clauses
-			if(select synonym is not found)
-				return immediateResults()
-
-		4) Check if there are commmon synonyms between the two clauses
-			if(no common synonym)
-			
-			else if(two common synonyms)
-				get intersection between the two maps
-
-			else if(one common synonym)
-		
-		5) map of <string, vector<string>> is built
-
-		6) throw to select function to select the synonym accordingly, and return as vector<string>
-	******/
-
-	vector<string> suchThatClauseResult = evaluateSuchThatClause();
-	vector<string> patternClauseResult = evaluatePatternClause();
-
-	if (suchThatClauseResult.empty() || patternClauseResult.empty()) {
-		return vector<string>();
+	// For clauses that returns false or clauses that returns no results
+	if (!isFirstClauseValid || !isSecondClauseValid) {
+		cout << "For clauses that returns false or clauses that returns no results" << endl;
+		return APICall::apiCallForNoResults();
 	}
-	else {
-		vector<string> intersection;
-		sort(suchThatClauseResult.begin(), suchThatClauseResult.end());
-		sort(patternClauseResult.begin(), patternClauseResult.end());
 
-		set_intersection(suchThatClauseResult.begin(), suchThatClauseResult.end(),
-			patternClauseResult.begin(), patternClauseResult.end(), back_inserter(intersection));
+	// Both clauses are boolean response which returns true
+	/*if (firstResultTable.empty() && secondResultTable.empty()) {
+		cout << "Both clauses are boolean response which returns true" << endl;
+		return APICall::apiCallForImmediateResults(synonymType);
+	}*/
 
-		return intersection;
+	// One clause is boolean response which returns true and another is a clause that returns results
+	if (firstResultTable.empty()) {
+		if (secondResult->isSelectSynonymFound(selectSynonym)) {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn found" << endl;
+			return selectFrom(secondResultTable);
+		}
+		else {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn NOT found" << endl;
+			return APICall::apiCallForImmediateResults(synonymType);
+		}		
 	}
+
+	if (secondResultTable.empty()) {
+		if (firstResult->isSelectSynonymFound(selectSynonym)) {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn found" << endl;
+			return selectFrom(firstResultTable);
+		}
+		else {
+			cout << "One clause is boolean response which returns true and another is a clause that returns results select syn NOT found" << endl;
+			return APICall::apiCallForImmediateResults(synonymType);
+		}
+	}
+
+	// Both clauses have results but select synonym is not found in any of the clause
+	if (!firstResult->isSelectSynonymFound(selectSynonym) && !secondResult->isSelectSynonymFound(selectSynonym)) {
+		cout << "// Both clauses have results but select synonym is not found in any of the clause" << endl;
+		return APICall::apiCallForImmediateResults(synonymType);
+	}
+
+	/*** MERGING AND INTERSECTION HERE ***/
+	return combineResults(firstResult, secondResult);
+}
+
+vector<string> QueryEvaluator::getResults(Result* result) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	string synonymType = queryObject->getSynonymTable()[selectSynonym];
+	map < string, vector<string> > selectMap = result->toComparableFormat().first;
+	bool isClauseValid = result->toComparableFormat().second;
+
+	result->printMap();
+
+	// Case 1: Clause returns false or Clause has no results
+	if (!isClauseValid) {
+		cout << "Case 1: Clause returns false or Clause has no results" << endl;
+		return APICall::apiCallForNoResults();
+	}
+
+	// Case 2: Clause is Boolean Response that returns true
+	if (selectMap.empty()) {
+		cout << " Case 2: Clause is Boolean Response that returns true" << endl;
+		return APICall::apiCallForImmediateResults(synonymType);
+	}
+
+	// Case 3: Clause has results but select synonym is not found in the clause
+	if (!result->isSelectSynonymFound(selectSynonym)) {
+		cout << "Case 3: Clause has results but select synonym is not found in the clause" << endl;
+		return APICall::apiCallForImmediateResults(synonymType);
+	}
+	
+	// Case 4: Clause has results and select synonym is found in the clause
+	cout << "Case 4: Clause has results and select synonym is found in the clause" << endl;
+	return selectFrom(selectMap);
+}
+
+vector<string> QueryEvaluator::removeDuplicates(vector<string> result) {
+	// Remove duplicates
+	vector<string> resultVector = result;
+	sort(resultVector.begin(), resultVector.end());
+	resultVector.erase(unique(resultVector.begin(), resultVector.end()), resultVector.end());
+
+	return resultVector;
+}
+
+vector<string> QueryEvaluator::selectFrom(map < string, vector<string> > selectMap) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	vector<string> selected = selectMap[selectSynonym];
+	
+	return removeDuplicates(selected);
+}
+
+vector<string> QueryEvaluator::getCommonKeys(vector<string> firstResultKeys, vector<string> secondResultKeys) {
+	vector<string> commonKeys;
+	sort(firstResultKeys.begin(), firstResultKeys.end());
+	sort(secondResultKeys.begin(), secondResultKeys.end());
+
+	set_intersection(firstResultKeys.begin(), firstResultKeys.end(),
+		secondResultKeys.begin(), secondResultKeys.end(), back_inserter(commonKeys));
+
+	return commonKeys;
+}
+
+vector<string> QueryEvaluator::combineResults(Result* firstResult, Result* secondResult) {
+	vector<string> firstResultKeys = firstResult->getSynonyms();
+	vector<string> secondResultKeys = secondResult->getSynonyms();
+
+	vector<string> commonKeys = getCommonKeys(firstResultKeys, secondResultKeys);
+
+	firstResult->printMap();
+	secondResult->printMap();
+
+	if (commonKeys.empty()) { // No common synonym
+		return noCommonSynonym(firstResult, secondResult);
+	}
+	else if (commonKeys.size() == 1) { // One common synonym
+		return oneCommonSynonym(firstResult, secondResult, commonKeys);
+	}
+	else {	// Two common synonyms
+		return twoCommonSynonyms(firstResult, secondResult, commonKeys);
+	}
+}
+
+vector<string> QueryEvaluator::noCommonSynonym(Result* firstResult, Result* secondResult) {
+	string selectSynonym = queryObject->getSelectClause().at(0);
+	map<string, vector<string>> firstResultTable = firstResult->toComparableFormat().first;
+	map<string, vector<string>> secondResultTable = secondResult->toComparableFormat().first;
+
+	cout << "No common synonyms" << endl;
+	if (firstResult->isSelectSynonymFound(selectSynonym)) {	// Select synonym found in first table - Select from first table
+		return selectFrom(firstResultTable);
+	}
+	else { // Select synonym found in second table - Select from second table
+		return selectFrom(secondResultTable);
+	}
+}
+
+vector<string> QueryEvaluator::oneCommonSynonym(Result* firstResult, Result* secondResult, vector<string> commonKeys) {
+	string commonKey = commonKeys.at(0);
+	vector<string> firstResultKeys = firstResult->getSynonyms();
+	vector<string> secondResultKeys = secondResult->getSynonyms();
+	map<string, vector<string>> firstResultTable = firstResult->toComparableFormat().first;
+	map<string, vector<string>> secondResultTable = secondResult->toComparableFormat().first;
+
+	int totalSynonyms = firstResultKeys.size() + secondResultKeys.size();
+	vector<string> firstTableValue = firstResultTable[commonKey];
+	vector<string> secondTableValue = secondResultTable[commonKey];
+	
+	map<string, vector<string>> finalResultsTable;
+
+	if (totalSynonyms == 2) {
+		cout << "One common synonym - Total Syn = 2" << endl;
+		vector<string> commonValues;
+		sort(firstTableValue.begin(), firstTableValue.end());
+		sort(secondTableValue.begin(), secondTableValue.end());
+
+		set_intersection(firstTableValue.begin(), firstTableValue.end(),
+			secondTableValue.begin(), secondTableValue.end(), back_inserter(commonValues));
+
+		if (commonValues.empty()) {
+			return APICall::apiCallForNoResults();
+		}
+
+		finalResultsTable[commonKey] = commonValues;
+		return selectFrom(finalResultsTable);
+	}
+	else if (totalSynonyms == 3) {
+		cout << "One common synonym - Total Syn = 3" << endl;
+		map<string, vector<string>> tableWithTwoSynonyms = firstResultKeys.size() == 2
+			? firstResultTable : secondResultTable;
+
+		map<string, vector<string>> tableWithOneSynonym = firstResultKeys.size() == 1
+			? firstResultTable : secondResultTable;
+
+		vector<string> tableWithTwoSynonymValue = tableWithTwoSynonyms[commonKey];
+		vector<string> tableWithOneSynonymValue = tableWithOneSynonym[commonKey];
+
+		string tableWithTwoSynonymSecondKey;
+
+		if (firstResultKeys.size() == 2) {
+			tableWithTwoSynonymSecondKey = firstResultKeys.at(0) != commonKey
+				? firstResultKeys.at(0) : firstResultKeys.at(1);
+		}
+		else {
+			tableWithTwoSynonymSecondKey = secondResultKeys.at(0) != commonKey
+				? secondResultKeys.at(0) : secondResultKeys.at(1);
+		}
+		vector<string> tableWithTwoSynonymSecondValue = tableWithTwoSynonyms[tableWithTwoSynonymSecondKey];
+
+		bool isTableEmpty = true;
+		vector<string> finalResultCommon;
+		vector<string> finalResultSecondValue;
+
+		int pos = 0;
+		for (string s : tableWithTwoSynonymValue) {
+			vector<string>::iterator it = find(tableWithOneSynonymValue.begin(), tableWithOneSynonymValue.end(), s);
+			// String found
+			if (it != tableWithOneSynonymValue.end()) {
+				finalResultCommon.push_back(s);
+				finalResultSecondValue.push_back(tableWithTwoSynonymSecondValue.at(pos));
+				isTableEmpty = false;
+			}
+			pos++;
+		}
+		if (isTableEmpty) {
+			return APICall::apiCallForNoResults();
+		}
+
+		finalResultsTable[commonKey] = finalResultCommon;
+		finalResultsTable[tableWithTwoSynonymSecondKey] = finalResultSecondValue;
+		return selectFrom(finalResultsTable);
+	}
+	else if (totalSynonyms == 4) {
+		cout << "One common synonym - Total Syn = 4" << endl;
+		string firstResultSecondKey = firstResultKeys.at(0) != commonKey ? firstResultKeys.at(0) : firstResultKeys.at(1);
+		vector<string> firstTableSecondValue = firstResultTable[firstResultSecondKey];
+
+		string secondResultSecondKey = secondResultKeys.at(0) != commonKey ? secondResultKeys.at(0) : secondResultKeys.at(1);
+		vector<string> secondTableSecondValue = secondResultTable[secondResultSecondKey];
+
+		bool isTableEmpty = true;
+		vector<string> finalResultCommon;
+		vector<string> finalResultFirstTableSecondValue;
+		vector<string> finalResultSecondTableSecondValue;
+
+		int pos = 0;
+		for (string s : firstTableValue) {
+			//vector<string>::iterator it = find(secondTableValue.begin(), secondTableValue.end(), s);
+			vector<string>::iterator it = secondTableValue.begin();
+			// String found
+			while ((it = find(it, secondTableValue.end(), s)) != secondTableValue.end()) {
+				int index = distance(secondTableValue.begin(), it);
+				finalResultCommon.push_back(s);
+				finalResultFirstTableSecondValue.push_back(firstTableSecondValue.at(pos));
+				finalResultSecondTableSecondValue.push_back(secondTableSecondValue.at(index));
+				isTableEmpty = false;
+
+				it++;
+			}
+			pos++;
+		}
+
+		if (isTableEmpty) {
+			return APICall::apiCallForNoResults();
+		}
+
+		finalResultsTable[commonKey] = finalResultCommon;
+		finalResultsTable[firstResultSecondKey] = finalResultFirstTableSecondValue;
+		finalResultsTable[secondResultSecondKey] = finalResultSecondTableSecondValue;
+		return selectFrom(finalResultsTable);
+	}
+
+	return vector<string>();
+}
+
+vector<string> QueryEvaluator::twoCommonSynonyms(Result* firstResult, Result* secondResult, vector<string> commonKeys) {
+	cout << "2 common synonyms" << endl;
+	string commonKey1 = commonKeys.at(0);
+	string commonKey2 = commonKeys.at(1);
+	map<string, vector<string>> firstResultTable = firstResult->toComparableFormat().first;
+	map<string, vector<string>> secondResultTable = secondResult->toComparableFormat().first;
+
+	vector<string> firstTableValue1 = firstResultTable[commonKey1];
+	vector<string> firstTableValue2 = firstResultTable[commonKey2];
+	vector<string> secondTableValue1 = secondResultTable[commonKey1];
+	vector<string> secondTableValue2 = secondResultTable[commonKey2];
+
+	bool isTableEmpty = true;
+	vector<string> finalResult1;
+	vector<string> finalResult2;
+	map<string, vector<string>> finalResultsTable;
+
+	// Find the same pairs
+	int pos = 0;
+	for (string s : firstTableValue1) {
+		vector<string>::iterator it = secondTableValue1.begin();
+		while ((it = find(it, secondTableValue1.end(), s)) != secondTableValue1.end()) {
+			int index = distance(secondTableValue1.begin(), it);
+			// Pair Found
+			if (secondTableValue2.at(index) == firstTableValue2.at(pos)) {
+				finalResult1.push_back(s);
+				finalResult2.push_back(firstTableValue2.at(pos));
+				isTableEmpty = false;
+			}
+			it++;
+		}
+		pos++;
+	}
+
+	// After intersection, if table is empty means no result
+	if (isTableEmpty) {
+		return APICall::apiCallForNoResults();
+	}
+
+	finalResultsTable[commonKey1] = finalResult1;
+	finalResultsTable[commonKey2] = finalResult2;
+	return selectFrom(finalResultsTable);
 }
 
 pair<string, string> QueryEvaluator::getParamType(SUCH_THAT_CLAUSE clause) {

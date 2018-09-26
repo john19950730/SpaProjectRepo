@@ -1,6 +1,7 @@
 #pragma once
 #include "APICall.h"
 #include "QueryObjStructures.h"
+#include "Result.h"
 #include <string>
 #include <map>
 
@@ -9,7 +10,7 @@ using namespace std;
 // Abstract class
 class APICallSuchThatClause : public APICall {
 public:
-	vector<string> executeApiCall();
+	Result* executeApiCall();
 	static APICallSuchThatClause* getApiCallResponse(string typeOfRs, pair<string, string> paramType,
 		SUCH_THAT_CLAUSE suchThatClause, string selectSynonym, map<string, string> synonymTable);
 protected:
@@ -25,10 +26,10 @@ protected:
 	void setSuchThatClause(SUCH_THAT_CLAUSE suchThatClause);
 
 	// Abstracted methods without implementation
-	virtual vector<string> apiCallForFollows() = 0;
-	virtual vector<string> apiCallForParent() = 0;
-	virtual vector<string> apiCallForUses() = 0;
-	virtual vector<string> apiCallForModifies() = 0;
+	virtual Result* apiCallForFollows() = 0;
+	virtual Result* apiCallForParent() = 0;
+	virtual Result* apiCallForUses() = 0;
+	virtual Result* apiCallForModifies() = 0;
 
 	// Helper methods
 	bool selectSynonymIsFoundInParam();

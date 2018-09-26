@@ -16,6 +16,8 @@ class TNode;
 class PKB {
 public:
 	// FOR FRONT-END
+	static void clearPKB(); //the Kill Switch
+
 	/* SPA relationships table */
 	static void addFollows(unsigned int stmtBefore, unsigned int stmtAfter);
 	static void addParent(unsigned int stmtParent, unsigned int stmtChild);
@@ -33,6 +35,9 @@ public:
 	static unsigned int addPrint(unsigned int stmtNo);
 	static unsigned int addCall(unsigned int stmtNo);
 	static unsigned int addProcedure(string procName);
+
+	/* SPA pattern table */
+	static void addConstant(unsigned int stmtNo, string constant);
 
 	// FOR PQL
 	/* SPA Follows Relations query */
@@ -87,8 +92,8 @@ public:
 
 	// PKB pattern query
 	static vector<unsigned int> getAllAssignsWithConstant(string constant);
-	static bool hasAssignmentStmt(); // a(_, _)
 	static bool isAssignmentUsesConstant(unsigned int stmtNo, string constant);
+	static vector<string> getAllConstants();
 
 	// PKB synonyms query
 	static vector<string> getVariables();
@@ -102,10 +107,16 @@ public:
 	static vector<string> getProcedureNames();
 	static vector<unsigned int> getAllStmtsThatFitSynonym(string synonym);
 
+	static const string getSynonymTypeOfStmt(unsigned int stmtNo);
 private:
 	static unsigned int addStatement(unsigned int stmtNo);
 	static bool procedureExists(string procName);
 	static bool exactMatch(string s1, string s2);
-	static const string getSynonymTypeOfStmt(unsigned int stmtNo);
+
 	static void addFollowsPair(unsigned int stmtBefore, unsigned int stmtAfter, bool star);
+	static void addParentPair(unsigned int stmtParent, unsigned int stmtChild, bool star);
+
+	//temporarily unused general pattern query
+	static vector<unsigned int> getAllStmtsWithConstant(string synonym, string constant);
+	static bool isStmtUsesConstant(string synonym, unsigned int stmtNo, string constant);
 };
