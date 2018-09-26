@@ -476,8 +476,9 @@ int CodeParser::checkForNestingModifies(string stmtType, string stmt) {
 		stack < std::pair<int, string> > curr_nesting_level = nesting_level;
 		while (curr_nesting_level.size() != 1) { //the if/while statement also modifies this variable
 			std::pair<int, string> top = curr_nesting_level.top();
-			//TODO: if encounter else, make else point to if
-			PKB::addModifies(top.first, checkModifies(stmtType, stmt));
+			if (top.first != 0) {
+				PKB::addModifies(top.first, checkModifies(stmtType, stmt));
+			}
 			curr_nesting_level.pop();
 		}
 	}
@@ -489,9 +490,10 @@ int CodeParser::checkForNestingUses(std::vector<std::string> vars) {
 		stack < std::pair<int, string> > curr_nesting_level = nesting_level; //TODO: might wanna safely copy stack
 		while (curr_nesting_level.size() != 1) { //the if/while statement also modifies this variable
 			std::pair<int, string> top = curr_nesting_level.top();
-			//TODO: if encounter else, make else point to if
 			for (int i = 0; i < vars.size(); i++) {
-				PKB::addUses(top.first, vars.at(i));
+				if (top.first != 0) {
+					PKB::addUses(top.first, vars.at(i));
+				}
 			}
 			curr_nesting_level.pop();
 		}
