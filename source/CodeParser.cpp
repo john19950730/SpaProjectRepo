@@ -459,7 +459,13 @@ string CodeParser::checkModifies(string stmtType, string stmt) { //returns var b
 				break;
 			}
 		}
+		std::regex pattern("else"); //remove else if it exists
+		token = std::regex_replace(token, pattern, "");
 		token.erase(std::remove(token.begin(), token.end(), ' '), token.end());
+		token.erase(std::remove(token.begin(), token.end(), '\t'), token.end());//remove tab
+		token.erase(std::remove(token.begin(), token.end(), '\n'), token.end());//remove nextline
+		token.erase(std::remove(token.begin(), token.end(), '{'), token.end());
+		token.erase(std::remove(token.begin(), token.end(), '}'), token.end());
 	}
 
 	return token;
