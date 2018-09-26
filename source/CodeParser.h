@@ -22,7 +22,6 @@ public:
 	static int CodeParser::checkForNestingUses(std::vector<std::string> vars);
 	static std::vector<std::string> CodeParser::split(string s, int lineNum);
 	static std::vector<std::string> CodeParser::splitWhileIfConditions(string s, int lineNum);
-	static bool is_number(string s);
 	static bool is_duplicate(string s, std::vector<std::string> list);
 	static bool CodeParser::is_appeared(char c, string s);
 	static bool CodeParser::compare_nesting(std::stack <std::pair<int, string>> prevNestingLevel, std::stack <std::pair<int, string>> currNestingLevel);
